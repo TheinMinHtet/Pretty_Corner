@@ -48,12 +48,7 @@ export default function HomePage() {
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full">
-      {/* 1. Mobile Welcome Ribbon (hidden on desktop because desktop Header renders it) */}
-      <div className="md:hidden bg-[#38262e] h-[30px] w-full flex items-center justify-center px-4">
-        <p className="text-[11px] text-center text-white font-normal font-sans tracking-wide">
-          A little beauty, delivered to your door.
-        </p>
-      </div>
+
 
       {/* 2. Mobile Header (hidden on desktop because desktop Header is active) */}
       <header className="md:hidden px-5 pt-3.5 pb-3">

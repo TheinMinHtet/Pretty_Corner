@@ -327,7 +327,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
       {/* 5. Added to Bag Toast Notification */}
       {showAddedToast && (
-        <div className="fixed bottom-[85px] md:bottom-8 left-1/2 -translate-x-1/2 bg-[#38262e] text-white text-[13px] font-medium px-5 py-3 rounded-full shadow-2xl z-50 flex items-center gap-3 animate-in fade-in zoom-in-95">
+        <div className="fixed bottom-[85px] md:bottom-8 left-1/2 -translate-x-1/2 bg-[#38262e]/85 backdrop-blur-md border border-white/15 text-white text-[13px] font-medium px-5 py-3 rounded-full shadow-2xl z-50 flex items-center gap-3 animate-in fade-in zoom-in-95">
           <span>✓ Added to your bag!</span>
           <Link href="/bag" className="text-[#fceef2] underline font-bold ml-1">
             View Bag →

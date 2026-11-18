@@ -30,7 +30,7 @@ export default function FloatingCartBar() {
           : 'translate-y-20 opacity-0 pointer-events-none'
       } bottom-[66px] md:bottom-6 left-3 right-3 md:left-1/2 md:-translate-x-1/2 max-w-[420px] md:max-w-xl md:w-full mx-auto`}
     >
-      <div className="bg-[#38262e] text-white rounded-2xl p-3 sm:px-5 sm:py-3.5 shadow-2xl border border-white/10 flex items-center justify-between gap-3 backdrop-blur-md">
+      <div className="bg-[#38262e]/85 text-white rounded-2xl p-3 sm:px-5 sm:py-3.5 shadow-2xl border border-white/15 flex items-center justify-between gap-3 backdrop-blur-lg">
         {/* Left Side: Bag Item Counter & Total Price */}
         <div className="flex items-center gap-3">
           <div className="relative w-10 h-10 rounded-xl bg-[#b73d67] flex items-center justify-center text-white shrink-0 shadow-sm">

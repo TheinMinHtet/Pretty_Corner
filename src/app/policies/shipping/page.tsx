@@ -26,9 +26,12 @@ export default function ShippingPolicyPage() {
       <div className="flex flex-col gap-5">
         <button
           onClick={() => router.back()}
-          className="text-[12px] font-bold text-[#b73d67] hover:underline text-left cursor-pointer md:hidden"
+          className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#b73d67] hover:text-[#8e294d] bg-[#fceef2] hover:bg-[#fadce6] px-3.5 py-1.5 rounded-full transition-all w-fit cursor-pointer shadow-2xs group"
         >
-          ‹ Back
+          <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          <span>Back</span>
         </button>
 
         <div>

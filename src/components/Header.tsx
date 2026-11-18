@@ -1,67 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { usePathname, useRouter } from 'next/navigation';
-import { useStore } from '@/context/StoreContext';
+import { usePathname } from 'next/navigation';
 
 const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false });
 const WishlistBadge = dynamic(() => import('@/components/WishlistBadge'), { ssr: false });
 
 export default function Header() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { cartCount, cartSubtotal, wishlist, isMounted, setSearchQuery } = useStore();
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState('');
 
   const isHome = pathname === '/';
   const isShop = pathname.startsWith('/shop') || pathname.startsWith('/product');
-  const isBag = pathname.startsWith('/bag');
   const isTrack = pathname.startsWith('/order-lookup') || pathname.startsWith('/order-tracking');
-  const isAbout = pathname.startsWith('/about');
   const isContact = pathname.startsWith('/contact');
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchInput.trim()) {
-      setSearchQuery(searchInput.trim());
-      router.push(`/shop?q=${encodeURIComponent(searchInput.trim())}`);
-      setSearchOpen(false);
-    } else {
-      router.push('/shop');
-    }
-  };
 
   return (
     <header className="hidden md:block w-full sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#eedfe5] transition-all">
-      {/* 1. Desktop Top Ribbon */}
-      <div className="bg-[#38262e] text-white text-[12px] py-1.5 px-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#b73d67]" />
-            <p className="font-sans tracking-wide">
-              A little beauty, delivered to your door. · Cash on Delivery & Mobile Banking in Yangon
-            </p>
-          </div>
-          <div className="flex items-center gap-4 text-[11px] text-white/80">
-            <Link href="/order-lookup" className="hover:text-white transition-colors">
-              Track Order
-            </Link>
-            <span>·</span>
-            <Link href="/faq" className="hover:text-white transition-colors">
-              FAQ
-            </Link>
-            <span>·</span>
-            <Link href="/contact" className="hover:text-white transition-colors">
-              Help & Contact
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Main Navigation Bar */}
+      {/* Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-6 lg:px-8 h-[74px] flex items-center justify-between gap-6">
         {/* Brand Logo */}
         <Link href="/" className="flex flex-col group shrink-0">
@@ -130,16 +87,12 @@ export default function Header() {
             }`}
           >
             Track Order
+            {isTrack && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
+            )}
           </Link>
 
-          <Link
-            href="/about"
-            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
-              isAbout ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
-            }`}
-          >
-            About
-          </Link>
+
 
           <Link
             href="/contact"
@@ -148,28 +101,14 @@ export default function Header() {
             }`}
           >
             Contact
+            {isContact && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
+            )}
           </Link>
         </nav>
 
-        {/* Right Action Icons & Search */}
+        {/* Right Action Icons */}
         <div className="flex items-center gap-3 lg:gap-4 shrink-0">
-          {/* Quick Search Input */}
-          <form onSubmit={handleSearchSubmit} className="relative">
-            <div className="bg-[#f7f4f5] h-[38px] w-[190px] lg:w-[240px] rounded-full flex items-center px-3.5 gap-2 transition-all focus-within:ring-1 focus-within:ring-[#b73d67] focus-within:w-[260px]">
-              <svg className="w-4 h-4 text-[#7a6870] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search products…"
-                className="bg-transparent text-[12px] text-[#38262e] placeholder-[#7a6870] outline-none w-full"
-              />
-            </div>
-          </form>
-
           {/* Wishlist Link */}
           <Link
             href="/shop"

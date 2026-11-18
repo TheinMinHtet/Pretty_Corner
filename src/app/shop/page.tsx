@@ -161,7 +161,7 @@ function ShopContent() {
           <span className="text-[#38262e] font-medium capitalize">{activeCategory}</span>
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <h1 className="font-serif text-[36px] lg:text-[42px] font-medium text-[#38262e] leading-tight">
               {activeCategory === 'skincare' ? 'The skincare corner' : 'The beauty corner'}
@@ -171,10 +171,35 @@ function ShopContent() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-[13px] text-[#7a6870]">
-              Showing <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'product' : 'products'}
-            </span>
+          {/* Desktop Search Bar */}
+          <div className="w-full md:w-[320px] lg:w-[380px] shrink-0">
+            <div className="bg-[#f7f4f5] border border-[#eedfe5] focus-within:border-[#b73d67] focus-within:bg-white h-[44px] rounded-full flex items-center px-4 gap-2.5 transition-all shadow-2xs">
+              <svg className="w-4 h-4 text-[#7a6870] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <input
+                type="text"
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                placeholder="Search products, formulas, SPF…"
+                className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full"
+              />
+              {searchFilter && (
+                <button
+                  onClick={() => setSearchFilter('')}
+                  className="text-[#7a6870] hover:text-[#38262e] text-xs p-1 transition-colors"
+                  title="Clear search"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            <div className="text-right mt-1.5">
+              <span className="text-[12px] text-[#7a6870]">
+                Showing <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'product' : 'products'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
