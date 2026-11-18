@@ -8,6 +8,14 @@ import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 
 const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false });
+const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper'), {
+  ssr: false,
+  loading: () => (
+    <button className="h-[30px] sm:h-[32px] px-3 bg-[#b73d67] text-white rounded-[7px] text-[11px] sm:text-[12px] font-bold flex items-center gap-1 shadow-xs">
+      + Add
+    </button>
+  ),
+});
 const WishlistButton = dynamic(() => import('@/components/WishlistButton'), {
   ssr: false,
   loading: () => (
@@ -242,15 +250,7 @@ export default function HomePage() {
                     <p className="text-[14px] sm:text-[15px] font-bold text-[#b73d67]">
                       {product.price.toLocaleString()} MMK
                     </p>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        addToCart(product.id);
-                      }}
-                      className="h-[30px] sm:h-[32px] px-3 bg-[#b73d67] text-white rounded-[7px] text-[11px] sm:text-[12px] font-bold flex items-center gap-1 hover:bg-[#a33259] active:scale-95 transition-all shadow-xs cursor-pointer"
-                    >
-                      + Add
-                    </button>
+                    <ProductCardStepper productId={product.id} />
                   </div>
                 </div>
               </div>

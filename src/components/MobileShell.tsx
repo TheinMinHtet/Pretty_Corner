@@ -4,7 +4,10 @@ import React from 'react';
 import Navigation from './Navigation';
 import Header from './Header';
 import Footer from './Footer';
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
+
+const FloatingCartBar = dynamic(() => import('./FloatingCartBar'), { ssr: false });
 
 export default function MobileShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -25,9 +28,12 @@ export default function MobileShell({ children }: { children: React.ReactNode })
       <Header />
 
       {/* Main Content Area */}
-      <main className={`flex-1 flex flex-col w-full ${showNav ? 'pb-[72px] md:pb-0' : ''}`}>
+      <main className={`flex-1 flex flex-col w-full ${showNav ? 'pb-[130px] md:pb-16' : ''}`}>
         {children}
       </main>
+
+      {/* Sticky Floating Cart Bar */}
+      <FloatingCartBar />
 
       {/* Desktop Persistent Footer (md and above) */}
       <Footer />

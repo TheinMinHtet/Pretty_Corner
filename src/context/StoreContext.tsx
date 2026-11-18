@@ -23,6 +23,9 @@ interface StoreContextType {
   cartCount: number;
   cartSubtotal: number;
   cartTotal: number;
+  getProductQuantity: (productId: string, sizeName?: string) => number;
+  incrementProduct: (productId: string, sizeName?: string) => void;
+  decrementProduct: (productId: string, sizeName?: string) => void;
   createOrder: (orderData: Omit<Order, 'id' | 'createdAt'>) => Order;
   getOrder: (id: string, phone?: string) => Order | undefined;
   updatePaymentStatus: (orderId: string, status: Order['paymentStatus']) => void;
@@ -153,6 +156,29 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     saveCartToStorage([]);
   };
 
+  const getProductQuantity = (productId: string, sizeName?: string): number => {
+    if (!isMounted) return 0;
+    if (sizeName) {
+      const item = cart.find((i) => i.productId === productId && i.size === sizeName);
+      return item ? item.quantity : 0;
+    }
+    return cart
+      .filter((i) => i.productId === productId)
+      .reduce((sum, i) => sum + i.quantity, 0);
+  };
+
+  const incrementProduct = (productId: string, sizeName?: string) => {
+    addToCart(productId, sizeName, 1);
+  };
+
+  const decrementProduct = (productId: string, sizeName?: string) => {
+    const product = products.find((p) => p.id === productId);
+    if (!product) return;
+    const chosenSize = sizeName || product.sizes[0]?.name;
+    const itemId = `${product.id}-${chosenSize}`;
+    updateCartQuantity(itemId, -1);
+  };
+
   const cartCount = isMounted ? cart.reduce((sum, item) => sum + item.quantity, 0) : 0;
   const cartSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const cartTotal = cartSubtotal + (selectedTownship?.fee || 3000);
@@ -227,6 +253,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         cartCount,
         cartSubtotal,
         cartTotal,
+        getProductQuantity,
+        incrementProduct,
+        decrementProduct,
         createOrder,
         getOrder,
         updatePaymentStatus,
