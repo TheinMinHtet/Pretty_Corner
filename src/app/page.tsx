@@ -16,20 +16,10 @@ const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper
     </button>
   ),
 });
-const WishlistButton = dynamic(() => import('@/components/WishlistButton'), {
-  ssr: false,
-  loading: () => (
-    <div className="absolute top-2.5 right-2.5 bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
-      <svg className="w-4 h-4 text-[#7a6870] fill-none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-      </svg>
-    </div>
-  ),
-});
 
 export default function HomePage() {
   const router = useRouter();
-  const { products, cartCount, isWishlisted, toggleWishlist, setSearchQuery, addToCart, isMounted } = useStore();
+  const { products, cartCount, setSearchQuery, addToCart, isMounted } = useStore();
   const [activeCategory, setActiveCategory] = useState<'skincare' | 'makeup' | 'lenses' | 'more'>('skincare');
   const [searchInput, setSearchInput] = useState('');
 
@@ -207,7 +197,6 @@ export default function HomePage() {
         {/* Responsive Product Grid: 2 cols on mobile, 3 cols on tablet, 4 cols on desktop */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5 lg:gap-6">
           {bestsellers.map((product) => {
-            const wishlisted = isWishlisted(product.id);
             return (
               <div key={product.id} className="flex flex-col group">
                 <div className="relative w-full h-[184px] sm:h-[230px] md:h-[260px] lg:h-[280px] bg-[#f9f5f7] rounded-[12px] overflow-hidden">
@@ -226,9 +215,6 @@ export default function HomePage() {
                       {product.badge}
                     </span>
                   )}
-
-                  {/* Wishlist Button */}
-                  <WishlistButton productId={product.id} />
                 </div>
 
                 {/* Details */}

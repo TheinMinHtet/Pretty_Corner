@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 
 const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false });
-const WishlistBadge = dynamic(() => import('@/components/WishlistBadge'), { ssr: false });
 
 export default function Header() {
   const pathname = usePathname();
@@ -92,8 +91,6 @@ export default function Header() {
             )}
           </Link>
 
-
-
           <Link
             href="/contact"
             className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
@@ -109,18 +106,6 @@ export default function Header() {
 
         {/* Right Action Icons */}
         <div className="flex items-center gap-3 lg:gap-4 shrink-0">
-          {/* Wishlist Link */}
-          <Link
-            href="/shop"
-            title="Wishlist"
-            className="relative p-2 text-[#38262e] hover:text-[#b73d67] hover:bg-[#fceef2] rounded-full transition-colors"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
-            <WishlistBadge className="absolute top-1 right-1 bg-[#b73d67] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center" />
-          </Link>
-
           {/* Bag Button */}
           <Link
             href="/bag"

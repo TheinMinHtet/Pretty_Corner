@@ -8,14 +8,11 @@ interface StoreContextType {
   isMounted: boolean;
   products: Product[];
   cart: CartItem[];
-  wishlist: string[];
   orders: Order[];
   selectedTownship: TownshipOption;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   setSelectedTownship: (township: TownshipOption) => void;
-  toggleWishlist: (productId: string) => void;
-  isWishlisted: (productId: string) => boolean;
   addToCart: (productId: string, sizeName?: string, quantity?: number) => void;
   updateCartQuantity: (itemId: string, delta: number) => void;
   removeFromCart: (itemId: string) => void;
@@ -58,7 +55,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
   const [products] = useState<Product[]>(MOCK_PRODUCTS);
   const [cart, setCart] = useState<CartItem[]>(INITIAL_CART);
-  const [wishlist, setWishlist] = useState<string[]>([]);
   const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
   const [selectedTownship, setSelectedTownship] = useState<TownshipOption>(MOCK_TOWNSHIPS[0]);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -71,10 +67,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (savedCart) {
         setCart(JSON.parse(savedCart));
       }
-      const savedWishlist = localStorage.getItem('pretty_corner_wishlist');
-      if (savedWishlist) {
-        setWishlist(JSON.parse(savedWishlist));
-      }
     } catch {
       // fallback to initial
     }
@@ -86,20 +78,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem('pretty_corner_cart', JSON.stringify(updatedCart));
     } catch {}
   };
-
-  const toggleWishlist = (productId: string) => {
-    setWishlist((prev) => {
-      const next = prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
-        : [...prev, productId];
-      try {
-        localStorage.setItem('pretty_corner_wishlist', JSON.stringify(next));
-      } catch {}
-      return next;
-    });
-  };
-
-  const isWishlisted = (productId: string) => isMounted && wishlist.includes(productId);
 
   const addToCart = (productId: string, sizeName?: string, quantity: number = 1) => {
     const product = products.find((p) => p.id === productId);
@@ -238,14 +216,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         isMounted,
         products,
         cart,
-        wishlist,
         orders,
         selectedTownship,
         searchQuery,
         setSearchQuery,
         setSelectedTownship,
-        toggleWishlist,
-        isWishlisted,
         addToCart,
         updateCartQuantity,
         removeFromCart,

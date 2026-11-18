@@ -9,7 +9,7 @@ import { MOCK_TOWNSHIPS } from '@/lib/mockData';
 
 export default function GuestCheckoutPage() {
   const router = useRouter();
-  const { cart, cartSubtotal, cartTotal, selectedTownship, setSelectedTownship, createOrder } = useStore();
+  const { cart, cartSubtotal, cartTotal, selectedTownship, setSelectedTownship, createOrder, isMounted } = useStore();
 
   const [customerName, setCustomerName] = useState('May Thu');
   const [phoneNumber, setPhoneNumber] = useState('09 765 432 100');
@@ -62,6 +62,14 @@ export default function GuestCheckoutPage() {
 
     router.push(`/payment-pending?orderId=${newOrder.id}`);
   };
+
+  if (!isMounted) {
+    return (
+      <div className="w-full bg-white flex flex-col min-h-[60vh] items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-[#b73d67] border-t-transparent animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full pb-12">

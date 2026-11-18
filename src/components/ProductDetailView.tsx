@@ -9,20 +9,10 @@ import { useStore } from '@/context/StoreContext';
 import { Product } from '@/lib/types';
 
 const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false });
-const WishlistButton = dynamic(() => import('@/components/WishlistButton'), {
-  ssr: false,
-  loading: () => (
-    <div className="absolute top-[18px] right-[20px] bg-white rounded-full w-[42px] h-[42px] flex items-center justify-center shadow-sm">
-      <svg className="w-[22px] h-[22px] text-[#7a6870] fill-none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-      </svg>
-    </div>
-  ),
-});
 
 export default function ProductDetailView({ product }: { product: Product }) {
   const router = useRouter();
-  const { addToCart, cartCount, isWishlisted, toggleWishlist, isMounted } = useStore();
+  const { addToCart, cartCount, isMounted } = useStore();
 
   const [selectedGalleryIdx, setSelectedGalleryIdx] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0]?.name || 'Standard');
@@ -34,7 +24,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
   const currentSizeObj = product.sizes.find((s) => s.name === selectedSize) || product.sizes[0];
   const unitPrice = currentSizeObj?.price || product.price;
   const totalPrice = unitPrice * quantity;
-  const wishlisted = isWishlisted(product.id);
 
   const handleAddToCart = () => {
     addToCart(product.id, selectedSize, quantity);
@@ -103,13 +92,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   </span>
                 </div>
               )}
-
-              {/* Wishlist Heart Button */}
-              <WishlistButton
-                productId={product.id}
-                className="absolute top-[18px] right-[20px] bg-white rounded-full w-[42px] h-[42px] flex items-center justify-center shadow-sm hover:scale-110 active:scale-95 transition-transform cursor-pointer"
-                svgClassName="w-[22px] h-[22px]"
-              />
 
               {/* Mobile Gallery Dots */}
               <div className="md:hidden absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
