@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-primary: #b73d67;
+    --brand-dark: #38262e;
+    --brand-text-muted: #7a6870;
+    --brand-text-body: #514149;
+    --brand-pink-tint: #fceef2;
+    --brand-surface: #fcf9fa;
+    --brand-surface-subtle: #f7f4f5;
+    --brand-border: #eedfe5;
+  }
+
+  body {
+    background-color: #ffffff;
+    color: #38262e;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+.font-serif {
+  font-family: var(--font-cormorant), Georgia, serif;
+}
+
+.font-sans {
+  font-family: var(--font-dmsans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Hide scrollbar for category pills / horizontal scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

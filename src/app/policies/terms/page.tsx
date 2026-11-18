@@ -1,0 +1,77 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
+export default function TermsPage() {
+  const router = useRouter();
+
+  return (
+    <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-10 flex flex-col min-h-full pb-12">
+      {/* 1. Mobile Header (hidden on desktop) */}
+      <header className="md:hidden px-5 pt-4 pb-2 text-center border-b border-transparent">
+        <h1 className="font-serif text-[29px] font-medium text-[#38262e]">
+          Pretty Corner
+        </h1>
+      </header>
+
+      {/* 2. Desktop Breadcrumb (md and up) */}
+      <div className="hidden md:flex items-center gap-2 text-[13px] text-[#7a6870] mb-6">
+        <Link href="/" className="hover:text-[#38262e]">Home</Link>
+        <span>/</span>
+        <span className="text-[#38262e] font-medium">Terms and Conditions</span>
+      </div>
+
+      <div className="flex flex-col gap-5">
+        <button
+          onClick={() => router.back()}
+          className="text-[12px] font-bold text-[#b73d67] hover:underline text-left cursor-pointer md:hidden"
+        >
+          ‹ Back
+        </button>
+
+        <div>
+          <h1 className="font-serif text-[32px] sm:text-[40px] font-medium text-[#38262e] leading-tight">
+            Terms and Conditions
+          </h1>
+          <p className="text-[14px] sm:text-[15px] text-[#7a6870] mt-1.5">
+            Standard customer agreement for orders placed at Pretty Corner.
+          </p>
+        </div>
+
+        <div className="space-y-4 text-[14px] text-[#514149] leading-relaxed">
+          <div className="bg-[#faf7f8] p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
+            <h3 className="font-serif text-[20px] font-medium text-[#38262e]">Order Acceptance</h3>
+            <p className="mt-2 text-[#7a6870]">
+              All orders placed on Pretty Corner represent an offer to purchase products. Orders are confirmed once payment verification is successfully logged in our system.
+            </p>
+          </div>
+
+          <div className="bg-[#faf7f8] p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
+            <h3 className="font-serif text-[20px] font-medium text-[#38262e]">Pricing & Availability</h3>
+            <p className="mt-2 text-[#7a6870]">
+              All product prices are quoted in Myanmar Kyat (MMK). While we make every effort to ensure stock availability, in the rare event of inventory stock-outs, our team will promptly contact you for substitution or refund.
+            </p>
+          </div>
+
+          <div className="bg-[#faf7f8] p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
+            <h3 className="font-serif text-[20px] font-medium text-[#38262e]">Customer Obligations</h3>
+            <p className="mt-2 text-[#7a6870]">
+              Customers agree to provide accurate recipient contact numbers and clear delivery landmark instructions to facilitate timely courier dispatch in Yangon.
+            </p>
+          </div>
+        </div>
+
+        <div className="pt-2">
+          <Link
+            href="/shop"
+            className="inline-flex items-center justify-center h-[50px] px-8 bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] transition-all shadow-xs"
+          >
+            Continue shopping →
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
