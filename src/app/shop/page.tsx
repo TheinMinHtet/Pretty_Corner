@@ -16,21 +16,11 @@ const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper
     </button>
   ),
 });
-const WishlistButton = dynamic(() => import('@/components/WishlistButton'), {
-  ssr: false,
-  loading: () => (
-    <div className="absolute top-2.5 right-2.5 bg-white w-8 h-8 rounded-full flex items-center justify-center shadow-sm">
-      <svg className="w-4 h-4 text-[#7a6870] fill-none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-      </svg>
-    </div>
-  ),
-});
 
 function ShopContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { products, cartCount, isWishlisted, toggleWishlist, addToCart, isMounted } = useStore();
+  const { products, cartCount, addToCart, isMounted } = useStore();
 
   const initialCat = searchParams.get('category') || 'skincare';
   const initialQuery = searchParams.get('q') || '';
@@ -243,7 +233,6 @@ function ShopContent() {
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5 lg:gap-6 mt-6">
             {filteredProducts.map((product) => {
-              const wishlisted = isWishlisted(product.id);
               return (
                 <div key={product.id} className="flex flex-col group">
                   <div className="relative w-full h-[204px] sm:h-[230px] md:h-[260px] lg:h-[280px] bg-[#f9f5f7] rounded-[12px] overflow-hidden">
@@ -262,9 +251,6 @@ function ShopContent() {
                         {product.badge}
                       </span>
                     )}
-
-                    {/* Wishlist Button */}
-                    <WishlistButton productId={product.id} />
                   </div>
 
                   {/* Details */}

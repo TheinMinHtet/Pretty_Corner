@@ -8,7 +8,15 @@ import { useStore } from '@/context/StoreContext';
 
 export default function ShoppingBagPage() {
   const router = useRouter();
-  const { cart, updateCartQuantity, removeFromCart, cartSubtotal, cartTotal, selectedTownship } = useStore();
+  const { cart, updateCartQuantity, removeFromCart, cartSubtotal, cartTotal, selectedTownship, isMounted } = useStore();
+
+  if (!isMounted) {
+    return (
+      <div className="w-full bg-white flex flex-col min-h-[60vh] items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-[#b73d67] border-t-transparent animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full pb-12">
