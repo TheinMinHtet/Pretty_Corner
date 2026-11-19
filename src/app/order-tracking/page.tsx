@@ -44,7 +44,7 @@ function OrderTrackingContent() {
             Your order, at a glance.
           </h2>
           <p className="text-[13px] text-[#7a6870] mt-1 font-medium">
-            {order.id} · Verified guest view
+            {order.id} · Order Tracking
           </p>
         </div>
 

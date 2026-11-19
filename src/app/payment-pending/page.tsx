@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
+import OrderingStepBar from '@/components/OrderingStepBar';
 
 function PaymentPendingContent() {
   const router = useRouter();
@@ -59,9 +60,9 @@ function PaymentPendingContent() {
             Secure payment
           </h1>
         </div>
-        <p className="font-sans text-[12px] text-center text-[#b73d67] mt-3 tracking-wide">
-          Delivery — <strong className="font-bold">2 Payment</strong> — Done
-        </p>
+        <div className="mt-3">
+          <OrderingStepBar currentStep={2} />
+        </div>
       </header>
 
       {/* 2. Payment Instructions (2:30) */}

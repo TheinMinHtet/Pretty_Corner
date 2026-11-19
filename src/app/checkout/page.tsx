@@ -6,16 +6,20 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { MOCK_TOWNSHIPS } from '@/lib/mockData';
+import OrderingStepBar from '@/components/OrderingStepBar';
+import { validatePhoneNumber } from '@/lib/validation';
 
-export default function GuestCheckoutPage() {
+export default function CheckoutPage() {
   const router = useRouter();
   const { cart, cartSubtotal, cartTotal, selectedTownship, setSelectedTownship, createOrder, isMounted } = useStore();
 
-  const [customerName, setCustomerName] = useState('May Thu');
-  const [phoneNumber, setPhoneNumber] = useState('09 765 432 100');
-  const [streetAddress, setStreetAddress] = useState('24 Insein Road, Building A, 3rd floor');
-  const [landmarkNote, setLandmarkNote] = useState('Near Hledan Centre · Please call on arrival');
-  const [confirmedAddress, setConfirmedAddress] = useState(true);
+  const [customerName, setCustomerName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const [streetAddress, setStreetAddress] = useState('');
+  const [landmarkNote, setLandmarkNote] = useState('');
+  const [confirmedAddress, setConfirmedAddress] = useState(false);
   const [pinCoords, setPinCoords] = useState({ lat: 16.8302, lng: 96.1301 });
   const [paymentMethod, setPaymentMethod] = useState<'MyanMyanPay' | 'KBZPay' | 'WavePay'>('MyanMyanPay');
   const [mapSearch, setMapSearch] = useState('');
@@ -39,8 +43,14 @@ export default function GuestCheckoutPage() {
       alert('Please fill in your name, phone number, and delivery address.');
       return;
     }
+    const phoneCheck = validatePhoneNumber(phoneNumber);
+    if (!phoneCheck.isValid) {
+      setPhoneTouched(true);
+      setPhoneError(phoneCheck.error || 'Please enter a valid phone number.');
+      return;
+    }
     if (!confirmedAddress) {
-      alert('Please verify your delivery address.');
+      alert('Please verify and confirm your delivery address.');
       return;
     }
 
@@ -94,21 +104,9 @@ export default function GuestCheckoutPage() {
           A few details, then you’re glowing.
         </p>
 
-        {/* 3 Steps indicator */}
-        <div className="relative mt-4 flex items-center justify-between">
-          <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-px bg-[#eedfe5] z-0" />
-
-          <div className="relative z-10 bg-[#fceef2] px-3.5 py-1.5 rounded-full flex items-center gap-1.5 border border-[#b73d67]/30">
-            <span className="text-[11px] font-bold text-[#b73d67]">1 Delivery</span>
-          </div>
-
-          <div className="relative z-10 bg-white px-3.5 py-1.5 rounded-full border border-[#eedfe5]">
-            <span className="text-[11px] font-medium text-[#7a6870]">2 Payment</span>
-          </div>
-
-          <div className="relative z-10 bg-white px-3.5 py-1.5 rounded-full border border-[#eedfe5]">
-            <span className="text-[11px] font-medium text-[#7a6870]">3 Done</span>
-          </div>
+        {/* Step indicator */}
+        <div className="mt-3">
+          <OrderingStepBar currentStep={1} />
         </div>
       </header>
 
@@ -119,32 +117,22 @@ export default function GuestCheckoutPage() {
           <span>/</span>
           <Link href="/bag" className="hover:text-[#38262e]">Beauty Bag</Link>
           <span>/</span>
-          <span className="text-[#38262e] font-medium">Guest Checkout</span>
+          <span className="text-[#38262e] font-medium">Checkout</span>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="font-serif text-[38px] font-medium text-[#38262e]">
-              Guest Checkout
+              Checkout
             </h1>
             <p className="font-sans text-[15px] text-[#7a6870] mt-1">
-              No account required. Fast, direct delivery across all Yangon townships.
+              Fast, direct delivery across all Yangon townships.
             </p>
           </div>
 
-          {/* Desktop Steps indicator */}
-          <div className="flex items-center gap-3">
-            <div className="bg-[#fceef2] text-[#b73d67] px-4 py-1.5 rounded-full text-[13px] font-bold border border-[#b73d67]/30">
-              1. Delivery
-            </div>
-            <span className="text-[#eedfe5]">→</span>
-            <div className="bg-[#fcf9fa] text-[#7a6870] px-4 py-1.5 rounded-full text-[13px] font-medium border border-[#eedfe5]">
-              2. Payment
-            </div>
-            <span className="text-[#eedfe5]">→</span>
-            <div className="bg-[#fcf9fa] text-[#7a6870] px-4 py-1.5 rounded-full text-[13px] font-medium border border-[#eedfe5]">
-              3. Confirmation
-            </div>
+          {/* Desktop Step Bar */}
+          <div className="w-full md:w-auto shrink-0">
+            <OrderingStepBar currentStep={1} />
           </div>
         </div>
       </div>
@@ -170,7 +158,8 @@ export default function GuestCheckoutPage() {
                     required
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] outline-none focus:border-[#b73d67]"
+                    placeholder="e.g. Daw Su Su / Ma Thida"
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67]"
                   />
                 </div>
 
@@ -182,9 +171,31 @@ export default function GuestCheckoutPage() {
                     type="tel"
                     required
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] outline-none focus:border-[#b73d67]"
+                    onChange={(e) => {
+                      setPhoneNumber(e.target.value);
+                      if (phoneTouched) {
+                        const check = validatePhoneNumber(e.target.value);
+                        setPhoneError(check.isValid ? '' : (check.error || ''));
+                      }
+                    }}
+                    onBlur={() => {
+                      setPhoneTouched(true);
+                      const check = validatePhoneNumber(phoneNumber);
+                      setPhoneError(check.isValid ? '' : (check.error || ''));
+                    }}
+                    placeholder="e.g. 09 765 432 100"
+                    className={`w-full h-[46px] px-3.5 bg-white border rounded-[9px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none transition-colors ${
+                      phoneError
+                        ? 'border-red-400 focus:border-red-500 bg-red-50/10'
+                        : 'border-[#eedfe5] focus:border-[#b73d67]'
+                    }`}
                   />
+                  {phoneError && (
+                    <p className="text-red-600 text-[11px] font-semibold mt-1 flex items-center gap-1">
+                      <span>⚠</span>
+                      <span>{phoneError}</span>
+                    </p>
+                  )}
                 </div>
 
                 <div className="sm:col-span-2">
@@ -219,8 +230,8 @@ export default function GuestCheckoutPage() {
                     required
                     value={streetAddress}
                     onChange={(e) => setStreetAddress(e.target.value)}
-                    placeholder="Street name, building number, floor"
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] outline-none focus:border-[#b73d67]"
+                    placeholder="e.g. No. 24, Insein Road, Building A, 3rd floor"
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67]"
                   />
                 </div>
 
@@ -233,7 +244,7 @@ export default function GuestCheckoutPage() {
                     value={landmarkNote}
                     onChange={(e) => setLandmarkNote(e.target.value)}
                     placeholder="e.g. Near Hledan Centre · Please call on arrival"
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] outline-none focus:border-[#b73d67]"
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67]"
                   />
                 </div>
               </div>

@@ -4,6 +4,7 @@ import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
+import OrderingStepBar from '@/components/OrderingStepBar';
 
 function OrderConfirmationContent() {
   const router = useRouter();
@@ -14,11 +15,67 @@ function OrderConfirmationContent() {
   const order = orders.find((o) => o.id === orderId) || orders[0];
 
   const [copied, setCopied] = useState(false);
+  const [downloaded, setDownloaded] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(order.id);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handlePrintReceipt = () => {
+    window.print();
+  };
+
+  const handleDownloadReceipt = () => {
+    const formattedDate = order.createdAt || new Date().toLocaleString();
+    const textReceipt = `
+==================================================
+                 PRETTY CORNER
+           Your Everyday Beauty Edit
+==================================================
+ORDER RECEIPT
+Order Reference : ${order.id}
+Date            : ${formattedDate}
+Payment Method  : ${order.paymentMethod || 'MyanMyanPay'}
+Payment Status  : Verified (Paid)
+
+CUSTOMER INFORMATION:
+Name            : ${order.customerName}
+Phone           : ${order.phone}
+Township        : ${order.township}
+Delivery Address: ${order.deliveryAddress}
+${order.landmarkNote ? `Landmark Note   : ${order.landmarkNote}\n` : ''}
+--------------------------------------------------
+ITEMS:
+--------------------------------------------------
+${order.items.map((i) => `• ${i.name} (${i.size})\n  Qty: ${i.quantity} x ${i.price.toLocaleString()} MMK = ${(i.price * i.quantity).toLocaleString()} MMK`).join('\n\n')}
+
+--------------------------------------------------
+Subtotal        : ${(order.subtotal || order.total - order.deliveryFee).toLocaleString()} MMK
+Delivery Fee    : ${order.deliveryFee.toLocaleString()} MMK
+--------------------------------------------------
+TOTAL PAID      : ${order.total.toLocaleString()} MMK
+==================================================
+Doorstep delivery in Yangon & nationwide shipping.
+Customer Care Hotline: 09 765 432 100
+Viber / Telegram: @prettycorner_mm
+Thank you for shopping with Pretty Corner!
+==================================================
+`.trim();
+
+    const blob = new Blob([textReceipt], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Receipt-${order.id}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    setDownloaded(true);
+    setTimeout(() => setDownloaded(false), 2500);
   };
 
   return (
@@ -29,6 +86,9 @@ function OrderConfirmationContent() {
         <h1 className="font-serif text-[29px] font-medium text-[#38262e]">
           Pretty Corner
         </h1>
+        <div className="mt-3 print:hidden">
+          <OrderingStepBar currentStep={3} />
+        </div>
       </header>
 
       {/* 2. Confirmation State (2:34) */}
@@ -137,10 +197,36 @@ function OrderConfirmationContent() {
             {order.deliveryAddress}
           </p>
         </div>
+
+        {/* Receipt Action Card (Save / Print) */}
+        <div className="mt-6 pt-5 border-t border-[#eedfe5] flex flex-col sm:flex-row items-center justify-center gap-3 print:hidden">
+          <button
+            onClick={handlePrintReceipt}
+            className="w-full sm:w-auto h-[46px] px-6 bg-white border border-[#eedfe5] hover:border-[#b73d67] text-[#38262e] hover:text-[#b73d67] rounded-[10px] font-bold text-[13px] sm:text-[14px] flex items-center justify-center gap-2 transition-all shadow-2xs cursor-pointer group"
+          >
+            <svg className="w-4 h-4 text-[#b73d67] group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+              <path d="M6 14h12v8H6z" />
+            </svg>
+            <span>Save / Print Receipt</span>
+          </button>
+
+          <button
+            onClick={handleDownloadReceipt}
+            className="w-full sm:w-auto h-[46px] px-6 bg-[#fceef2] hover:bg-[#fadce6] text-[#b73d67] rounded-[10px] font-bold text-[13px] sm:text-[14px] flex items-center justify-center gap-2 transition-all cursor-pointer"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span>{downloaded ? 'Receipt Downloaded! ✓' : 'Download Receipt (.txt)'}</span>
+          </button>
+        </div>
       </section>
 
       {/* 4. Help & Action Buttons (2:36) */}
-      <section className="px-5 pt-8 flex flex-col gap-3">
+      <section className="px-5 pt-8 flex flex-col gap-3 print:hidden">
         <Link
           href={`/order-tracking?orderId=${order.id}`}
           className="w-full h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-xs"

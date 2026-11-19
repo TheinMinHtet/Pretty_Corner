@@ -54,7 +54,7 @@ export default function PrivacyPolicyPage() {
           <div className="bg-[#faf7f8] p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
             <h3 className="font-serif text-[20px] font-medium text-[#38262e]">No Unsolicited Marketing</h3>
             <p className="mt-2 text-[#7a6870]">
-              Your phone number is used exclusively for dispatch notifications, driver calls on arrival, and OTP order lookup verifications. We never sell or share your data with third parties.
+              Your phone number is used exclusively for dispatch notifications, driver calls on arrival, and order tracking lookups. We never sell or share your data with third parties.
             </p>
           </div>
 

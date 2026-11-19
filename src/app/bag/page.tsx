@@ -166,7 +166,7 @@ export default function ShoppingBagPage() {
                   href="/checkout"
                   className="w-full mt-6 h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-sm cursor-pointer"
                 >
-                  Guest checkout →
+                  Checkout →
                 </Link>
 
                 <div className="flex items-center justify-center gap-2 mt-4 text-[#7a6870]">
