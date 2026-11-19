@@ -43,29 +43,7 @@ export default function Header() {
             )}
           </Link>
 
-          <Link
-            href="/shop?category=skincare"
-            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
-              pathname.includes('category=skincare') ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
-            }`}
-          >
-            Skincare
-            {pathname.includes('category=skincare') && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
-            )}
-          </Link>
 
-          <Link
-            href="/shop?category=makeup"
-            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
-              pathname.includes('category=makeup') ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
-            }`}
-          >
-            Makeup
-            {pathname.includes('category=makeup') && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
-            )}
-          </Link>
 
           <Link
             href="/shop"
