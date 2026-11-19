@@ -240,36 +240,54 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. Brand Promise - Responsive Banner */}
-      <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pb-10">
-        <div className="bg-[#fceef2] rounded-2xl p-6 sm:p-10 lg:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="max-w-xl">
-            <h4 className="font-serif text-[24px] sm:text-[30px] font-medium leading-snug text-[#38262e]">
-              A corner for your kind of beautiful.
-            </h4>
-            <p className="text-[13px] sm:text-[15px] text-[#7a6870] leading-relaxed mt-2">
-              Thoughtfully picked. Lovingly packed. Authentic beauty, without the fuss. Handcrafted skincare essentials delivered directly to your doorstep in Yangon.
-            </p>
+      {/* 6. Address Card Banner */}
+      <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pb-3 sm:pb-5">
+        <div className="bg-[#fceef2] rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-[#eedfe5]">
+          {/* Address Card Image */}
+          <div className="w-full md:max-w-2xl bg-white rounded-xl shadow-xs overflow-hidden border border-[#eedfe5]/80">
+            <Image
+              src="/assets/address-card-demo.png"
+              alt="Pretty Corner Address Card"
+              width={700}
+              height={260}
+              className="w-full h-auto object-contain block"
+              priority={false}
+            />
           </div>
 
-          <div className="shrink-0 flex flex-wrap gap-3">
-            <Link
-              href="/shop"
-              className="h-[46px] px-6 bg-[#38262e] text-white rounded-[10px] text-[13px] font-bold flex items-center justify-center hover:bg-[#b73d67] transition-colors"
-            >
-              Shop Catalog
-            </Link>
-            <Link
-              href="/about"
-              className="h-[46px] px-6 bg-white text-[#38262e] border border-[#eedfe5] rounded-[10px] text-[13px] font-bold flex items-center justify-center hover:bg-[#faf5f7] transition-colors"
-            >
-              Our Story
-            </Link>
+          {/* Right Side Content & Action Buttons */}
+          <div className="w-full md:w-auto md:max-w-md flex flex-col justify-center items-start gap-3">
+            <div>
+              <span className="inline-block text-[11px] uppercase tracking-wider font-bold text-[#b73d67] bg-white/80 px-2.5 py-0.5 rounded-full border border-[#eedfe5] mb-1.5">
+                Visit Us or Order Online
+              </span>
+              <h4 className="font-serif text-[20px] sm:text-[24px] font-medium leading-snug text-[#38262e]">
+                Everyday beauty, crafted with care.
+              </h4>
+              <p className="text-[13px] text-[#7a6870] leading-relaxed mt-1">
+                Drop by our studio or explore our curated collection delivered fresh to your doorstep in Yangon.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2.5">
+              <Link
+                href="/shop"
+                className="h-[40px] px-5 bg-[#38262e] text-white rounded-[10px] text-[13px] font-bold flex items-center justify-center hover:bg-[#b73d67] transition-colors shadow-xs"
+              >
+                Shop Catalog
+              </Link>
+              <Link
+                href="/about"
+                className="h-[40px] px-5 bg-white text-[#38262e] border border-[#eedfe5] rounded-[10px] text-[13px] font-bold flex items-center justify-center hover:bg-[#faf5f7] transition-colors shadow-xs"
+              >
+                Our Story
+              </Link>
+            </div>
           </div>
         </div>
 
         {/* Mobile quick links (hidden on desktop because desktop Footer handles it) */}
-        <div className="md:hidden flex items-center justify-center gap-3 text-[11px] text-[#7a6870] mt-5 font-normal">
+        <div className="md:hidden flex items-center justify-center gap-3 text-[11px] text-[#7a6870] mt-2.5 font-normal">
           <Link href="/about" className="hover:text-[#38262e] hover:underline">
             About us
           </Link>

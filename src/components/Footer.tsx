@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer className="w-full bg-[#fdfafb] border-t border-[#eedfe5] mt-auto">
       {/* 1. Main Footer Grid */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-8 sm:pb-10 lg:pb-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
           {/* Column 1: Brand & Philosophy */}
           <div className="flex flex-col space-y-4">
@@ -146,7 +146,7 @@ export default function Footer() {
       </div>
 
       {/* 2. Bottom Copyright Bar */}
-      <div className="border-t border-[#eedfe5] bg-white py-4 px-6 lg:px-8">
+      <div className="border-t border-[#eedfe5] bg-white pt-4 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:pb-4 px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-[12px] text-[#7a6870]">
           <p>© {new Date().getFullYear()} Pretty Corner. All rights reserved.</p>
           <div className="flex flex-wrap items-center justify-center gap-4 text-[12px]">

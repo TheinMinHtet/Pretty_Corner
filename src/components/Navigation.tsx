@@ -18,8 +18,8 @@ export default function Navigation() {
   const isContact = pathname.startsWith('/contact') || pathname.startsWith('/about') || pathname.startsWith('/faq') || pathname.startsWith('/policies') || pathname.startsWith('/order-lookup') || pathname.startsWith('/order-tracking');
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 w-full max-w-lg mx-auto bg-white/95 backdrop-blur-md z-40 border-t border-[#eedfe5] shadow-lg">
-      <div className="h-[58px] flex items-center justify-around px-2">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md z-40 border-t border-[#eedfe5] shadow-lg pb-[env(safe-area-inset-bottom,0px)]">
+      <div className="h-[58px] max-w-md mx-auto flex items-center justify-around px-2">
         {/* Home Tab */}
         <Link
           href="/"

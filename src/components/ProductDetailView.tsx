@@ -278,7 +278,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
       </div>
 
       {/* 4. Mobile Bottom Purchase Bar (hidden on desktop md:hidden) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md border-t border-[#eedfe5] px-5 py-3 z-40 shadow-lg">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md border-t border-[#eedfe5] px-5 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] z-40 shadow-lg">
         <div className="max-w-md mx-auto flex items-center gap-3">
           {/* Quantity Selector */}
           <div className="h-[50px] w-[105px] border border-[#eedfe5] rounded-[10px] flex items-center justify-between px-3 text-[#38262e] bg-white">
