@@ -123,13 +123,13 @@ export default function HomePage() {
 
       {/* 4. Categories - Responsive Container */}
       <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-8 pb-3">
-        <div className="flex items-center justify-between">
-          <h3 className="font-serif text-[24px] sm:text-[28px] font-medium text-[#38262e]">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="font-serif text-[22px] sm:text-[28px] font-medium text-[#38262e]">
             Explore by category
           </h3>
           <Link
             href="/shop"
-            className="hidden sm:inline-block text-[13px] font-bold text-[#b73d67] hover:underline"
+            className="inline-block text-[12px] sm:text-[13px] font-bold text-[#b73d67] hover:underline shrink-0"
           >
             Explore all products →
           </Link>
