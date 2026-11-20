@@ -32,7 +32,6 @@ function ShopContent() {
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
 
   // Filter Modal specific states
-  const [filterBrand, setFilterBrand] = useState<'all' | 'pretty-essentials'>('all');
   const [maxPrice, setMaxPrice] = useState<number>(60000);
   const [inStockOnly, setInStockOnly] = useState<boolean>(true);
 
@@ -115,10 +114,6 @@ function ShopContent() {
       if (p.price > maxPrice) {
         return false;
       }
-      // Brand filter
-      if (filterBrand === 'pretty-essentials' && p.brand && !p.brand.includes('Pretty Essentials')) {
-        return false;
-      }
       return true;
     }).sort((a, b) => {
       if (sortBy === 'price-asc') return a.price - b.price;
@@ -126,7 +121,7 @@ function ShopContent() {
       if (sortBy === 'newest') return b.id.localeCompare(a.id);
       return 0; // featured default
     });
-  }, [products, activeCategory, activeSubcategory, searchFilter, inStockOnly, maxPrice, filterBrand, sortBy]);
+  }, [products, activeCategory, activeSubcategory, searchFilter, inStockOnly, maxPrice, sortBy]);
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full">
@@ -437,33 +432,6 @@ function ShopContent() {
                       {cat.label}
                     </button>
                   ))}
-                </div>
-              </div>
-
-              {/* Brands */}
-              <div>
-                <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">Brand</p>
-                <div className="space-y-2 text-[13px] text-[#38262e]">
-                  <label className="flex items-center gap-2.5 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="brand"
-                      checked={filterBrand === 'pretty-essentials'}
-                      onChange={() => setFilterBrand('pretty-essentials')}
-                      className="accent-[#b73d67]"
-                    />
-                    Pretty Essentials (Direct Edit)
-                  </label>
-                  <label className="flex items-center gap-2.5 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="brand"
-                      checked={filterBrand === 'all'}
-                      onChange={() => setFilterBrand('all')}
-                      className="accent-[#b73d67]"
-                    />
-                    All other brands
-                  </label>
                 </div>
               </div>
 
