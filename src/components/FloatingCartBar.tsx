@@ -28,7 +28,7 @@ export default function FloatingCartBar() {
         isVisible
           ? 'translate-y-0 opacity-100 pointer-events-auto'
           : 'translate-y-20 opacity-0 pointer-events-none'
-      } bottom-4 md:bottom-6 left-3 right-3 md:left-1/2 md:-translate-x-1/2 max-w-[420px] md:max-w-xl md:w-full mx-auto`}
+      } bottom-[calc(66px+env(safe-area-inset-bottom,0px))] md:bottom-6 left-3 right-3 md:left-1/2 md:-translate-x-1/2 max-w-[420px] md:max-w-xl md:w-full mx-auto`}
     >
       {/* Molten Glass / Translucent Liquid Sheen Container */}
       <div className="relative overflow-hidden rounded-2xl p-3 sm:px-5 sm:py-3.5 flex items-center justify-between gap-3 bg-white/55 backdrop-blur-2xl backdrop-saturate-200 border border-white/80 shadow-[0_16px_40px_-8px_rgba(56,38,46,0.18),0_4px_16px_rgba(183,61,103,0.12),inset_0_1px_2px_rgba(255,255,255,0.9)]">
