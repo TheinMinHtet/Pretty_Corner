@@ -8,9 +8,9 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
     <footer className="w-full bg-[#fdfafb] border-t border-[#eedfe5] mt-auto">
       {/* 1. Main Footer Grid: Classic 3 columns (Left: Brand, Middle: Customer Care, Right: Payment & Delivery) */}
       <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 pt-4 sm:pt-7 lg:pt-9 pb-4 sm:pb-7">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8 lg:gap-12 items-start">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 items-start max-w-[340px] sm:max-w-none mx-auto">
           {/* Column 1: Brand */}
-          <div className="col-span-2 md:col-span-1 flex flex-col items-center md:items-start text-center md:text-left">
+          <div className="col-span-2 md:col-span-1 flex flex-col items-center md:items-start text-center md:text-left mb-1 sm:mb-0">
             <Link href="/" className="inline-block group text-center md:text-left">
               <span className="font-serif text-[24px] sm:text-[28px] lg:text-[30px] font-medium text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
                 Pretty Corner
