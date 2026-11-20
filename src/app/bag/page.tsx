@@ -25,7 +25,7 @@ export default function ShoppingBagPage() {
         <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870] mb-2 sm:mb-3">
           <Link href="/" className="hover:text-[#38262e]">Home</Link>
           <span>/</span>
-          <span className="text-[#38262e] font-medium">Beauty Bag</span>
+          <span className="text-[#38262e] font-medium">  Beauty Bag</span>
         </div>
 
         <h1 className="font-serif text-[30px] sm:text-[38px] font-medium text-[#38262e]">

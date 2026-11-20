@@ -97,8 +97,8 @@ export default function HomePage() {
       <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 md:pt-6">
         <div className="relative w-full h-[386px] sm:h-[460px] md:h-[500px] lg:h-[540px] rounded-2xl md:rounded-3xl overflow-hidden bg-[#faf7f8]">
           <Image
-            src="/assets/hero.png"
-            alt="The Daily Glow Edit"
+            src="/assets/hero-banner.jpg"
+            alt="Pretty Corner Hero"
             fill
             priority
             className="object-cover pointer-events-none"
@@ -108,13 +108,13 @@ export default function HomePage() {
           <div className="absolute inset-0 p-6 sm:p-10 md:p-12 lg:p-16 flex flex-col justify-between">
             <div className="max-w-lg">
               <span className="inline-block font-sans text-[11px] sm:text-[12px] font-bold tracking-[2px] text-[#b73d67] uppercase">
-                The Curated Variety Edit
+                Your little corner of beauty and inspiration.
               </span>
               <h2 className="font-serif text-[41px] sm:text-[50px] md:text-[58px] lg:text-[64px] font-medium leading-[1.05] text-[#38262e] mt-2">
                 Beauty, gadgets &<br />daily essentials.
               </h2>
               <p className="font-sans text-[14px] sm:text-[16px] text-[#7a6870] mt-3 max-w-md">
-                Your corner for all things lovely. Authentic cosmetics, smart electrical devices, and everyday lifestyle finds delivered to your door.
+                A little corner of beauty, style, and inspiration. Discover your pretty side with Pretty Corner.
               </p>
             </div>
 

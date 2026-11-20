@@ -339,23 +339,12 @@ function ShopContent() {
           <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
             <button
               onClick={() => setShowFilterModal(true)}
-              className={`h-[38px] px-3.5 sm:px-4 rounded-[9px] border flex items-center gap-2 text-[13px] transition-colors cursor-pointer ${
+              className={`flex items-center gap-2 border rounded-full text-[13px] px-4 h-[38px] cursor-pointer font-medium transition-all shadow-[0_2px_8px_rgba(56,38,46,0.02)] ${
                 maxPrice < 60000 || !inStockOnly || activeCategory !== 'all'
-                  ? 'bg-[#fceef2] border-[#b73d67] text-[#b73d67] font-semibold'
-                  : 'bg-white border-[#eedfe5] text-[#38262e] hover:border-[#b73d67]'
+                  ? 'bg-[#fcf7f9] border-[#b73d67] text-[#b73d67] ring-1 ring-[#b73d67]/20 font-semibold'
+                  : 'bg-[#fdfbfa] hover:bg-[#fcf7f9] border-[#eedfe5] text-[#38262e] hover:border-[#b73d67]'
               }`}
             >
-              <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="4" y1="21" x2="4" y2="14" />
-                <line x1="4" y1="10" x2="4" y2="3" />
-                <line x1="12" y1="21" x2="12" y2="12" />
-                <line x1="12" y1="8" x2="12" y2="3" />
-                <line x1="20" y1="21" x2="20" y2="16" />
-                <line x1="20" y1="12" x2="20" y2="3" />
-                <line x1="1" y1="14" x2="7" y2="14" />
-                <line x1="9" y1="8" x2="15" y2="8" />
-                <line x1="17" y1="16" x2="23" y2="16" />
-              </svg>
               <span>Filters</span>
               {(maxPrice < 60000 || !inStockOnly || activeCategory !== 'all') && (
                 <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />
@@ -367,7 +356,7 @@ function ShopContent() {
               <button
                 type="button"
                 onClick={() => setShowSortDropdown(!showSortDropdown)}
-                className={`flex items-center gap-2 bg-[#fdfbfa] hover:bg-[#fcf7f9] border rounded-full text-[13px] text-[#38262e] px-4 h-[38px] cursor-pointer font-medium transition-all shadow-[0_2px_8px_rgba(56,38,46,0.02)] ${
+                className={`flex items-center bg-[#fdfbfa] hover:bg-[#fcf7f9] border rounded-full text-[13px] text-[#38262e] px-4 h-[38px] cursor-pointer font-medium transition-all shadow-[0_2px_8px_rgba(56,38,46,0.02)] ${
                   showSortDropdown ? 'border-[#b73d67] ring-1 ring-[#b73d67]/20 bg-[#fcf7f9]' : 'border-[#eedfe5]'
                 }`}
               >
@@ -376,9 +365,6 @@ function ShopContent() {
                   {sortBy === 'newest' && 'Sort: Newest'}
                   {sortBy === 'price-asc' && 'Price: Low to High'}
                   {sortBy === 'price-desc' && 'Price: High to Low'}
-                </span>
-                <span className={`text-[#b73d67] text-xs transition-transform duration-200 ${showSortDropdown ? 'rotate-180' : ''}`}>
-                  ⌄
                 </span>
               </button>
 

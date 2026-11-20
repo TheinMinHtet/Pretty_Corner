@@ -33,15 +33,28 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full pb-12">
-      {/* Breadcrumb - Consistent across mobile and desktop */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-3 flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870]">
-        <Link href="/" className="hover:text-[#38262e]">Home</Link>
-        <span>/</span>
-        <Link href={`/shop?category=${product.category}`} className="hover:text-[#38262e] capitalize">
-          {product.category}
-        </Link>
-        <span>/</span>
-        <span className="text-[#38262e] font-medium truncate">{product.name}</span>
+      {/* Breadcrumb & Back Button */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870]">
+          <Link href="/" className="hover:text-[#38262e]">Home</Link>
+          <span>/</span>
+          <Link href={`/shop?category=${product.category}`} className="hover:text-[#38262e] capitalize">
+            {product.category}
+          </Link>
+          <span>/</span>
+          <span className="text-[#38262e] font-medium truncate max-w-[200px] sm:max-w-none">{product.name}</span>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-1.5 text-[12.5px] sm:text-[13px] font-semibold text-[#b73d67] hover:text-[#8e294d] bg-[#fceef2] hover:bg-[#fadce6] px-3.5 py-1.5 rounded-full transition-all cursor-pointer shadow-2xs group"
+        >
+          <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          <span>Back</span>
+        </button>
       </div>
 
       {/* Main Product Detail Section - Responsive 2-Column Grid */}
