@@ -132,15 +132,17 @@ function OrderConfirmationContent() {
     y += 30;
     ctx.textAlign = 'left';
     ctx.fillStyle = '#7a6870';
-    ctx.fillText('Subtotal', 60, y);
-    ctx.textAlign = 'right';
-    ctx.fillText(`${(order.subtotal || order.total - order.deliveryFee).toLocaleString()} MMK`, canvas.width - 60, y);
+    if (order.deliveryFee > 0) {
+      ctx.fillText('Subtotal', 60, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(`${(order.subtotal || order.total - order.deliveryFee).toLocaleString()} MMK`, canvas.width - 60, y);
 
-    y += 26;
-    ctx.textAlign = 'left';
-    ctx.fillText('Delivery', 60, y);
-    ctx.textAlign = 'right';
-    ctx.fillText(`${order.deliveryFee.toLocaleString()} MMK`, canvas.width - 60, y);
+      y += 26;
+      ctx.textAlign = 'left';
+      ctx.fillText('Delivery', 60, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(`${order.deliveryFee.toLocaleString()} MMK`, canvas.width - 60, y);
+    }
 
     // Divider
     y += 25;
@@ -268,14 +270,16 @@ function OrderConfirmationContent() {
             </div>
           ))}
 
-          <div className="flex justify-between items-center text-[13px]">
-            <span className="text-[#7a6870]">
-              Delivery
-            </span>
-            <span className="font-bold text-[#38262e]">
-              {order.deliveryFee.toLocaleString()} MMK
-            </span>
-          </div>
+          {order.deliveryFee > 0 && (
+            <div className="flex justify-between items-center text-[13px]">
+              <span className="text-[#7a6870]">
+                Delivery
+              </span>
+              <span className="font-bold text-[#38262e]">
+                {order.deliveryFee.toLocaleString()} MMK
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="my-3 border-t border-[#eedfe5]" />

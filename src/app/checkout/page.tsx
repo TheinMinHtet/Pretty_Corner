@@ -28,8 +28,8 @@ export default function CheckoutPage() {
 
   const [formAlert, setFormAlert] = useState<string | null>(null);
 
-  const deliveryFee = selectedTownship?.fee || 3000;
-  const grandTotal = cartSubtotal + deliveryFee;
+  const deliveryFee = 0;
+  const grandTotal = cartSubtotal;
 
   const handleUseCurrentLocation = () => {
     setIsLocating(true);
@@ -398,21 +398,8 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              <div className="border-t border-[#eedfe5] pt-3 space-y-2 text-[14px]">
-                <div className="flex justify-between text-[#7a6870]">
-                  <span>Subtotal</span>
-                  <span className="text-[#38262e] font-medium">{cartSubtotal.toLocaleString()} MMK</span>
-                </div>
-                <div className="flex justify-between text-[#7a6870]">
-                  <span>Delivery</span>
-                  <span className="text-[#38262e] font-medium">{deliveryFee.toLocaleString()} MMK</span>
-                </div>
-              </div>
-
-              <div className="my-4 border-t border-[#eedfe5]" />
-
-              <div className="flex justify-between items-center text-[18px] font-bold text-[#38262e]">
-                <span>Grand Total</span>
+              <div className="border-t border-[#eedfe5] pt-4 flex justify-between items-center text-[18px] font-bold text-[#38262e]">
+                <span>Total</span>
                 <span className="text-[#b73d67]">{grandTotal.toLocaleString()} MMK</span>
               </div>
 
