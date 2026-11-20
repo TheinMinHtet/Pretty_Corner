@@ -199,14 +199,14 @@ export default function HomePage() {
               Top Picks & Highlights
             </h3>
             <p className="font-sans text-[12px] sm:text-[13px] text-[#7a6870] mt-1">
-              Showing featured items. Tap &quot;Shop all&quot; to browse our full catalog ({matchingProducts.length} items).
+              Showing featured highlights. Explore our complete collection in the shop.
             </p>
           </div>
           <Link
             href={activeCategory === 'all' ? '/shop' : `/shop?category=${activeCategory}`}
             className="text-[13px] font-bold text-[#b73d67] hover:underline shrink-0"
           >
-            Shop all ({matchingProducts.length}) →
+            Shop more →
           </Link>
         </div>
 
@@ -261,7 +261,7 @@ export default function HomePage() {
             href={activeCategory === 'all' ? '/shop' : `/shop?category=${activeCategory}`}
             className="inline-flex items-center justify-center gap-1.5 h-[42px] px-6 rounded-[10px] bg-[#faf7f8] text-[#b73d67] border border-[#eedfe5] hover:bg-[#fceef2] hover:border-[#b73d67] text-[13px] font-bold transition-all shadow-2xs"
           >
-            <span>View all in catalog ({matchingProducts.length} items) →</span>
+            <span>Explore full collection in shop →</span>
           </Link>
         </div>
       </section>
