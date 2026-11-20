@@ -259,35 +259,52 @@ function ShopContent() {
 
       {/* 3. Catalog Section - Responsive Container */}
       <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-3 pb-12">
-        {/* Controls Toolbar: Subcategories, Filter Button, Sort Selector */}
+        {/* Controls Toolbar: Active Filters & Count on Left, Filter & Sort on Right */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#eedfe5]">
-          {/* Subcategory Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
-            {subcategoryList.map((sub) => {
-              const isSelected = activeSubcategory === sub || (sub === 'All skincare' && activeSubcategory === 'all');
-              return (
+          {/* Left: Product Counter & Active Filter Badges */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="text-[13px] text-[#7a6870]">
+              Showing <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'product' : 'products'}
+            </span>
+
+            {activeSubcategory !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 bg-[#fceef2] text-[#b73d67] text-[12px] font-semibold px-2.5 py-0.5 rounded-full border border-[#f5d9e3]">
+                <span>{activeSubcategory}</span>
                 <button
-                  key={sub}
-                  onClick={() => setActiveSubcategory(sub === 'All skincare' ? 'all' : sub)}
-                  className={`h-[36px] px-4 rounded-[18px] text-[13px] whitespace-nowrap transition-colors cursor-pointer ${
-                    isSelected
-                      ? 'bg-[#38262e] text-white font-medium'
-                      : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
-                  }`}
+                  onClick={() => setActiveSubcategory('all')}
+                  className="hover:text-[#38262e] cursor-pointer ml-0.5"
+                  title="Remove filter"
                 >
-                  {sub}
+                  ✕
                 </button>
-              );
-            })}
+              </span>
+            )}
+
+            {searchFilter && (
+              <span className="inline-flex items-center gap-1.5 bg-[#f7f4f5] text-[#38262e] text-[12px] font-medium px-2.5 py-0.5 rounded-full border border-[#eedfe5]">
+                <span>&quot;{searchFilter}&quot;</span>
+                <button
+                  onClick={() => setSearchFilter('')}
+                  className="hover:text-[#b73d67] cursor-pointer ml-0.5"
+                  title="Clear search"
+                >
+                  ✕
+                </button>
+              </span>
+            )}
           </div>
 
-          {/* Filter & Sort Bar */}
+          {/* Right: Filter & Sort Bar */}
           <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
             <button
               onClick={() => setShowFilterModal(true)}
-              className="h-[38px] px-4 rounded-[9px] bg-white border border-[#eedfe5] flex items-center gap-2 text-[#38262e] text-[13px] hover:border-[#b73d67] transition-colors cursor-pointer"
+              className={`h-[38px] px-3.5 sm:px-4 rounded-[9px] border flex items-center gap-2 text-[13px] transition-colors cursor-pointer ${
+                activeSubcategory !== 'all' || maxPrice < 60000 || !inStockOnly
+                  ? 'bg-[#fceef2] border-[#b73d67] text-[#b73d67] font-semibold'
+                  : 'bg-white border-[#eedfe5] text-[#38262e] hover:border-[#b73d67]'
+              }`}
             >
-              <svg className="w-[18px] h-[18px] text-[#38262e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="4" y1="21" x2="4" y2="14" />
                 <line x1="4" y1="10" x2="4" y2="3" />
                 <line x1="12" y1="21" x2="12" y2="12" />
@@ -299,6 +316,9 @@ function ShopContent() {
                 <line x1="17" y1="16" x2="23" y2="16" />
               </svg>
               <span>Filters</span>
+              {(activeSubcategory !== 'all' || maxPrice < 60000 || !inStockOnly) && (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />
+              )}
             </button>
 
             <div className="relative">
@@ -434,6 +454,29 @@ function ShopContent() {
                   ))}
                 </div>
               </div>
+
+              {/* Subcategories (when a specific category is selected) */}
+              {activeCategory !== 'all' && (
+                <div>
+                  <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">Subcategory</p>
+                  <div className="flex flex-wrap gap-2">
+                    {subcategoryList.map((sub) => {
+                      const isSelected = activeSubcategory === sub || (sub.startsWith('All ') && activeSubcategory === 'all');
+                      return (
+                        <button
+                          key={sub}
+                          onClick={() => setActiveSubcategory(sub.startsWith('All ') ? 'all' : sub)}
+                          className={`h-[32px] px-3 rounded-[16px] text-[12px] transition-colors cursor-pointer ${
+                            isSelected ? 'bg-[#38262e] text-white font-medium' : 'bg-[#fceef2] text-[#38262e]'
+                          }`}
+                        >
+                          {sub}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Price range */}
               <div>
