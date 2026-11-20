@@ -57,12 +57,17 @@ export default function HomePage() {
     },
   ], [products]);
 
-  // Show products matching selected category or top curated products on all
-  const displayedProducts = (
-    activeCategory === 'all'
+  // Matching products for the selected category
+  const matchingProducts = useMemo(() => {
+    return activeCategory === 'all'
       ? products
-      : products.filter((p) => p.category === activeCategory)
-  ).slice(0, 4);
+      : products.filter((p) => p.category === activeCategory);
+  }, [products, activeCategory]);
+
+  // Show top 4 curated highlights as preview
+  const displayedProducts = useMemo(() => {
+    return matchingProducts.slice(0, 4);
+  }, [matchingProducts]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -188,20 +193,20 @@ export default function HomePage() {
 
       {/* 5. Bestsellers - Responsive Grid */}
       <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-4 pb-10">
-        <div className="flex items-baseline justify-between mb-5">
+        <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-5 gap-2">
           <div>
-            <h3 className="font-serif text-[28px] sm:text-[32px] font-medium text-[#38262e]">
-              Loved for a reason
+            <h3 className="font-serif text-[26px] sm:text-[32px] font-medium text-[#38262e]">
+              Top Picks & Highlights
             </h3>
-            <p className="font-sans text-[13px] text-[#7a6870] mt-0.5 hidden sm:block">
-              Curated bestsellers across beauty, smart tech, and daily living.
+            <p className="font-sans text-[12px] sm:text-[13px] text-[#7a6870] mt-1">
+              Showing featured items. Tap &quot;Shop all&quot; to browse our full catalog ({matchingProducts.length} items).
             </p>
           </div>
           <Link
             href={activeCategory === 'all' ? '/shop' : `/shop?category=${activeCategory}`}
-            className="text-[13px] font-bold text-[#b73d67] hover:underline"
+            className="text-[13px] font-bold text-[#b73d67] hover:underline shrink-0"
           >
-            Shop all →
+            Shop all ({matchingProducts.length}) →
           </Link>
         </div>
 
@@ -248,6 +253,16 @@ export default function HomePage() {
               </div>
             );
           })}
+        </div>
+
+        {/* Full catalog CTA button beneath the preview grid */}
+        <div className="mt-7 text-center">
+          <Link
+            href={activeCategory === 'all' ? '/shop' : `/shop?category=${activeCategory}`}
+            className="inline-flex items-center justify-center gap-1.5 h-[42px] px-6 rounded-[10px] bg-[#faf7f8] text-[#b73d67] border border-[#eedfe5] hover:bg-[#fceef2] hover:border-[#b73d67] text-[13px] font-bold transition-all shadow-2xs"
+          >
+            <span>View all in catalog ({matchingProducts.length} items) →</span>
+          </Link>
         </div>
       </section>
 
