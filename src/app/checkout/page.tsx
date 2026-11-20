@@ -141,6 +141,10 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
+    const activeEl = typeof document !== 'undefined' ? (document.activeElement as HTMLElement) : null;
+    if (activeEl?.getAttribute('data-no-submit') === 'true' || activeEl?.getAttribute('name') === 'map-search') {
+      return;
+    }
     setNameTouched(true);
     setPhoneTouched(true);
     setAddressTouched(true);
@@ -219,7 +223,20 @@ export default function CheckoutPage() {
       </div>
 
       {/* Main Form Area - 2-Column Responsive Layout */}
-      <form onSubmit={handlePlaceOrder} noValidate className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
+      <form
+        onSubmit={handlePlaceOrder}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            const target = e.target as HTMLElement;
+            if (target?.getAttribute('data-no-submit') === 'true' || target?.getAttribute('name') === 'map-search') {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }
+        }}
+        noValidate
+        className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2"
+      >
         <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-start">
           {/* Left Column: Delivery Form & Payment Methods */}
           <div className="md:col-span-7 lg:col-span-8 space-y-6">
@@ -383,6 +400,8 @@ export default function CheckoutPage() {
                   </svg>
                   <input
                     type="text"
+                    name="map-search"
+                    data-no-submit="true"
                     value={mapSearch}
                     onChange={(e) => setMapSearch(e.target.value)}
                     onKeyDown={(e) => {
