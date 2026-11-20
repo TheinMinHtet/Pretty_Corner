@@ -54,42 +54,49 @@ function ShopContent() {
       label: 'All Products',
       description: 'Explore full catalog across beauty, tech & variety',
       count: products.length,
+      aliases: ['all', 'everything', 'catalog', 'products', 'store'],
     },
     {
       id: 'electrical',
       label: 'Electrical & Gadgets',
       description: 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
       count: products.filter((p) => p.category === 'electrical').length,
+      aliases: ['electrical', 'electronics', 'gadget', 'gadgets', 'tech', 'device', 'devices', 'mirror', 'humidifier', 'sonic'],
     },
     {
       id: 'skincare',
       label: 'Skincare',
       description: 'Gentle barrier serums, moisturizers & UV daily defense',
       count: products.filter((p) => p.category === 'skincare').length,
+      aliases: ['skincare', 'skin', 'serum', 'cream', 'moisturizer', 'barrier', 'sunscreen', 'uv', 'cleanser'],
     },
     {
       id: 'makeup',
       label: 'Makeup',
       description: 'Breathable cheek tints, lip glazes & complexion picks',
       count: products.filter((p) => p.category === 'makeup').length,
+      aliases: ['makeup', 'cosmetics', 'tint', 'lip', 'blush', 'cheek', 'glaze', 'complexion'],
     },
     {
       id: 'lifestyle',
       label: 'Lifestyle & Variety',
       description: 'Silk hair accessories, vacuum tumblers & daily finds',
       count: products.filter((p) => p.category === 'lifestyle').length,
+      aliases: ['lifestyle', 'variety', 'tumbler', 'hair', 'scrunchie', 'accessories', 'everyday'],
     },
     {
       id: 'lenses',
       label: 'Contact Lenses',
       description: 'Hydrated daily and monthly comfort beauty lenses',
       count: products.filter((p) => p.category === 'lenses').length,
+      aliases: ['lenses', 'lens', 'contact lens', 'contact lenses', 'eyes', 'eye'],
     },
     {
       id: 'more',
       label: 'Accessories & More',
       description: 'Pure silk ties, beauty tools & thoughtful additions',
       count: products.filter((p) => p.category === 'more').length,
+      aliases: ['more', 'accessories', 'tools', 'silk', 'additions'],
     },
   ], [products]);
 
@@ -150,13 +157,21 @@ function ShopContent() {
       if (activeCategory !== 'all' && p.category !== activeCategory) {
         return false;
       }
-      // Search term
+      // Search term (searches by product name, tagline, description, category ID, category label, or category aliases)
       if (searchFilter.trim()) {
-        const q = searchFilter.toLowerCase();
+        const q = searchFilter.toLowerCase().trim();
+        const categoryObj = categoriesList.find((c) => c.id === p.category);
+        const matchesCategory =
+          p.category.toLowerCase().includes(q) ||
+          (categoryObj && (
+            categoryObj.label.toLowerCase().includes(q) ||
+            categoryObj.aliases.some((alias) => alias.includes(q) || q.includes(alias))
+          ));
         const matchesQuery =
           p.name.toLowerCase().includes(q) ||
           p.tagline.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q);
+          p.description.toLowerCase().includes(q) ||
+          matchesCategory;
         if (!matchesQuery) return false;
       }
       // In stock
@@ -178,79 +193,27 @@ function ShopContent() {
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full">
-      {/* 1. Mobile Header (hidden on desktop because desktop Header renders it) */}
-      <header className="md:hidden px-5 pt-3.5 pb-2 border-b border-transparent">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => router.push('/')}
-            className="p-1 -ml-1 text-[#38262e] hover:opacity-70 transition-opacity"
-            aria-label="Back to home"
-          >
-            <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          <h1 className="font-serif text-[28px] font-medium text-[#38262e]">
-            {getCategoryTitle()}
-          </h1>
-
-          <Link href="/bag" className="relative p-1 text-[#38262e] hover:opacity-80 transition-opacity">
-            <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
-              <path d="M3 6h18" />
-              <path d="M16 10a4 4 0 01-8 0" />
-            </svg>
-            <CartBadge className="absolute -top-1 -right-1 bg-[#b73d67] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center" />
-          </Link>
-        </div>
-
-        <p className="font-sans text-[12px] text-[#7a6870] mt-2">
-          {getCategorySubtitle()}
-        </p>
-
-        {/* Mobile Search input */}
-        <div className="mt-3.5 bg-[#f7f4f5] h-[44px] rounded-[9px] flex items-center px-3.5 gap-2.5 focus-within:ring-1 focus-within:ring-[#b73d67]">
-          <svg className="w-[20px] h-[20px] text-[#7a6870] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
-          <input
-            type="text"
-            value={searchFilter}
-            onChange={(e) => setSearchFilter(e.target.value)}
-            placeholder="Search electrical, beauty, gadgets, lifestyle…"
-            className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full"
-          />
-          {searchFilter && (
-            <button onClick={() => setSearchFilter('')} className="text-[#7a6870] text-xs hover:text-[#38262e]">
-              ✕
-            </button>
-          )}
-        </div>
-      </header>
-
-      {/* 2. Desktop Catalog Header & Breadcrumb (md and up) */}
-      <div className="hidden md:block w-full max-w-7xl mx-auto px-6 lg:px-8 pt-8 pb-4">
+      {/* Catalog Header & Breadcrumb - Consistent across mobile and desktop */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-4">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-[12px] text-[#7a6870] mb-3">
+        <div className="flex items-center gap-2 text-[12px] text-[#7a6870] mb-2 sm:mb-3">
           <Link href="/" className="hover:text-[#38262e]">Home</Link>
           <span>/</span>
           <span className="text-[#38262e] font-medium capitalize">{activeCategory}</span>
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
           <div>
-            <h1 className="font-serif text-[36px] lg:text-[42px] font-medium text-[#38262e] leading-tight">
+            <h1 className="font-serif text-[28px] sm:text-[36px] lg:text-[42px] font-medium text-[#38262e] leading-tight">
               {getCategoryTitle()}
             </h1>
-            <p className="font-sans text-[14px] text-[#7a6870] mt-1.5 max-w-xl">
+            <p className="font-sans text-[13px] sm:text-[14px] text-[#7a6870] mt-1 sm:mt-1.5 max-w-xl">
               {getCategorySubtitle()}
             </p>
           </div>
 
-          {/* Desktop Search Bar */}
-          <div className="w-full md:w-[320px] lg:w-[380px] shrink-0">
+          {/* Search Bar - Consistent on mobile and desktop */}
+          <div className="w-full md:w-[320px] lg:w-[380px] shrink-0 mt-2 md:mt-0">
             <div className="bg-[#f7f4f5] border border-[#eedfe5] focus-within:border-[#b73d67] focus-within:bg-white h-[44px] rounded-full flex items-center px-4 gap-2.5 transition-all shadow-2xs">
               <svg className="w-4 h-4 text-[#7a6870] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="11" cy="11" r="8" />
@@ -261,7 +224,7 @@ function ShopContent() {
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
                 placeholder="Search products, electricals, gadgets…"
-                className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full"
+                className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full font-normal"
               />
               {searchFilter && (
                 <button
@@ -273,7 +236,7 @@ function ShopContent() {
                 </button>
               )}
             </div>
-            <div className="text-right mt-1.5">
+            <div className="hidden md:block text-right mt-1.5">
               <span className="text-[12px] text-[#7a6870]">
                 Showing <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'product' : 'products'}
               </span>

@@ -93,51 +93,9 @@ export default function HomePage() {
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full">
-
-
-      {/* 2. Mobile Header (hidden on desktop because desktop Header is active) */}
-      <header className="md:hidden px-5 pt-3.5 pb-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="font-serif text-[30px] font-medium leading-[1.1] text-[#38262e]">
-              Pretty Corner
-            </h1>
-            <p className="font-sans text-[9px] font-medium tracking-[1.5px] text-[#7a6870] uppercase mt-1">
-              Beauty, Gadgets & Variety Edit
-            </p>
-          </div>
-
-          <Link href="/bag" className="relative p-2 text-[#38262e] hover:opacity-80 transition-opacity">
-            <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
-              <path d="M3 6h18" />
-              <path d="M16 10a4 4 0 01-8 0" />
-            </svg>
-            <CartBadge className="absolute top-0 right-0 bg-[#b73d67] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center" />
-          </Link>
-        </div>
-
-        {/* Mobile Search bar */}
-        <form onSubmit={handleSearchSubmit} className="mt-4">
-          <div className="bg-[#f7f4f5] h-[42px] rounded-[9px] flex items-center px-3.5 gap-2.5 transition-all focus-within:ring-1 focus-within:ring-[#b73d67]">
-            <svg className="w-[19px] h-[19px] text-[#7a6870] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <input
-              type="text"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search gadgets, beauty, electricals, lifestyle…"
-              className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full font-normal"
-            />
-          </div>
-        </form>
-      </header>
-
-      {/* 3. Hero Editorial - Responsive Container */}
-      <section className="w-full max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 sm:pt-4 md:pt-6">
-        <div className="relative w-full h-[386px] sm:h-[460px] md:h-[500px] lg:h-[540px] sm:rounded-2xl md:rounded-3xl overflow-hidden bg-[#faf7f8]">
+      {/* Hero Editorial - Responsive Container */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 md:pt-6">
+        <div className="relative w-full h-[386px] sm:h-[460px] md:h-[500px] lg:h-[540px] rounded-2xl md:rounded-3xl overflow-hidden bg-[#faf7f8]">
           <Image
             src="/assets/hero.png"
             alt="The Daily Glow Edit"
@@ -165,7 +123,7 @@ export default function HomePage() {
                 href="/shop"
                 className="inline-flex items-center justify-center bg-[#b73d67] text-white text-[14px] sm:text-[15px] font-bold h-[48px] sm:h-[52px] px-7 sm:px-8 rounded-[12px] shadow-sm hover:bg-[#a33259] active:scale-[0.98] transition-all"
               >
-                Explore all products →
+                Explore all products
               </Link>
             </div>
           </div>
@@ -182,7 +140,7 @@ export default function HomePage() {
             onClick={() => setShowCategoryModal(true)}
             className="text-[13px] font-bold text-[#b73d67] hover:underline cursor-pointer shrink-0"
           >
-            All Categories →
+            All Categories
           </button>
         </div>
 
@@ -218,7 +176,7 @@ export default function HomePage() {
             href={activeCategory === 'all' ? '/shop' : `/shop?category=${activeCategory}`}
             className="text-[13px] font-bold text-[#b73d67] hover:underline shrink-0"
           >
-            Shop more →
+            Shop more
           </Link>
         </div>
 
@@ -273,7 +231,7 @@ export default function HomePage() {
             href={activeCategory === 'all' ? '/shop' : `/shop?category=${activeCategory}`}
             className="inline-flex items-center justify-center gap-1.5 h-[42px] px-6 rounded-[10px] bg-[#faf7f8] text-[#b73d67] border border-[#eedfe5] hover:bg-[#fceef2] hover:border-[#b73d67] text-[13px] font-bold transition-all shadow-2xs"
           >
-            <span>Explore full collection in shop →</span>
+            <span>Explore full collection in shop</span>
           </Link>
         </div>
       </section>
@@ -293,7 +251,7 @@ export default function HomePage() {
             />
           </div>
 
-          {/* Right Side Content & Action Buttons */}
+          {/* Right Side Content */}
           <div className="w-full md:w-auto md:max-w-md flex flex-col justify-center items-start gap-3">
             <div>
               <span className="inline-block text-[11px] uppercase tracking-wider font-bold text-[#b73d67] bg-white/80 px-2.5 py-0.5 rounded-full border border-[#eedfe5] mb-1.5">
@@ -306,37 +264,7 @@ export default function HomePage() {
                 Drop by our studio or explore our curated collection delivered fresh to your doorstep in Yangon.
               </p>
             </div>
-
-            <div className="flex flex-wrap gap-2.5">
-              <Link
-                href="/shop"
-                className="h-[40px] px-5 bg-[#38262e] text-white rounded-[10px] text-[13px] font-bold flex items-center justify-center hover:bg-[#b73d67] transition-colors shadow-xs"
-              >
-                Shop Catalog
-              </Link>
-              <Link
-                href="/about"
-                className="h-[40px] px-5 bg-white text-[#38262e] border border-[#eedfe5] rounded-[10px] text-[13px] font-bold flex items-center justify-center hover:bg-[#faf5f7] transition-colors shadow-xs"
-              >
-                Our Story
-              </Link>
-            </div>
           </div>
-        </div>
-
-        {/* Mobile quick links (hidden on desktop because desktop Footer handles it) */}
-        <div className="md:hidden flex items-center justify-center gap-3 text-[11px] text-[#7a6870] mt-2.5 font-normal">
-          <Link href="/about" className="hover:text-[#38262e] hover:underline">
-            About us
-          </Link>
-          <span>·</span>
-          <Link href="/policies/shipping" className="hover:text-[#38262e] hover:underline">
-            Delivery & returns
-          </Link>
-          <span>·</span>
-          <Link href="/contact" className="hover:text-[#38262e] hover:underline">
-            Contact
-          </Link>
         </div>
       </section>
 
@@ -417,7 +345,7 @@ export default function HomePage() {
                 onClick={() => setShowCategoryModal(false)}
                 className="w-full h-[46px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] transition-colors flex items-center justify-center cursor-pointer"
               >
-                Browse Full Catalog in Shop →
+                Browse Full Catalog in Shop
               </Link>
             </div>
           </div>

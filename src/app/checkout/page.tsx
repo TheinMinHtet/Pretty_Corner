@@ -25,6 +25,8 @@ export default function CheckoutPage() {
   const [mapSearch, setMapSearch] = useState('');
   const [isLocating, setIsLocating] = useState(false);
 
+  const [formAlert, setFormAlert] = useState<string | null>(null);
+
   const deliveryFee = selectedTownship?.fee || 3000;
   const grandTotal = cartSubtotal + deliveryFee;
 
@@ -40,7 +42,7 @@ export default function CheckoutPage() {
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
     if (!customerName.trim() || !phoneNumber.trim() || !streetAddress.trim()) {
-      alert('Please fill in your name, phone number, and delivery address.');
+      setFormAlert('Please fill in your name, phone number, and delivery address.');
       return;
     }
     const phoneCheck = validatePhoneNumber(phoneNumber);
@@ -50,7 +52,7 @@ export default function CheckoutPage() {
       return;
     }
     if (!confirmedAddress) {
-      alert('Please verify and confirm your delivery address.');
+      setFormAlert('Please verify and confirm your delivery address.');
       return;
     }
 
@@ -83,36 +85,9 @@ export default function CheckoutPage() {
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full pb-12">
-      {/* 1. Mobile Header (hidden on desktop) */}
-      <header className="md:hidden px-5 pt-3.5 pb-4 border-b border-[#eedfe5]">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            className="p-1 -ml-1 text-[#38262e] hover:opacity-70 transition-opacity cursor-pointer"
-            aria-label="Back"
-          >
-            <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="font-serif text-[29px] font-medium text-[#38262e]">
-            Checkout
-          </h1>
-        </div>
-
-        <p className="font-sans text-[13px] text-[#7a6870] mt-1.5">
-          A few details, then you’re glowing.
-        </p>
-
-        {/* Step indicator */}
-        <div className="mt-3">
-          <OrderingStepBar currentStep={1} />
-        </div>
-      </header>
-
-      {/* 2. Desktop Breadcrumb & Heading (md and up) */}
-      <div className="hidden md:block w-full max-w-7xl mx-auto px-6 lg:px-8 pt-8 pb-4">
-        <div className="flex items-center gap-2 text-[13px] text-[#7a6870] mb-3">
+      {/* Breadcrumb & Heading - Unified across mobile and desktop */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-4">
+        <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870] mb-2 sm:mb-3">
           <Link href="/" className="hover:text-[#38262e]">Home</Link>
           <span>/</span>
           <Link href="/bag" className="hover:text-[#38262e]">Beauty Bag</Link>
@@ -122,26 +97,42 @@ export default function CheckoutPage() {
 
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="font-serif text-[38px] font-medium text-[#38262e]">
+            <h1 className="font-serif text-[30px] sm:text-[38px] font-medium text-[#38262e]">
               Checkout
             </h1>
-            <p className="font-sans text-[15px] text-[#7a6870] mt-1">
+            <p className="font-sans text-[13px] sm:text-[15px] text-[#7a6870] mt-1">
               Fast, direct delivery across all Yangon townships.
             </p>
           </div>
 
-          {/* Desktop Step Bar */}
+          {/* Unified Step Bar */}
           <div className="w-full md:w-auto shrink-0">
             <OrderingStepBar currentStep={1} />
           </div>
         </div>
       </div>
 
-      {/* 3. Main Form Area - 2-Column Responsive Layout */}
-      <form onSubmit={handlePlaceOrder} className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-4">
+      {/* Main Form Area - 2-Column Responsive Layout */}
+      <form onSubmit={handlePlaceOrder} className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
         <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-start">
-          {/* Left Column: Delivery Form & Payment Methods (col-span-12 on mobile, col-span-7 or 8 on desktop) */}
+          {/* Left Column: Delivery Form & Payment Methods */}
           <div className="md:col-span-7 lg:col-span-8 space-y-6">
+            {/* Elegant Notification if form invalid */}
+            {formAlert && (
+              <div className="p-4 rounded-xl bg-white border border-[#eedfe5] text-[#38262e] flex items-center justify-between gap-3 shadow-sm animate-in fade-in duration-200">
+                <div className="flex items-center gap-2.5">
+                  <span className="w-2 h-2 rounded-full bg-[#b73d67] shrink-0" />
+                  <span className="text-[13px] font-medium text-[#7a6870]">{formAlert}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormAlert(null)}
+                  className="w-6 h-6 rounded-full hover:bg-[#faf7f8] text-[#7a6870] hover:text-[#38262e] flex items-center justify-center text-xs font-bold cursor-pointer transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
             {/* Step 1: Contact Details */}
             <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
               <h2 className="font-serif text-[24px] sm:text-[26px] font-medium text-[#38262e] mb-4">

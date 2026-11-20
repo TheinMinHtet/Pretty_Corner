@@ -28,7 +28,7 @@ export default function ProductCardStepper({
         }}
         className={
           className ||
-          'h-[30px] sm:h-[32px] px-3 bg-[#b73d67] text-white rounded-[7px] text-[11px] sm:text-[12px] font-bold flex items-center gap-1 hover:bg-[#a33259] active:scale-95 transition-all shadow-xs cursor-pointer select-none'
+          'h-[30px] sm:h-[32px] px-3 bg-[#b73d67]/80 hover:bg-[#b73d67] text-white rounded-[7px] text-[11px] sm:text-[12px] font-bold flex items-center gap-1 active:scale-95 transition-all shadow-xs cursor-pointer select-none'
         }
         aria-label="Add product to bag"
       >
@@ -46,7 +46,7 @@ export default function ProductCardStepper({
       className={
         className
           ? `${className} flex items-center justify-between`
-          : 'h-[30px] sm:h-[32px] px-1 bg-[#b73d67] text-white rounded-[7px] flex items-center justify-between gap-1.5 shadow-xs transition-all animate-in zoom-in-95 duration-150 select-none'
+          : 'h-[30px] sm:h-[32px] px-1 bg-[#b73d67]/85 text-white rounded-[7px] flex items-center justify-between gap-1.5 shadow-xs transition-all animate-in zoom-in-95 duration-150 select-none'
       }
     >
       <button

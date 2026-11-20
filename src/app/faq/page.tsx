@@ -41,16 +41,9 @@ export default function FaqPage() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-10 flex flex-col min-h-full pb-12">
-      {/* 1. Mobile Header (hidden on desktop) */}
-      <header className="md:hidden px-5 pt-4 pb-2 text-center border-b border-transparent">
-        <h1 className="font-serif text-[29px] font-medium text-[#38262e]">
-          Pretty Corner
-        </h1>
-      </header>
-
-      {/* 2. Desktop Breadcrumb (md and up) */}
-      <div className="hidden md:flex items-center gap-2 text-[13px] text-[#7a6870] mb-6">
+    <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-10 flex flex-col min-h-full pb-12">
+      {/* Breadcrumb - Consistent across mobile and desktop */}
+      <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870] mb-4 sm:mb-6">
         <Link href="/" className="hover:text-[#38262e]">Home</Link>
         <span>/</span>
         <span className="text-[#38262e] font-medium">Frequently Asked Questions</span>
@@ -109,7 +102,7 @@ export default function FaqPage() {
             href="/contact"
             className="inline-block mt-3 px-6 py-2.5 bg-[#b73d67] text-white rounded-[10px] text-[13px] font-bold hover:bg-[#a33259] transition-colors"
           >
-            Chat with Pretty Corner →
+            Chat with Pretty Corner
           </Link>
         </div>
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Product, CartItem, Order, TownshipOption } from '@/lib/types';
 import { MOCK_PRODUCTS, INITIAL_ORDERS, MOCK_TOWNSHIPS } from '@/lib/mockData';
 
@@ -130,9 +130,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     saveCartToStorage(updatedCart);
   };
 
-  const clearCart = () => {
-    saveCartToStorage([]);
-  };
+  const clearCart = useCallback(() => {
+    setCart((prev) => {
+      if (prev.length === 0) return prev;
+      try {
+        localStorage.setItem('pretty_corner_cart', JSON.stringify([]));
+      } catch {}
+      return [];
+    });
+  }, []);
 
   const getProductQuantity = (productId: string, sizeName?: string): number => {
     if (!isMounted) return 0;
@@ -208,6 +214,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         return o;
       })
     );
+    if (status === 'paid') {
+      clearCart();
+    }
   };
 
   return (

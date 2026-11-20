@@ -85,7 +85,7 @@ export default function Footer() {
       </div>
 
       {/* 2. Bottom Copyright Bar */}
-      <div className="border-t border-[#eedfe5] bg-white py-3.5 pb-[calc(4.75rem+env(safe-area-inset-bottom,0px))] md:py-3.5 px-5 sm:px-6 lg:px-8">
+      <div className="border-t border-[#eedfe5] bg-white py-3.5 px-5 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] sm:text-[12px] text-[#7a6870] text-center sm:text-left">
           <p>© {new Date().getFullYear()} Pretty Corner. All rights reserved.</p>
           <p className="text-[#a4929a]">

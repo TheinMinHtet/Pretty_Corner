@@ -20,49 +20,26 @@ export default function ShoppingBagPage() {
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full pb-12">
-      {/* 1. Mobile Header (hidden on desktop) */}
-      <header className="md:hidden px-5 pt-3.5 pb-2">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.back()}
-            className="p-1 -ml-1 text-[#38262e] hover:opacity-70 transition-opacity cursor-pointer"
-            aria-label="Back"
-          >
-            <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="font-serif text-[29px] font-medium text-[#38262e]">
-            Your beauty bag
-          </h1>
-        </div>
-        <p className="font-sans text-[14px] text-[#7a6870] mt-2">
-          {cart.length > 0
-            ? `${cart.length} lovely ${cart.length === 1 ? 'find' : 'finds'}, picked by you.`
-            : 'Your beauty bag is currently empty.'}
-        </p>
-      </header>
-
-      {/* 2. Desktop Breadcrumb & Heading (md and up) */}
-      <div className="hidden md:block w-full max-w-7xl mx-auto px-6 lg:px-8 pt-8 pb-4">
-        <div className="flex items-center gap-2 text-[13px] text-[#7a6870] mb-3">
+      {/* Breadcrumb & Heading - Consistent across mobile and desktop */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-4">
+        <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870] mb-2 sm:mb-3">
           <Link href="/" className="hover:text-[#38262e]">Home</Link>
           <span>/</span>
           <span className="text-[#38262e] font-medium">Beauty Bag</span>
         </div>
 
-        <h1 className="font-serif text-[38px] font-medium text-[#38262e]">
+        <h1 className="font-serif text-[30px] sm:text-[38px] font-medium text-[#38262e]">
           Your beauty bag
         </h1>
-        <p className="font-sans text-[15px] text-[#7a6870] mt-1">
+        <p className="font-sans text-[13px] sm:text-[15px] text-[#7a6870] mt-1">
           {cart.length > 0
             ? `${cart.length} lovely ${cart.length === 1 ? 'find' : 'finds'} ready for doorstep delivery.`
             : 'Your beauty bag is currently empty.'}
         </p>
       </div>
 
-      {/* 3. Main Content Area - Responsive 2-Column Grid on Tablet/Desktop */}
-      <div className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-2">
+      {/* Main Content Area - Responsive 2-Column Grid */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
         {cart.length > 0 ? (
           <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-start">
             {/* Left Column: Bag Line Items (col-span-12 on mobile, col-span-7 or 8 on desktop) */}
@@ -123,15 +100,6 @@ export default function ShoppingBagPage() {
                   </div>
                 </div>
               ))}
-
-              {/* Mobile Trust Strip */}
-              <div className="md:hidden py-5">
-                <div className="bg-[#fceef2] rounded-[8px] h-[54px] flex items-center justify-center px-4">
-                  <p className="text-[12px] text-[#7a6870] text-center font-normal">
-                    Authentic products. Thoughtfully packed.
-                  </p>
-                </div>
-              </div>
             </div>
 
             {/* Right Column: Order Summary Card (sticky on desktop) */}
@@ -166,22 +134,12 @@ export default function ShoppingBagPage() {
                   href="/checkout"
                   className="w-full mt-6 h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-sm cursor-pointer"
                 >
-                  Checkout →
+                  Checkout
                 </Link>
-
-                <div className="flex items-center justify-center gap-2 mt-4 text-[#7a6870]">
-                  <svg className="w-4 h-4 text-[#7a6870]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                    <path d="M7 11V7a5 5 0 0110 0v4" />
-                  </svg>
-                  <span className="text-[12px]">
-                    No account needed. Just your beauty.
-                  </span>
-                </div>
 
                 <div className="text-center mt-4">
                   <Link href="/shop" className="text-[13px] font-bold text-[#b73d67] hover:underline">
-                    ← Continue shopping
+                    Continue shopping
                   </Link>
                 </div>
               </div>
@@ -204,7 +162,7 @@ export default function ShoppingBagPage() {
               href="/shop"
               className="mt-6 inline-flex items-center justify-center px-8 h-[48px] bg-[#b73d67] text-white rounded-[10px] text-[14px] font-bold hover:bg-[#a33259] transition-all cursor-pointer"
             >
-              Start shopping →
+              Start shopping
             </Link>
           </div>
         )}

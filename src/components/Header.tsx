@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
@@ -9,6 +9,7 @@ const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false }
 
 export default function Header() {
   const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isHome = pathname === '/';
   const isShop = pathname.startsWith('/shop') || pathname.startsWith('/product');
@@ -16,21 +17,21 @@ export default function Header() {
   const isContact = pathname.startsWith('/contact');
 
   return (
-    <header className="hidden md:block w-full sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#eedfe5] transition-all">
+    <header className="w-full sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#eedfe5] transition-all">
       {/* Main Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 h-[74px] flex items-center justify-between gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[64px] md:h-[74px] flex items-center justify-between gap-4">
         {/* Brand Logo */}
-        <Link href="/" className="flex flex-col group shrink-0">
-          <span className="font-serif text-[30px] lg:text-[34px] font-medium leading-none text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
+        <Link href="/" className="flex flex-col group shrink-0" onClick={() => setMobileMenuOpen(false)}>
+          <span className="font-serif text-[24px] sm:text-[28px] md:text-[30px] lg:text-[34px] font-medium leading-none text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
             Pretty Corner
           </span>
-          <span className="font-sans text-[9px] font-bold tracking-[2px] text-[#7a6870] uppercase mt-1">
+          <span className="font-sans text-[8px] sm:text-[9px] font-bold tracking-[1.5px] sm:tracking-[2px] text-[#7a6870] uppercase mt-0.5 sm:mt-1">
             Beauty, Gadgets & Variety Edit
           </span>
         </Link>
 
-        {/* Center Nav Links */}
-        <nav className="flex items-center gap-6 lg:gap-8 text-[14px]">
+        {/* Center Nav Links (md and above) */}
+        <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-[14px]">
           <Link
             href="/"
             className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
@@ -81,26 +82,94 @@ export default function Header() {
         </nav>
 
         {/* Right Action Icons */}
-        <div className="flex items-center gap-3 lg:gap-4 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0">
           {/* Bag Button */}
           <Link
             href="/bag"
-            className="flex items-center gap-2 bg-[#fceef2] hover:bg-[#fae2ea] text-[#38262e] px-4 py-2 rounded-full transition-all group"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-1.5 sm:gap-2 bg-[#fceef2] hover:bg-[#fae2ea] text-[#38262e] px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all group"
           >
             <div className="relative">
-              <svg className="w-5 h-5 text-[#38262e] group-hover:text-[#b73d67] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#38262e] group-hover:text-[#b73d67] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
                 <path d="M3 6h18" />
                 <path d="M16 10a4 4 0 01-8 0" />
               </svg>
               <CartBadge className="absolute -top-1.5 -right-2 bg-[#b73d67] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center" />
             </div>
-            <span className="font-bold text-[13px] text-[#38262e]">
+            <span className="font-bold text-[12px] sm:text-[13px] text-[#38262e]">
               Bag
             </span>
           </Link>
+
+          {/* Mobile Menu Toggle Button (visible on mobile only) */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg text-[#38262e] hover:bg-[#fceef2] transition-colors cursor-pointer"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? (
+              <svg className="w-5 h-5 text-[#38262e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5 text-[#38262e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Dropdown Menu for Navigation Links */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-white/98 border-t border-[#eedfe5] px-5 py-4 space-y-1 shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
+          <Link
+            href="/"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-[14px] font-medium transition-colors ${
+              isHome ? 'bg-[#fceef2] text-[#b73d67] font-bold' : 'text-[#38262e] hover:bg-[#faf7f8]'
+            }`}
+          >
+            <span>Home</span>
+            {isHome && <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />}
+          </Link>
+
+          <Link
+            href="/shop"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-[14px] font-medium transition-colors ${
+              isShop ? 'bg-[#fceef2] text-[#b73d67] font-bold' : 'text-[#38262e] hover:bg-[#faf7f8]'
+            }`}
+          >
+            <span>All Products</span>
+            {isShop && <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />}
+          </Link>
+
+          <Link
+            href="/order-lookup"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-[14px] font-medium transition-colors ${
+              isTrack ? 'bg-[#fceef2] text-[#b73d67] font-bold' : 'text-[#38262e] hover:bg-[#faf7f8]'
+            }`}
+          >
+            <span>Track Order</span>
+            {isTrack && <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />}
+          </Link>
+
+          <Link
+            href="/contact"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-[14px] font-medium transition-colors ${
+              isContact ? 'bg-[#fceef2] text-[#b73d67] font-bold' : 'text-[#38262e] hover:bg-[#faf7f8]'
+            }`}
+          >
+            <span>Contact & Help</span>
+            {isContact && <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />}
+          </Link>
+        </div>
+      )}
     </header>
   );
 }
+
