@@ -13,15 +13,16 @@ export default function Navigation() {
   const isHome = pathname === '/';
   const isShop = pathname.startsWith('/shop') || pathname.startsWith('/product');
   const isBag = pathname.startsWith('/bag') || pathname.startsWith('/checkout') || pathname.startsWith('/order-confirmation') || pathname.startsWith('/payment');
-  const isContact = pathname.startsWith('/contact') || pathname.startsWith('/about') || pathname.startsWith('/faq') || pathname.startsWith('/policies') || pathname.startsWith('/order-lookup') || pathname.startsWith('/order-tracking');
+  const isReceipt = pathname.startsWith('/order-lookup') || pathname.startsWith('/order-tracking');
+  const isContact = pathname.startsWith('/contact') || pathname.startsWith('/about') || pathname.startsWith('/faq') || pathname.startsWith('/policies');
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md z-40 border-t border-[#eedfe5] shadow-lg pb-[env(safe-area-inset-bottom,0px)]">
-      <div className="h-[58px] max-w-md mx-auto flex items-center justify-around px-2">
+      <div className="h-[58px] max-w-md mx-auto flex items-center justify-around px-1">
         {/* Home Tab */}
         <Link
           href="/"
-          className={`flex flex-col items-center justify-center w-16 py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 max-w-[68px] py-1 transition-colors ${
             isHome ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
@@ -29,7 +30,7 @@ export default function Navigation() {
             <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" />
             <path d="M9 21V12h6v9" />
           </svg>
-          <span className={`text-[11px] mt-0.5 tracking-tight ${isHome ? 'font-bold' : 'font-medium'}`}>
+          <span className={`text-[10.5px] mt-0.5 tracking-tight ${isHome ? 'font-bold' : 'font-medium'}`}>
             Home
           </span>
         </Link>
@@ -37,7 +38,7 @@ export default function Navigation() {
         {/* Shop Tab */}
         <Link
           href="/shop"
-          className={`flex flex-col items-center justify-center w-16 py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 max-w-[68px] py-1 transition-colors ${
             isShop ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
@@ -47,7 +48,7 @@ export default function Navigation() {
             <rect x="14" y="14" width="7" height="7" rx="1.5" />
             <rect x="3" y="14" width="7" height="7" rx="1.5" />
           </svg>
-          <span className={`text-[11px] mt-0.5 tracking-tight ${isShop ? 'font-bold' : 'font-medium'}`}>
+          <span className={`text-[10.5px] mt-0.5 tracking-tight ${isShop ? 'font-bold' : 'font-medium'}`}>
             Shop
           </span>
         </Link>
@@ -55,7 +56,7 @@ export default function Navigation() {
         {/* Bag Tab */}
         <Link
           href="/bag"
-          className={`flex flex-col items-center justify-center w-16 py-1 transition-colors relative ${
+          className={`flex flex-col items-center justify-center flex-1 max-w-[68px] py-1 transition-colors relative ${
             isBag ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
@@ -68,23 +69,43 @@ export default function Navigation() {
             <CartBadge />
           </div>
           <span
-            className={`text-[11px] mt-0.5 tracking-tight ${isBag ? 'font-bold' : 'font-medium'}`}
+            className={`text-[10.5px] mt-0.5 tracking-tight ${isBag ? 'font-bold' : 'font-medium'}`}
           >
             Bag
+          </span>
+        </Link>
+
+        {/* Order Receipt Tab */}
+        <Link
+          href="/order-lookup"
+          aria-label="Order Receipt"
+          title="Order Receipt"
+          className={`flex flex-col items-center justify-center flex-1 max-w-[68px] py-1 transition-colors ${
+            isReceipt ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
+          }`}
+        >
+          <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z" />
+            <path d="M8 7h8" />
+            <path d="M8 11h8" />
+            <path d="M8 15h5" />
+          </svg>
+          <span className={`text-[10.5px] mt-0.5 tracking-tight ${isReceipt ? 'font-bold' : 'font-medium'}`}>
+            Receipt
           </span>
         </Link>
 
         {/* Contact Tab */}
         <Link
           href="/contact"
-          className={`flex flex-col items-center justify-center w-16 py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 max-w-[68px] py-1 transition-colors ${
             isContact ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
           <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
           </svg>
-          <span className={`text-[11px] mt-0.5 tracking-tight ${isContact ? 'font-bold' : 'font-medium'}`}>
+          <span className={`text-[10.5px] mt-0.5 tracking-tight ${isContact ? 'font-bold' : 'font-medium'}`}>
             Contact
           </span>
         </Link>
