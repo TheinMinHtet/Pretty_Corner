@@ -28,7 +28,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
       <Header />
 
       {/* Main Content Area */}
-      <main className={`flex-1 flex flex-col w-full ${showNav ? 'pb-[64px] md:pb-0' : ''}`}>
+      <main className="flex-1 flex flex-col w-full">
         {children}
       </main>
 
@@ -36,7 +36,7 @@ export default function MobileShell({ children }: { children: React.ReactNode })
       <FloatingCartBar />
 
       {/* Footer */}
-      <Footer />
+      <Footer hasBottomNav={showNav} />
 
       {/* Mobile Bottom 4-Tab Navigation */}
       {showNav && <Navigation />}
