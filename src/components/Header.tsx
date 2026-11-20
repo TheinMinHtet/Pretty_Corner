@@ -25,7 +25,7 @@ export default function Header() {
             Pretty Corner
           </span>
           <span className="font-sans text-[9px] font-bold tracking-[2px] text-[#7a6870] uppercase mt-1">
-            Your Everyday Beauty Edit
+            Beauty, Gadgets & Variety Edit
           </span>
         </Link>
 
@@ -43,8 +43,6 @@ export default function Header() {
             )}
           </Link>
 
-
-
           <Link
             href="/shop"
             className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
@@ -53,6 +51,18 @@ export default function Header() {
           >
             All Products
             {isShop && !pathname.includes('category=') && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
+            )}
+          </Link>
+
+          <Link
+            href="/shop?category=electrical"
+            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
+              pathname.includes('category=electrical') ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
+            }`}
+          >
+            ⚡ Electrical
+            {pathname.includes('category=electrical') && (
               <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
             )}
           </Link>

@@ -256,7 +256,11 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   onClick={() => setOpenHowToUse(!openHowToUse)}
                   className="w-full flex items-center justify-between text-left cursor-pointer"
                 >
-                  <span className="text-[15px] font-bold text-[#38262e]">How to use & ingredients</span>
+                  <span className="text-[15px] font-bold text-[#38262e]">
+                    {product.category === 'electrical' || product.category === 'lifestyle'
+                      ? 'How to use & specifications'
+                      : 'How to use & ingredients'}
+                  </span>
                   <span className="text-[20px] text-[#38262e] font-normal leading-none">
                     {openHowToUse ? '−' : '+'}
                   </span>
@@ -264,10 +268,15 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {openHowToUse && (
                   <div className="pt-2 text-[14px] text-[#7a6870] leading-relaxed space-y-2">
                     <p>
-                      <strong className="text-[#38262e]">Directions:</strong> {product.usage}
+                      <strong className="text-[#38262e]">Directions / Usage:</strong> {product.usage}
                     </p>
                     <p>
-                      <strong className="text-[#38262e]">Ingredients:</strong> {product.ingredients}
+                      <strong className="text-[#38262e]">
+                        {product.category === 'electrical' || product.category === 'lifestyle'
+                          ? 'Specifications:'
+                          : 'Ingredients:'}
+                      </strong>{' '}
+                      {product.specs || product.ingredients}
                     </p>
                   </div>
                 )}

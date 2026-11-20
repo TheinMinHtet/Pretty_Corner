@@ -16,12 +16,12 @@ export default function Footer() {
                 Pretty Corner
               </span>
               <p className="font-sans text-[10px] font-bold tracking-[2px] text-[#7a6870] uppercase mt-0.5">
-                Your Everyday Beauty Edit
+                Beauty, Gadgets & Variety Edit
               </p>
             </Link>
 
             <p className="text-[13px] text-[#7a6870] leading-relaxed max-w-xs">
-              A corner for your kind of beautiful. Curated authentic skincare, gentle daily formulas, and glow essentials lovingly delivered in Myanmar.
+              A corner for all your everyday favorites. Curated authentic cosmetics, smart electrical gadgets, and lifestyle variety lovingly delivered in Myanmar.
             </p>
 
             <div className="pt-2">
@@ -44,28 +44,23 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/shop?category=skincare" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Skincare Essentials
+                <Link href="/shop?category=electrical" className="hover:text-[#b73d67] transition-colors inline-block">
+                  ⚡ Electrical & Gadgets
                 </Link>
               </li>
               <li>
                 <Link href="/shop?category=skincare" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Hydrating Serums
-                </Link>
-              </li>
-              <li>
-                <Link href="/shop?category=skincare" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Daily Moisturizers
-                </Link>
-              </li>
-              <li>
-                <Link href="/shop?category=skincare" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Sun Protection (SPF)
+                  ✨ Skincare Essentials
                 </Link>
               </li>
               <li>
                 <Link href="/shop?category=makeup" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Everyday Makeup
+                  💄 Everyday Makeup
+                </Link>
+              </li>
+              <li>
+                <Link href="/shop?category=lifestyle" className="hover:text-[#b73d67] transition-colors inline-block">
+                  🌿 Lifestyle & Variety
                 </Link>
               </li>
             </ul>

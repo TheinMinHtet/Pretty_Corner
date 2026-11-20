@@ -20,11 +20,15 @@ const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper
 export default function HomePage() {
   const router = useRouter();
   const { products, cartCount, setSearchQuery, addToCart, isMounted } = useStore();
-  const [activeCategory, setActiveCategory] = useState<'skincare' | 'makeup' | 'lenses' | 'more'>('skincare');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchInput, setSearchInput] = useState('');
 
-  // Show up to 4 items on bestsellers to look beautiful on 2-col, 3-col, and 4-col responsive layouts
-  const bestsellers = products.slice(0, 4);
+  // Show products matching selected category or top curated products on all
+  const displayedProducts = (
+    activeCategory === 'all'
+      ? products
+      : products.filter((p) => p.category === activeCategory)
+  ).slice(0, 4);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +52,7 @@ export default function HomePage() {
               Pretty Corner
             </h1>
             <p className="font-sans text-[9px] font-medium tracking-[1.5px] text-[#7a6870] uppercase mt-1">
-              Your Everyday Beauty Edit
+              Beauty, Gadgets & Variety Edit
             </p>
           </div>
 
@@ -73,7 +77,7 @@ export default function HomePage() {
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search your next beauty favorite"
+              placeholder="Search gadgets, beauty, electricals, lifestyle…"
               className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full font-normal"
             />
           </div>
@@ -95,13 +99,13 @@ export default function HomePage() {
           <div className="absolute inset-0 p-6 sm:p-10 md:p-12 lg:p-16 flex flex-col justify-between">
             <div className="max-w-lg">
               <span className="inline-block font-sans text-[11px] sm:text-[12px] font-bold tracking-[2px] text-[#b73d67] uppercase">
-                The Daily Glow Edit
+                The Curated Variety Edit
               </span>
               <h2 className="font-serif text-[41px] sm:text-[50px] md:text-[58px] lg:text-[64px] font-medium leading-[1.05] text-[#38262e] mt-2">
-                A little care.<br />A lot of glow.
+                Beauty, gadgets &<br />daily essentials.
               </h2>
               <p className="font-sans text-[14px] sm:text-[16px] text-[#7a6870] mt-3 max-w-md">
-                Good skin days start here. Thoughtful formulas designed for radiant everyday wear.
+                Your corner for all things lovely. Authentic cosmetics, smart electrical devices, and everyday lifestyle finds delivered to your door.
               </p>
             </div>
 
@@ -110,7 +114,7 @@ export default function HomePage() {
                 href="/shop"
                 className="inline-flex items-center justify-center bg-[#b73d67] text-white text-[14px] sm:text-[15px] font-bold h-[48px] sm:h-[52px] px-7 sm:px-8 rounded-[12px] shadow-sm hover:bg-[#a33259] active:scale-[0.98] transition-all"
               >
-                Find your glow →
+                Explore all products →
               </Link>
             </div>
           </div>
@@ -121,56 +125,66 @@ export default function HomePage() {
       <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-8 pb-3">
         <div className="flex items-center justify-between">
           <h3 className="font-serif text-[24px] sm:text-[28px] font-medium text-[#38262e]">
-            Your beauty, your way
+            Explore by category
           </h3>
           <Link
             href="/shop"
             className="hidden sm:inline-block text-[13px] font-bold text-[#b73d67] hover:underline"
           >
-            Explore all categories →
+            Explore all products →
           </Link>
         </div>
 
         <div className="flex items-center gap-2.5 mt-3.5 overflow-x-auto no-scrollbar pb-1">
           <button
+            onClick={() => setActiveCategory('all')}
+            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
+              activeCategory === 'all'
+                ? 'bg-[#38262e] text-white'
+                : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
+            }`}
+          >
+            All Finds
+          </button>
+          <button
+            onClick={() => setActiveCategory('electrical')}
+            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
+              activeCategory === 'electrical'
+                ? 'bg-[#38262e] text-white'
+                : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
+            }`}
+          >
+            ⚡ Electrical & Gadgets
+          </button>
+          <button
             onClick={() => setActiveCategory('skincare')}
-            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors ${
+            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
               activeCategory === 'skincare'
                 ? 'bg-[#38262e] text-white'
                 : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
             }`}
           >
-            Skincare
+            ✨ Skincare
           </button>
           <button
             onClick={() => setActiveCategory('makeup')}
-            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors ${
+            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
               activeCategory === 'makeup'
                 ? 'bg-[#38262e] text-white'
                 : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
             }`}
           >
-            Makeup
+            💄 Makeup
           </button>
           <button
-            onClick={() => setActiveCategory('lenses')}
-            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors ${
-              activeCategory === 'lenses'
+            onClick={() => setActiveCategory('lifestyle')}
+            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
+              activeCategory === 'lifestyle'
                 ? 'bg-[#38262e] text-white'
                 : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
             }`}
           >
-            Lenses
-          </button>
-          <button
-            onClick={() => setActiveCategory('more')}
-            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors ${
-              activeCategory === 'more'
-                ? 'bg-[#38262e] text-white'
-                : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
-            }`}
-          >
-            More Essentials
+            🌿 Lifestyle & Others
           </button>
         </div>
       </section>
@@ -183,11 +197,11 @@ export default function HomePage() {
               Loved for a reason
             </h3>
             <p className="font-sans text-[13px] text-[#7a6870] mt-0.5 hidden sm:block">
-              Daily bestsellers crafted for authentic results.
+              Curated bestsellers across beauty, smart tech, and daily living.
             </p>
           </div>
           <Link
-            href={`/shop?category=${activeCategory}`}
+            href={activeCategory === 'all' ? '/shop' : `/shop?category=${activeCategory}`}
             className="text-[13px] font-bold text-[#b73d67] hover:underline"
           >
             Shop all →
@@ -196,7 +210,7 @@ export default function HomePage() {
 
         {/* Responsive Product Grid: 2 cols on mobile, 3 cols on tablet, 4 cols on desktop */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5 lg:gap-6">
-          {bestsellers.map((product) => {
+          {displayedProducts.map((product) => {
             return (
               <div key={product.id} className="flex flex-col group">
                 <div className="relative w-full h-[184px] sm:h-[230px] md:h-[260px] lg:h-[280px] bg-[#f9f5f7] rounded-[12px] overflow-hidden">

@@ -22,7 +22,7 @@ function ShopContent() {
   const searchParams = useSearchParams();
   const { products, cartCount, addToCart, isMounted } = useStore();
 
-  const initialCat = searchParams.get('category') || 'skincare';
+  const initialCat = searchParams.get('category') || 'all';
   const initialQuery = searchParams.get('q') || '';
 
   const [activeCategory, setActiveCategory] = useState<string>(initialCat);
@@ -32,15 +32,54 @@ function ShopContent() {
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
 
   // Filter Modal specific states
-  const [filterBrand, setFilterBrand] = useState<'all' | 'pretty-essentials'>('pretty-essentials');
-  const [maxPrice, setMaxPrice] = useState<number>(50000);
+  const [filterBrand, setFilterBrand] = useState<'all' | 'pretty-essentials'>('all');
+  const [maxPrice, setMaxPrice] = useState<number>(60000);
   const [inStockOnly, setInStockOnly] = useState<boolean>(true);
 
+  const getCategoryTitle = () => {
+    switch (activeCategory) {
+      case 'electrical':
+        return 'Electrical & Smart Gadgets';
+      case 'skincare':
+        return 'Skincare Essentials';
+      case 'makeup':
+        return 'Everyday Makeup';
+      case 'lifestyle':
+        return 'Lifestyle & Variety';
+      default:
+        return 'The Variety Corner';
+    }
+  };
+
+  const getCategorySubtitle = () => {
+    switch (activeCategory) {
+      case 'electrical':
+        return 'Sonic beauty devices, touch LED mirrors, humidifiers & smart lifestyle tech.';
+      case 'skincare':
+        return 'Gentle serums, barrier moisturizers, and UV daily defense formulas.';
+      case 'makeup':
+        return 'Breathable cheek tints, cushion lip glazes, and daily complexion picks.';
+      case 'lifestyle':
+        return 'Silk hair ties, vacuum tumblers, and thoughtful everyday accessories.';
+      default:
+        return 'From genuine skincare & makeup to smart electrical gadgets and variety essentials.';
+    }
+  };
+
   const subcategoryList = useMemo(() => {
+    if (activeCategory === 'electrical') {
+      return ['All electrical', 'Beauty Tech', 'Smart Gadgets', 'Home & Living'];
+    }
     if (activeCategory === 'skincare') {
       return ['All skincare', 'Serums', 'Moisturizers', 'SPF & Sun care'];
     }
-    return ['All products'];
+    if (activeCategory === 'makeup') {
+      return ['All makeup', 'Face', 'Lips'];
+    }
+    if (activeCategory === 'lifestyle') {
+      return ['All lifestyle', 'Daily Essentials', 'Accessories'];
+    }
+    return ['All products', 'Electrical', 'Skincare', 'Makeup', 'Lifestyle'];
   }, [activeCategory]);
 
   const filteredProducts = useMemo(() => {
@@ -50,9 +89,10 @@ function ShopContent() {
         return false;
       }
       // Subcategory filter
-      if (activeSubcategory !== 'all') {
+      if (activeSubcategory !== 'all' && !activeSubcategory.startsWith('All ')) {
         const subLower = activeSubcategory.toLowerCase();
         const matchesSub =
+          (p.subcategory && p.subcategory.toLowerCase().includes(subLower)) ||
           p.category.toLowerCase().includes(subLower) ||
           p.tagline.toLowerCase().includes(subLower) ||
           p.name.toLowerCase().includes(subLower);
@@ -104,7 +144,7 @@ function ShopContent() {
           </button>
 
           <h1 className="font-serif text-[28px] font-medium text-[#38262e]">
-            {activeCategory === 'skincare' ? 'The skincare corner' : 'The beauty corner'}
+            {getCategoryTitle()}
           </h1>
 
           <Link href="/bag" className="relative p-1 text-[#38262e] hover:opacity-80 transition-opacity">
@@ -118,7 +158,7 @@ function ShopContent() {
         </div>
 
         <p className="font-sans text-[12px] text-[#7a6870] mt-2">
-          A little everyday care, for every kind of skin.
+          {getCategorySubtitle()}
         </p>
 
         {/* Mobile Search input */}
@@ -131,7 +171,7 @@ function ShopContent() {
             type="text"
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            placeholder="Serums, moisturizers, SPF…"
+            placeholder="Search electrical, beauty, gadgets, lifestyle…"
             className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full"
           />
           {searchFilter && (
@@ -154,10 +194,10 @@ function ShopContent() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <h1 className="font-serif text-[36px] lg:text-[42px] font-medium text-[#38262e] leading-tight">
-              {activeCategory === 'skincare' ? 'The skincare corner' : 'The beauty corner'}
+              {getCategoryTitle()}
             </h1>
             <p className="font-sans text-[14px] text-[#7a6870] mt-1.5 max-w-xl">
-              A little everyday care, for every kind of skin. Thoughtfully picked formulations for balanced daily rituals.
+              {getCategorySubtitle()}
             </p>
           </div>
 
@@ -172,7 +212,7 @@ function ShopContent() {
                 type="text"
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
-                placeholder="Search products, formulas, SPF…"
+                placeholder="Search products, electricals, gadgets…"
                 className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full"
               />
               {searchFilter && (
@@ -191,6 +231,34 @@ function ShopContent() {
               </span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Main Category Tabs */}
+      <div className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-2 pb-2">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          {[
+            { id: 'all', label: 'All Products' },
+            { id: 'electrical', label: '⚡ Electrical & Gadgets' },
+            { id: 'skincare', label: '✨ Skincare' },
+            { id: 'makeup', label: '💄 Makeup' },
+            { id: 'lifestyle', label: '🌿 Lifestyle & Variety' },
+          ].map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => {
+                setActiveCategory(cat.id);
+                setActiveSubcategory('all');
+              }}
+              className={`h-[36px] sm:h-[38px] px-4 sm:px-5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all cursor-pointer ${
+                activeCategory === cat.id
+                  ? 'bg-[#38262e] text-white shadow-xs'
+                  : 'bg-[#faf7f8] text-[#38262e] border border-[#eedfe5] hover:bg-[#fceef2]'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -347,17 +415,26 @@ function ShopContent() {
               <div>
                 <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">Category</p>
                 <div className="flex flex-wrap gap-2">
-                  {['all', 'skincare', 'makeup', 'lenses'].map((cat) => (
+                  {[
+                    { id: 'all', label: 'All Products' },
+                    { id: 'electrical', label: '⚡ Electrical & Gadgets' },
+                    { id: 'skincare', label: '✨ Skincare' },
+                    { id: 'makeup', label: '💄 Makeup' },
+                    { id: 'lifestyle', label: '🌿 Lifestyle & Variety' },
+                  ].map((cat) => (
                     <button
-                      key={cat}
-                      onClick={() => setActiveCategory(cat)}
-                      className={`h-[34px] px-3.5 rounded-[17px] text-[12px] capitalize transition-colors ${
-                        activeCategory === cat
+                      key={cat.id}
+                      onClick={() => {
+                        setActiveCategory(cat.id);
+                        setActiveSubcategory('all');
+                      }}
+                      className={`h-[34px] px-3.5 rounded-[17px] text-[12px] transition-colors cursor-pointer ${
+                        activeCategory === cat.id
                           ? 'bg-[#38262e] text-white font-medium'
                           : 'bg-[#fceef2] text-[#38262e]'
                       }`}
                     >
-                      {cat}
+                      {cat.label}
                     </button>
                   ))}
                 </div>

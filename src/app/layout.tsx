@@ -20,8 +20,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'Pretty Corner | Your Everyday Beauty Edit',
-  description: 'A little beauty, delivered to your door. Authentic skincare, makeup, and everyday glow essentials.',
+  title: 'Pretty Corner | Beauty, Electrical Gadgets & Everyday Variety',
+  description: 'A curated corner for all your favorites. Authentic cosmetics, smart electrical devices, and everyday lifestyle finds delivered across Myanmar.',
 };
 
 export default function RootLayout({
