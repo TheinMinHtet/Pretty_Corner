@@ -8,7 +8,7 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
     <footer className="w-full bg-[#fdfafb] border-t border-[#eedfe5] mt-auto">
       {/* 1. Main Footer Grid: Classic 3 columns (Left: Brand, Middle: Customer Care, Right: Payment & Delivery) */}
       <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 pt-4 sm:pt-7 lg:pt-9 pb-4 sm:pb-7">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8 lg:gap-12 items-start md:items-center">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8 lg:gap-12 items-start">
           {/* Column 1: Brand */}
           <div className="col-span-2 md:col-span-1 flex flex-col items-center justify-center text-center self-center py-2 md:py-0">
             <Link href="/" className="inline-block group text-center">
@@ -19,7 +19,7 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
           </div>
 
           {/* Column 2: Customer Care */}
-          <div className="col-span-1 md:pl-12 lg:pl-20">
+          <div className="col-span-1 md:pl-8 lg:pl-14">
             <h4 className="font-serif text-[15px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight">
               Customer Care
             </h4>
@@ -32,21 +32,6 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
               <li>
                 <Link href="/faq" className="hover:text-[#b73d67] transition-colors inline-block">
                   FAQs
-                </Link>
-              </li>
-              <li>
-                <Link href="/policies/shipping" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Shipping & Townships
-                </Link>
-              </li>
-              <li>
-                <Link href="/policies/returns" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Returns & Refunds
-                </Link>
-              </li>
-              <li>
-                <Link href="/policies/privacy" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Privacy Policy
                 </Link>
               </li>
               <li>

@@ -103,6 +103,7 @@ export default function HomePage() {
             priority
             className="object-cover pointer-events-none"
           />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/60 via-white/25 to-transparent pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-transparent pointer-events-none" />
 
           <div className="absolute inset-0 p-6 sm:p-10 md:p-12 lg:p-16 flex flex-col justify-between">
@@ -113,7 +114,7 @@ export default function HomePage() {
               <h2 className="font-serif text-[41px] sm:text-[50px] md:text-[58px] lg:text-[64px] font-medium leading-[1.05] text-[#38262e] mt-2">
                 Beauty, gadgets &<br />daily essentials.
               </h2>
-              <p className="font-sans text-[14px] sm:text-[16px] text-[#7a6870] mt-3 max-w-md">
+              <p className="font-sans text-[15px] sm:text-[16.5px] font-medium text-[#2e1d25] leading-relaxed mt-3 max-w-md">
                 A little corner of beauty, style, and inspiration. Discover your pretty side with Pretty Corner.
               </p>
             </div>

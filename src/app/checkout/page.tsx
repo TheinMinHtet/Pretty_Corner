@@ -224,7 +224,7 @@ export default function CheckoutPage() {
               Checkout
             </h1>
             <p className="font-sans text-[13px] sm:text-[15px] text-[#7a6870] mt-1">
-              Fast, direct delivery across all Yangon townships.
+              Fast, direct delivery across all townships.
             </p>
           </div>
 
@@ -416,7 +416,7 @@ export default function CheckoutPage() {
                         handleMapSearch();
                       }
                     }}
-                    placeholder="Search street, township or landmark in Yangon…"
+                    placeholder="Search street, township or landmark …"
                     className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full"
                   />
                   {mapSearch && (
