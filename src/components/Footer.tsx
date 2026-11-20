@@ -10,24 +10,15 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-5 sm:pt-6 lg:pt-8 pb-5 sm:pb-8 lg:pb-10">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8 lg:gap-12">
           {/* Column 1: Brand & Philosophy - Spans 2 cols on mobile, 1 col on desktop */}
-          <div className="col-span-2 md:col-span-1 flex flex-col space-y-2 sm:space-y-4">
-            <div className="flex items-center justify-between sm:justify-start gap-3 flex-wrap">
-              <Link href="/" className="inline-block group">
-                <span className="font-serif text-[24px] sm:text-[30px] lg:text-[32px] font-medium text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
-                  Pretty Corner
-                </span>
-                <p className="font-sans text-[9px] sm:text-[10px] font-bold tracking-[2px] text-[#7a6870] uppercase mt-0.5">
-                  Beauty, Gadgets & Variety Edit
-                </p>
-              </Link>
-
-              <div className="sm:pt-1">
-                <span className="inline-flex items-center gap-1.5 bg-[#fceef2] text-[#b73d67] text-[10px] sm:text-[11px] font-semibold px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-[#f5d9e3]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />
-                  100% Authentic Guaranteed
-                </span>
-              </div>
-            </div>
+          <div className="col-span-2 md:col-span-1 flex flex-col space-y-2 sm:space-y-3">
+            <Link href="/" className="inline-block group">
+              <span className="font-serif text-[24px] sm:text-[30px] lg:text-[32px] font-medium text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
+                Pretty Corner
+              </span>
+              <p className="font-sans text-[9px] sm:text-[10px] font-bold tracking-[2px] text-[#7a6870] uppercase mt-0.5">
+                Beauty, Gadgets & Variety Edit
+              </p>
+            </Link>
 
             <p className="text-[12px] sm:text-[13px] text-[#7a6870] leading-relaxed max-w-sm">
               Curated authentic cosmetics, smart electrical gadgets, and lifestyle variety lovingly delivered in Myanmar.
@@ -39,7 +30,7 @@ export default function Footer() {
             <h4 className="font-serif text-[16px] sm:text-[18px] font-medium text-[#38262e] mb-2.5 sm:mb-4 tracking-tight">
               Customer Care
             </h4>
-            <ul className="space-y-1.5 sm:space-y-2.5 text-[12px] sm:text-[13px] text-[#7a6870] leading-snug">
+            <ul className="space-y-1.5 sm:space-y-2 text-[12px] sm:text-[13px] text-[#7a6870] leading-snug">
               <li>
                 <Link href="/about" className="hover:text-[#b73d67] transition-colors inline-block">
                   About us
@@ -47,27 +38,27 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/faq" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Frequently asked questions
+                  FAQs
                 </Link>
               </li>
               <li>
                 <Link href="/policies/shipping" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Shipping & Yangon Townships
+                  Shipping & Townships
                 </Link>
               </li>
               <li>
                 <Link href="/policies/returns" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Return & Refund policy
+                  Returns & Refunds
                 </Link>
               </li>
               <li>
                 <Link href="/policies/privacy" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Privacy policy
+                  Privacy Policy
                 </Link>
               </li>
               <li>
                 <Link href="/policies/terms" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Terms and conditions
+                  Terms & Conditions
                 </Link>
               </li>
             </ul>
