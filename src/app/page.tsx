@@ -168,9 +168,6 @@ export default function HomePage() {
             <h3 className="font-serif text-[22px] sm:text-[32px] font-medium text-[#38262e] leading-tight">
               Top Picks & Highlights
             </h3>
-            <p className="font-sans text-[12px] sm:text-[13px] text-[#7a6870] mt-1">
-              Showing featured highlights. Explore our complete collection in the shop.
-            </p>
           </div>
           <Link
             href={activeCategory === 'all' ? '/shop' : `/shop?category=${activeCategory}`}

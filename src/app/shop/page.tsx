@@ -350,14 +350,14 @@ function ShopContent() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="appearance-none bg-white border border-[#eedfe5] rounded-[9px] text-[13px] text-[#38262e] pr-8 pl-3.5 h-[38px] focus:outline-none focus:border-[#b73d67] cursor-pointer font-normal"
+                className="appearance-none bg-[#fdfbfa] hover:bg-[#fcf7f9] border border-[#eedfe5] rounded-full text-[13px] text-[#38262e] pr-8 pl-4 h-[38px] focus:outline-none focus:border-[#b73d67] cursor-pointer font-medium transition-colors shadow-[0_2px_8px_rgba(56,38,46,0.02)]"
               >
                 <option value="featured">Sort: Featured</option>
                 <option value="newest">Sort: Newest</option>
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
               </select>
-              <span className="absolute right-3 top-2.5 pointer-events-none text-[#7a6870] text-xs">⌄</span>
+              <span className="absolute right-3.5 top-2.5 pointer-events-none text-[#b73d67] text-xs">⌄</span>
             </div>
           </div>
         </div>

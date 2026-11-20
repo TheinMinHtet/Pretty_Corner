@@ -119,15 +119,15 @@ export default function CheckoutPage() {
           <div className="md:col-span-7 lg:col-span-8 space-y-6">
             {/* Elegant Notification if form invalid */}
             {formAlert && (
-              <div className="p-4 rounded-xl bg-white border border-[#eedfe5] text-[#38262e] flex items-center justify-between gap-3 shadow-sm animate-in fade-in duration-200">
+              <div className="p-3.5 sm:p-4 rounded-xl bg-[#fdf2f5] border border-[#f3ccd8] text-[#38262e] flex items-center justify-between gap-3 shadow-[0_4px_20px_rgba(183,61,103,0.06)] animate-in fade-in duration-200">
                 <div className="flex items-center gap-2.5">
                   <span className="w-2 h-2 rounded-full bg-[#b73d67] shrink-0" />
-                  <span className="text-[13px] font-medium text-[#7a6870]">{formAlert}</span>
+                  <span className="text-[13px] font-medium text-[#842a4b]">{formAlert}</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setFormAlert(null)}
-                  className="w-6 h-6 rounded-full hover:bg-[#faf7f8] text-[#7a6870] hover:text-[#38262e] flex items-center justify-center text-xs font-bold cursor-pointer transition-colors"
+                  className="w-6 h-6 rounded-full hover:bg-white/60 text-[#b73d67] flex items-center justify-center text-xs font-bold cursor-pointer transition-colors"
                 >
                   ✕
                 </button>
@@ -182,8 +182,8 @@ export default function CheckoutPage() {
                     }`}
                   />
                   {phoneError && (
-                    <p className="text-red-600 text-[11px] font-semibold mt-1 flex items-center gap-1">
-                      <span>⚠</span>
+                    <p className="text-[#b73d67] text-[11px] font-medium mt-1 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] shrink-0 inline-block" />
                       <span>{phoneError}</span>
                     </p>
                   )}
