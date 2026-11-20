@@ -375,7 +375,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Map search input */}
-              <form onSubmit={handleMapSearch} className="mb-3 flex items-center gap-2">
+              <div className="mb-3 flex items-center gap-2">
                 <div className="flex-1 bg-[#f7f4f5] border border-[#eedfe5] focus-within:border-[#b73d67] focus-within:bg-white h-[42px] rounded-[9px] flex items-center px-3 gap-2.5 transition-all">
                   <svg className="w-4 h-4 text-[#7a6870] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <circle cx="11" cy="11" r="8" />
@@ -385,6 +385,12 @@ export default function CheckoutPage() {
                     type="text"
                     value={mapSearch}
                     onChange={(e) => setMapSearch(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleMapSearch();
+                      }
+                    }}
                     placeholder="Search street, township or landmark in Yangon…"
                     className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full"
                   />
@@ -399,13 +405,14 @@ export default function CheckoutPage() {
                   )}
                 </div>
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={() => handleMapSearch()}
                   disabled={isSearchingMap || !mapSearch.trim()}
                   className="h-[42px] px-4 bg-[#38262e] hover:bg-[#503742] text-white text-[12px] font-bold rounded-[9px] transition-colors shrink-0 disabled:opacity-40 cursor-pointer"
                 >
                   {isSearchingMap ? 'Searching…' : 'Search'}
                 </button>
-              </form>
+              </div>
 
               {/* GPS error or guide alert */}
               {gpsErrorMsg && (
