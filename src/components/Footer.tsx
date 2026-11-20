@@ -9,20 +9,13 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
       {/* 1. Main Footer Grid: Classic 3 columns (Left: Brand, Middle: Customer Care, Right: Payment & Delivery) */}
       <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 pt-4 sm:pt-7 lg:pt-9 pb-4 sm:pb-7">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8 lg:gap-12 items-start">
-          {/* Column 1: Brand & Philosophy */}
-          <div className="col-span-2 md:col-span-1 flex flex-col items-center md:items-start text-center md:text-left space-y-2 sm:space-y-2.5">
+          {/* Column 1: Brand */}
+          <div className="col-span-2 md:col-span-1 flex flex-col items-center md:items-start text-center md:text-left">
             <Link href="/" className="inline-block group text-center md:text-left">
               <span className="font-serif text-[24px] sm:text-[28px] lg:text-[30px] font-medium text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
                 Pretty Corner
               </span>
-              <p className="font-sans text-[9px] sm:text-[10px] font-bold tracking-[2px] text-[#7a6870] uppercase mt-0.5">
-                Beauty, Gadgets & Variety Edit
-              </p>
             </Link>
-
-            <p className="text-[12px] sm:text-[13px] text-[#7a6870] leading-relaxed max-w-sm md:max-w-[320px] mx-auto md:mx-0">
-              Curated authentic cosmetics, smart electrical gadgets, and lifestyle variety lovingly delivered across Myanmar.
-            </p>
           </div>
 
           {/* Column 2: Customer Care */}
