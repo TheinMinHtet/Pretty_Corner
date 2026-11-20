@@ -20,13 +20,13 @@ export default function Footer() {
               </p>
             </Link>
 
-            <p className="text-[12px] sm:text-[13px] text-[#7a6870] leading-relaxed max-w-sm">
+            <p className="text-[12px] sm:text-[13px] text-[#7a6870] leading-relaxed max-w-xs sm:max-w-[320px]">
               Curated authentic cosmetics, smart electrical gadgets, and lifestyle variety lovingly delivered across Myanmar.
             </p>
           </div>
 
-          {/* Column 2: Customer Care (Single neat vertical list) */}
-          <div className="col-span-1">
+          {/* Column 2: Customer Care (Single neat vertical list, shifted right on desktop for even spacing) */}
+          <div className="col-span-1 md:pl-12 lg:pl-20">
             <h4 className="font-serif text-[16px] sm:text-[17px] font-medium text-[#38262e] mb-2.5 sm:mb-3.5 tracking-tight">
               Customer Care
             </h4>
