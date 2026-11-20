@@ -1,6 +1,8 @@
 /**
- * Validates phone numbers with specific support for Myanmar mobile formats (MPT, ATOM/Telenor, Ooredoo, MyTel)
- * as well as standard international numbers.
+ * Validates phone numbers according to the required Myanmar formats:
+ * - Must start with 09, 01, or +959
+ * - Must be followed by 6 to 10 digits
+ * - Starting with anything else or not having 6-10 digits following the prefix is invalid
  */
 export function validatePhoneNumber(phone: string): { isValid: boolean; error?: string } {
   const trimmed = phone.trim();
@@ -11,24 +13,36 @@ export function validatePhoneNumber(phone: string): { isValid: boolean; error?: 
   // Remove whitespace, dashes, parentheses, dots
   const cleaned = trimmed.replace(/[\s\-\(\)\.]/g, '');
 
-  // Must consist only of optional leading '+' and digits
+  // Must consist only of digits with optional leading '+'
   if (!/^\+?[0-9]+$/.test(cleaned)) {
     return { isValid: false, error: 'Phone number can only contain numbers.' };
   }
 
-  // Myanmar formats:
-  // 09 followed by 7-9 digits (total 9-11 digits)
-  // +959 or 959 followed by 7-9 digits (total 10-12 digits without '+')
-  // 9 followed by 7-9 digits
-  const myanmarPattern = /^(?:\+?959|09|9)\d{7,9}$/;
+  // Must start with 09, 01, or +959
+  const startsWithValidPrefix =
+    cleaned.startsWith('09') ||
+    cleaned.startsWith('01') ||
+    cleaned.startsWith('+959');
 
-  // General valid international phone number: 8 to 15 digits
-  const internationalPattern = /^\+?[0-9]{8,15}$/;
-
-  if (!myanmarPattern.test(cleaned) && !internationalPattern.test(cleaned)) {
+  if (!startsWithValidPrefix) {
     return {
       isValid: false,
-      error: 'Please enter a valid Myanmar phone number (e.g., 09 765 432 100 or 09XXXXXXXXX).',
+      error: 'Phone number must start with 09, 01, or +959.',
+    };
+  }
+
+  // Check digits that follow the prefix: 6 to 10 numbers
+  let suffix = '';
+  if (cleaned.startsWith('+959')) {
+    suffix = cleaned.slice(4);
+  } else if (cleaned.startsWith('09') || cleaned.startsWith('01')) {
+    suffix = cleaned.slice(2);
+  }
+
+  if (suffix.length < 6 || suffix.length > 10 || !/^\d+$/.test(suffix)) {
+    return {
+      isValid: false,
+      error: 'Phone number must have 6 to 10 digits following 09, 01, or +959.',
     };
   }
 
