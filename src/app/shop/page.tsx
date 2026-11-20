@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
@@ -30,6 +30,19 @@ function ShopContent() {
   const [sortBy, setSortBy] = useState<'featured' | 'newest' | 'price-asc' | 'price-desc'>('featured');
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
   const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
+
+  // Sync state when URL query params change (e.g. from Home page Others popup)
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    setActiveCategory(cat || 'all');
+  }, [searchParams]);
+
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q !== null) {
+      setSearchFilter(q);
+    }
+  }, [searchParams]);
 
   // Filter Modal specific states
   const [maxPrice, setMaxPrice] = useState<number>(60000);
