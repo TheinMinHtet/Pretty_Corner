@@ -79,7 +79,32 @@ function ShopContent() {
       description: 'Silk hair accessories, vacuum tumblers & daily finds',
       count: products.filter((p) => p.category === 'lifestyle').length,
     },
+    {
+      id: 'lenses',
+      label: 'Contact Lenses',
+      description: 'Hydrated daily and monthly comfort beauty lenses',
+      count: products.filter((p) => p.category === 'lenses').length,
+    },
+    {
+      id: 'more',
+      label: 'Accessories & More',
+      description: 'Pure silk ties, beauty tools & thoughtful additions',
+      count: products.filter((p) => p.category === 'more').length,
+    },
   ], [products]);
+
+  // Limit visible pill bar to 5 categories (including All Products); others go into '+ Others'
+  const visibleCategories = useMemo(() => {
+    const top5 = categoriesList.slice(0, 5);
+    // If an "other" category is active, display it so the active state is always visible
+    if (activeCategory !== 'all' && !top5.some((c) => c.id === activeCategory)) {
+      const activeObj = categoriesList.find((c) => c.id === activeCategory);
+      if (activeObj) {
+        return [...top5.slice(0, 4), activeObj];
+      }
+    }
+    return top5;
+  }, [categoriesList, activeCategory]);
 
   const getCategoryTitle = () => {
     switch (activeCategory) {
@@ -91,6 +116,10 @@ function ShopContent() {
         return 'Everyday Makeup';
       case 'lifestyle':
         return 'Lifestyle & Variety';
+      case 'lenses':
+        return 'Contact Lenses & Eye Care';
+      case 'more':
+        return 'Accessories & More';
       default:
         return 'The Variety Corner';
     }
@@ -106,6 +135,10 @@ function ShopContent() {
         return 'Breathable cheek tints, cushion lip glazes, and daily complexion picks.';
       case 'lifestyle':
         return 'Silk hair ties, vacuum tumblers, and thoughtful everyday accessories.';
+      case 'lenses':
+        return 'Moisture-rich daily and monthly contact lenses for natural beauty.';
+      case 'more':
+        return 'Pure mulberry silk scrunchies, cosmetic tools & everyday add-ons.';
       default:
         return 'From genuine skincare & makeup to smart electrical gadgets and variety essentials.';
     }
@@ -252,7 +285,7 @@ function ShopContent() {
       {/* Main Category Tabs */}
       <div className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-2 pb-2">
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-          {categoriesList.map((cat) => (
+          {visibleCategories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
@@ -267,9 +300,18 @@ function ShopContent() {
           ))}
           <button
             onClick={() => setShowCategoryModal(true)}
-            className="h-[36px] sm:h-[38px] px-4 rounded-full text-[13px] font-bold whitespace-nowrap bg-[#faf7f8] text-[#b73d67] border border-[#eedfe5] hover:bg-[#fceef2] transition-colors cursor-pointer shrink-0 flex items-center gap-1"
+            className={`h-[36px] sm:h-[38px] px-4 rounded-full text-[13px] font-bold whitespace-nowrap border transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
+              !categoriesList.slice(0, 5).some((c) => c.id === activeCategory) && activeCategory !== 'all'
+                ? 'bg-[#38262e] text-white border-[#38262e]'
+                : 'bg-[#faf7f8] text-[#b73d67] border-[#eedfe5] hover:bg-[#fceef2]'
+            }`}
           >
             <span>+ Others</span>
+            {categoriesList.length > 5 && (
+              <span className="text-[11px] opacity-75">
+                ({categoriesList.length - 5})
+              </span>
+            )}
           </button>
         </div>
       </div>

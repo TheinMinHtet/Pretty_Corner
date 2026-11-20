@@ -55,6 +55,18 @@ export default function HomePage() {
       description: 'Silk hair accessories, vacuum tumblers & daily finds',
       count: products.filter((p) => p.category === 'lifestyle').length,
     },
+    {
+      id: 'lenses',
+      label: 'Contact Lenses',
+      description: 'Hydrated daily and monthly comfort beauty lenses',
+      count: products.filter((p) => p.category === 'lenses').length,
+    },
+    {
+      id: 'more',
+      label: 'Accessories & More',
+      description: 'Pure silk ties, beauty tools & thoughtful additions',
+      count: products.filter((p) => p.category === 'more').length,
+    },
   ], [products]);
 
   // Matching products for the selected category
