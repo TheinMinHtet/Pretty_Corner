@@ -11,7 +11,7 @@ import { validatePhoneNumber } from '@/lib/validation';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, cartSubtotal, cartTotal, selectedTownship, setSelectedTownship, createOrder, isMounted } = useStore();
+  const { cart, cartSubtotal, cartTotal, selectedTownship, setSelectedTownship, createOrder, clearCart, isMounted } = useStore();
 
   const [customerName, setCustomerName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -22,7 +22,7 @@ export default function CheckoutPage() {
   const [nameTouched, setNameTouched] = useState(false);
   const [addressTouched, setAddressTouched] = useState(false);
   const [pinCoords, setPinCoords] = useState({ lat: 16.8302, lng: 96.1301 });
-  const [paymentMethod, setPaymentMethod] = useState<'MyanMyanPay' | 'KBZPay' | 'WavePay'>('MyanMyanPay');
+  const [paymentMethod, setPaymentMethod] = useState<'Mobile Banking' | 'Cash on Delivery'>('Mobile Banking');
   const [mapSearch, setMapSearch] = useState('');
   const [isLocating, setIsLocating] = useState(false);
   const [isSearchingMap, setIsSearchingMap] = useState(false);
@@ -155,6 +155,8 @@ export default function CheckoutPage() {
       return;
     }
 
+    const isCOD = paymentMethod === 'Cash on Delivery';
+
     const newOrder = createOrder({
       customerName,
       phone: phoneNumber,
@@ -167,11 +169,16 @@ export default function CheckoutPage() {
       deliveryFee,
       total: grandTotal,
       paymentMethod,
-      paymentStatus: 'pending',
-      fulfillmentStatus: 'pending_review',
+      paymentStatus: isCOD ? 'pending' : 'pending',
+      fulfillmentStatus: isCOD ? 'confirmed' : 'pending_review',
     });
 
-    router.push(`/payment-pending?orderId=${newOrder.id}`);
+    if (isCOD) {
+      clearCart();
+      router.push(`/order-confirmation?orderId=${newOrder.id}`);
+    } else {
+      router.push(`/payment-pending?orderId=${newOrder.id}`);
+    }
   };
 
   if (!isMounted) {
@@ -467,55 +474,53 @@ export default function CheckoutPage() {
                 Choose your preferred payment method. Verified securely in Yangon.
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {/* 1. Mobile Banking */}
                 <div
-                  onClick={() => setPaymentMethod('MyanMyanPay')}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all ${
-                    paymentMethod === 'MyanMyanPay'
+                  onClick={() => setPaymentMethod('Mobile Banking')}
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
+                    paymentMethod === 'Mobile Banking'
                       ? 'bg-[#fceef2] border-[#b73d67] ring-1 ring-[#b73d67]'
                       : 'bg-white border-[#eedfe5] hover:border-[#b73d67]'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[14px] font-bold text-[#b73d67]">
-                      ● MyanMyanPay
-                    </span>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[15px] font-bold ${paymentMethod === 'Mobile Banking' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                        {paymentMethod === 'Mobile Banking' ? '●' : '○'} Mobile Banking
+                      </span>
+                      <span className="text-[10px] font-bold text-[#b73d67] bg-white px-2 py-0.5 rounded border border-[#eedfe5]">
+                        KBZPay · WavePay
+                      </span>
+                    </div>
+                    <p className="text-[12px] text-[#7a6870] mt-1.5 leading-relaxed">
+                      Instant transfer via KBZPay, WavePay, or mobile banking with digital payment verification.
+                    </p>
                   </div>
-                  <p className="text-[11px] text-[#7a6870] mt-1.5">
-                    Instant gateway & digital verification
-                  </p>
                 </div>
 
+                {/* 2. Cash on Delivery */}
                 <div
-                  onClick={() => setPaymentMethod('KBZPay')}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all ${
-                    paymentMethod === 'KBZPay'
+                  onClick={() => setPaymentMethod('Cash on Delivery')}
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
+                    paymentMethod === 'Cash on Delivery'
                       ? 'bg-[#fceef2] border-[#b73d67] ring-1 ring-[#b73d67]'
                       : 'bg-white border-[#eedfe5] hover:border-[#b73d67]'
                   }`}
                 >
-                  <span className="text-[14px] font-bold text-[#38262e]">
-                    ○ KBZPay
-                  </span>
-                  <p className="text-[11px] text-[#7a6870] mt-1.5">
-                    Direct QR or Mobile number transfer
-                  </p>
-                </div>
-
-                <div
-                  onClick={() => setPaymentMethod('WavePay')}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all ${
-                    paymentMethod === 'WavePay'
-                      ? 'bg-[#fceef2] border-[#b73d67] ring-1 ring-[#b73d67]'
-                      : 'bg-white border-[#eedfe5] hover:border-[#b73d67]'
-                  }`}
-                >
-                  <span className="text-[14px] font-bold text-[#38262e]">
-                    ○ WavePay
-                  </span>
-                  <p className="text-[11px] text-[#7a6870] mt-1.5">
-                    Direct Wave Money Wallet transfer
-                  </p>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[15px] font-bold ${paymentMethod === 'Cash on Delivery' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                        {paymentMethod === 'Cash on Delivery' ? '●' : '○'} Cash on Delivery
+                      </span>
+                      <span className="text-[10px] font-bold text-[#38262e] bg-[#faf7f8] px-2 py-0.5 rounded border border-[#eedfe5]">
+                        Pay at Doorstep
+                      </span>
+                    </div>
+                    <p className="text-[12px] text-[#7a6870] mt-1.5 leading-relaxed">
+                      Pay cash directly to the delivery rider when your package arrives safely at your doorstep.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -558,7 +563,9 @@ export default function CheckoutPage() {
                 type="submit"
                 className="w-full mt-5 h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer"
               >
-                Place order · {grandTotal.toLocaleString()} MMK
+                {paymentMethod === 'Cash on Delivery'
+                  ? `Confirm order · ${grandTotal.toLocaleString()} MMK (Cash on Delivery)`
+                  : `Proceed to payment · ${grandTotal.toLocaleString()} MMK`}
               </button>
 
               <p className="text-[11px] text-center text-[#7a6870] mt-3 leading-normal">

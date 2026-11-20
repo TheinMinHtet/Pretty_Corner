@@ -59,7 +59,7 @@ export interface Order {
   subtotal: number;
   deliveryFee: number;
   total: number;
-  paymentMethod: 'MyanMyanPay' | 'KBZPay' | 'WavePay';
+  paymentMethod: 'Mobile Banking' | 'Cash on Delivery' | 'MyanMyanPay' | 'KBZPay' | 'WavePay' | string;
   paymentStatus: 'paid' | 'pending' | 'failed' | 'expired';
   fulfillmentStatus: 'pending_review' | 'confirmed' | 'processing' | 'shipped' | 'delivered';
   createdAt: string;

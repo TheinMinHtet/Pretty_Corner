@@ -157,7 +157,7 @@ function OrderConfirmationContent() {
     ctx.textAlign = 'left';
     ctx.font = 'bold 18px sans-serif';
     ctx.fillStyle = '#38262e';
-    ctx.fillText('Grand Total Paid', 60, y);
+    ctx.fillText(order.paymentMethod === 'Cash on Delivery' ? 'Total to Pay on Delivery' : 'Grand Total Paid', 60, y);
     ctx.textAlign = 'right';
     ctx.fillStyle = '#b73d67';
     ctx.fillText(`${order.total.toLocaleString()} MMK`, canvas.width - 60, y);
@@ -205,7 +205,9 @@ function OrderConfirmationContent() {
         </h2>
 
         <p className="font-sans text-[14px] text-[#7a6870] mt-2 leading-relaxed max-w-[320px]">
-          Thank you, {order.customerName}. Your payment is verified and we’ve received your order.
+          {order.paymentMethod === 'Cash on Delivery'
+            ? `Thank you, ${order.customerName}. Your order is confirmed! Please have cash ready when our courier arrives.`
+            : `Thank you, ${order.customerName}. Your payment is verified and we’ve received your order.`}
         </p>
 
         {/* Order reference card (2:390) */}
@@ -241,7 +243,9 @@ function OrderConfirmationContent() {
         <div className="flex justify-between items-center text-[13px] py-1">
           <span className="text-[#7a6870]">Payment</span>
           <span className="font-bold text-[#38262e]">
-            Paid · {order.paymentMethod || 'MyanMyanPay'}
+            {order.paymentMethod === 'Cash on Delivery'
+              ? 'Cash on Delivery · Pay on arrival'
+              : `Paid · ${order.paymentMethod || 'Mobile Banking'}`}
           </span>
         </div>
 
@@ -285,7 +289,9 @@ function OrderConfirmationContent() {
         <div className="my-3 border-t border-[#eedfe5]" />
 
         <div className="flex justify-between items-center text-[17px] py-1">
-          <span className="text-[#7a6870]">Total paid</span>
+          <span className="text-[#7a6870]">
+            {order.paymentMethod === 'Cash on Delivery' ? 'Total to pay' : 'Total paid'}
+          </span>
           <span className="font-bold text-[#38262e]">
             {order.total.toLocaleString()} MMK
           </span>
