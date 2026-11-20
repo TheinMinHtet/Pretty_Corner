@@ -9,10 +9,9 @@ export default function FloatingCartBar() {
   const pathname = usePathname();
   const { cartCount, cartSubtotal, isMounted } = useStore();
 
-  // Hide the bar on cart/checkout pages and dedicated product detail page where purchase bar is present
+  // Hide the bar on cart/checkout pages where purchase flow is present
   const isExcludedPage =
     pathname === '/bag' ||
-    pathname.startsWith('/product') ||
     pathname.startsWith('/checkout') ||
     pathname.startsWith('/order-confirmation') ||
     pathname.startsWith('/payment-pending') ||
@@ -22,13 +21,24 @@ export default function FloatingCartBar() {
 
   if (!isMounted) return null;
 
+  // Position above bottom nav when bottom nav is present (e.g. /shop, /) or near screen bottom on /product
+  const hasBottomNav =
+    !pathname.startsWith('/product') &&
+    !pathname.startsWith('/checkout') &&
+    !pathname.startsWith('/order-confirmation') &&
+    !pathname.startsWith('/payment');
+
+  const bottomPosition = hasBottomNav
+    ? 'bottom-[calc(66px+env(safe-area-inset-bottom,0px))] md:bottom-6'
+    : 'bottom-[calc(16px+env(safe-area-inset-bottom,0px))] md:bottom-6';
+
   return (
     <div
       className={`fixed z-50 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] max-w-[420px] md:max-w-xl transition-all duration-300 ease-out transform ${
         isVisible
           ? 'translate-y-0 opacity-100 pointer-events-auto'
           : 'translate-y-20 opacity-0 pointer-events-none'
-      } bottom-[calc(66px+env(safe-area-inset-bottom,0px))] md:bottom-6`}
+      } ${bottomPosition}`}
     >
       {/* Molten Glass / Translucent Liquid Sheen Container */}
       <div className="relative overflow-hidden rounded-2xl p-3 sm:px-5 sm:py-3.5 flex items-center justify-between gap-3 bg-white/55 backdrop-blur-2xl backdrop-saturate-200 border border-white/80 shadow-[0_16px_40px_-8px_rgba(56,38,46,0.18),0_4px_16px_rgba(183,61,103,0.12),inset_0_1px_2px_rgba(255,255,255,0.9)]">

@@ -19,7 +19,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
   const [quantity, setQuantity] = useState(1);
   const [openWhyLove, setOpenWhyLove] = useState(true);
   const [openHowToUse, setOpenHowToUse] = useState(false);
-  const [showAddedToast, setShowAddedToast] = useState(false);
 
   const currentSizeObj = product.sizes.find((s) => s.name === selectedSize) || product.sizes[0];
   const unitPrice = currentSizeObj?.price || product.price;
@@ -27,8 +26,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
   const handleAddToCart = () => {
     addToCart(product.id, selectedSize, quantity);
-    setShowAddedToast(true);
-    setTimeout(() => setShowAddedToast(false), 2200);
   };
 
   return (
@@ -268,15 +265,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* Added to Bag Toast Notification */}
-      {showAddedToast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#38262e]/90 backdrop-blur-md border border-white/20 text-white text-[13px] font-medium px-5 py-3 rounded-full shadow-2xl z-50 flex items-center gap-3 animate-in fade-in zoom-in-95">
-          <span>✓ Added to your bag!</span>
-          <Link href="/bag" className="text-[#fceef2] underline font-bold ml-1">
-            View Bag
-          </Link>
-        </div>
-      )}
     </div>
   );
 }
