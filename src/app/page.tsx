@@ -255,13 +255,13 @@ export default function HomePage() {
           <div className="w-full md:w-auto md:max-w-md flex flex-col justify-center items-start gap-3">
             <div>
               <span className="inline-block text-[11px] uppercase tracking-wider font-bold text-[#b73d67] bg-white/80 px-2.5 py-0.5 rounded-full border border-[#eedfe5] mb-1.5">
-                Visit Us or Order Online
+                Store Location & Online Orders
               </span>
               <h4 className="font-serif text-[20px] sm:text-[24px] font-medium leading-snug text-[#38262e]">
-                Everyday beauty, crafted with care.
+                You&apos;re always welcome to visit us.
               </h4>
               <p className="text-[13px] text-[#7a6870] leading-relaxed mt-1">
-                Drop by our studio or explore our curated collection delivered fresh to your doorstep in Yangon.
+                Find our store address and contact details above, or easily order your favorite beauty &amp; gadgets online with doorstep delivery in Yangon.
               </p>
             </div>
           </div>
