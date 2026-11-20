@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
@@ -22,6 +22,40 @@ export default function HomePage() {
   const { products, cartCount, setSearchQuery, addToCart, isMounted } = useStore();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchInput, setSearchInput] = useState('');
+  const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
+
+  const categoriesList = useMemo(() => [
+    {
+      id: 'all',
+      label: 'All Products',
+      description: 'Explore our complete variety of products',
+      count: products.length,
+    },
+    {
+      id: 'electrical',
+      label: 'Electrical & Gadgets',
+      description: 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
+      count: products.filter((p) => p.category === 'electrical').length,
+    },
+    {
+      id: 'skincare',
+      label: 'Skincare',
+      description: 'Gentle barrier serums, moisturizers & UV daily defense',
+      count: products.filter((p) => p.category === 'skincare').length,
+    },
+    {
+      id: 'makeup',
+      label: 'Makeup',
+      description: 'Breathable cheek tints, lip glazes & complexion picks',
+      count: products.filter((p) => p.category === 'makeup').length,
+    },
+    {
+      id: 'lifestyle',
+      label: 'Lifestyle & Others',
+      description: 'Silk hair accessories, vacuum tumblers & daily finds',
+      count: products.filter((p) => p.category === 'lifestyle').length,
+    },
+  ], [products]);
 
   // Show products matching selected category or top curated products on all
   const displayedProducts = (
@@ -127,64 +161,33 @@ export default function HomePage() {
           <h3 className="font-serif text-[22px] sm:text-[28px] font-medium text-[#38262e]">
             Explore by category
           </h3>
-          <Link
-            href="/shop"
-            className="inline-block text-[12px] sm:text-[13px] font-bold text-[#b73d67] hover:underline shrink-0"
+          <button
+            onClick={() => setShowCategoryModal(true)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#fceef2] text-[#b73d67] text-[12px] sm:text-[13px] font-bold hover:bg-[#f6e1e8] transition-colors cursor-pointer shrink-0"
           >
-            Explore all products →
-          </Link>
+            <span>+ Others</span>
+          </button>
         </div>
 
         <div className="flex items-center gap-2.5 mt-3.5 overflow-x-auto no-scrollbar pb-1">
+          {categoriesList.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
+                activeCategory === cat.id
+                  ? 'bg-[#38262e] text-white'
+                  : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
           <button
-            onClick={() => setActiveCategory('all')}
-            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
-              activeCategory === 'all'
-                ? 'bg-[#38262e] text-white'
-                : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
-            }`}
+            onClick={() => setShowCategoryModal(true)}
+            className="h-[36px] sm:h-[40px] px-4 rounded-[20px] text-[13px] font-bold whitespace-nowrap bg-[#faf7f8] text-[#b73d67] border border-[#eedfe5] hover:bg-[#fceef2] transition-colors cursor-pointer shrink-0 flex items-center gap-1"
           >
-            All Products
-          </button>
-          <button
-            onClick={() => setActiveCategory('electrical')}
-            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
-              activeCategory === 'electrical'
-                ? 'bg-[#38262e] text-white'
-                : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
-            }`}
-          >
-            Electrical & Gadgets
-          </button>
-          <button
-            onClick={() => setActiveCategory('skincare')}
-            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
-              activeCategory === 'skincare'
-                ? 'bg-[#38262e] text-white'
-                : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
-            }`}
-          >
-            Skincare
-          </button>
-          <button
-            onClick={() => setActiveCategory('makeup')}
-            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
-              activeCategory === 'makeup'
-                ? 'bg-[#38262e] text-white'
-                : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
-            }`}
-          >
-            Makeup
-          </button>
-          <button
-            onClick={() => setActiveCategory('lifestyle')}
-            className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
-              activeCategory === 'lifestyle'
-                ? 'bg-[#38262e] text-white'
-                : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
-            }`}
-          >
-            Lifestyle & Others
+            <span>+ Others</span>
           </button>
         </div>
       </section>
@@ -315,6 +318,86 @@ export default function HomePage() {
           </Link>
         </div>
       </section>
+
+      {/* 7. Category Popup Modal ("+ Others") */}
+      {showCategoryModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-[#38262e]/50 backdrop-blur-xs transition-opacity"
+            onClick={() => setShowCategoryModal(false)}
+          />
+
+          {/* Dialog */}
+          <div className="relative w-full sm:max-w-lg bg-white rounded-t-[20px] sm:rounded-2xl p-6 max-h-[85vh] overflow-y-auto shadow-2xl z-10 animate-in fade-in slide-in-from-bottom-6 sm:zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-[#eedfe5]">
+              <div>
+                <h3 className="font-serif text-[22px] font-medium text-[#38262e]">
+                  All Categories
+                </h3>
+                <p className="text-[12px] text-[#7a6870] mt-0.5">
+                  Select a category to explore
+                </p>
+              </div>
+              <button
+                onClick={() => setShowCategoryModal(false)}
+                className="w-8 h-8 rounded-full bg-[#fceef2] flex items-center justify-center text-[#38262e] hover:bg-[#f6e1e8] transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="py-4 space-y-2.5">
+              {categoriesList.map((cat) => {
+                const isSelected = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      setActiveCategory(cat.id);
+                      setShowCategoryModal(false);
+                    }}
+                    className={`w-full text-left p-3.5 rounded-[12px] border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                      isSelected
+                        ? 'bg-[#fceef2] border-[#b73d67] shadow-xs'
+                        : 'bg-white border-[#eedfe5] hover:border-[#b73d67] hover:bg-[#faf7f8]'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[14px] font-bold ${isSelected ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                          {cat.label}
+                        </span>
+                        {isSelected && (
+                          <span className="text-[10px] bg-[#b73d67] text-white font-bold px-1.5 py-0.5 rounded-full">
+                            Active
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[12px] text-[#7a6870] mt-0.5 line-clamp-1">
+                        {cat.description}
+                      </p>
+                    </div>
+                    <span className="text-[12px] font-semibold text-[#7a6870] bg-[#faf7f8] px-2.5 py-1 rounded-full border border-[#eedfe5] shrink-0">
+                      {cat.count} items
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="pt-2 border-t border-[#eedfe5]">
+              <Link
+                href="/shop"
+                onClick={() => setShowCategoryModal(false)}
+                className="w-full h-[46px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] transition-colors flex items-center justify-center cursor-pointer"
+              >
+                Browse Full Catalog in Shop →
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -26,14 +26,47 @@ function ShopContent() {
   const initialQuery = searchParams.get('q') || '';
 
   const [activeCategory, setActiveCategory] = useState<string>(initialCat);
-  const [activeSubcategory, setActiveSubcategory] = useState<string>('all');
   const [searchFilter, setSearchFilter] = useState<string>(initialQuery);
   const [sortBy, setSortBy] = useState<'featured' | 'newest' | 'price-asc' | 'price-desc'>('featured');
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
+  const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
 
   // Filter Modal specific states
   const [maxPrice, setMaxPrice] = useState<number>(60000);
   const [inStockOnly, setInStockOnly] = useState<boolean>(true);
+
+  const categoriesList = useMemo(() => [
+    {
+      id: 'all',
+      label: 'All Products',
+      description: 'Explore full catalog across beauty, tech & variety',
+      count: products.length,
+    },
+    {
+      id: 'electrical',
+      label: 'Electrical & Gadgets',
+      description: 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
+      count: products.filter((p) => p.category === 'electrical').length,
+    },
+    {
+      id: 'skincare',
+      label: 'Skincare',
+      description: 'Gentle barrier serums, moisturizers & UV daily defense',
+      count: products.filter((p) => p.category === 'skincare').length,
+    },
+    {
+      id: 'makeup',
+      label: 'Makeup',
+      description: 'Breathable cheek tints, lip glazes & complexion picks',
+      count: products.filter((p) => p.category === 'makeup').length,
+    },
+    {
+      id: 'lifestyle',
+      label: 'Lifestyle & Variety',
+      description: 'Silk hair accessories, vacuum tumblers & daily finds',
+      count: products.filter((p) => p.category === 'lifestyle').length,
+    },
+  ], [products]);
 
   const getCategoryTitle = () => {
     switch (activeCategory) {
@@ -65,37 +98,11 @@ function ShopContent() {
     }
   };
 
-  const subcategoryList = useMemo(() => {
-    if (activeCategory === 'electrical') {
-      return ['All electrical', 'Beauty Tech', 'Smart Gadgets', 'Home & Living'];
-    }
-    if (activeCategory === 'skincare') {
-      return ['All skincare', 'Serums', 'Moisturizers', 'SPF & Sun care'];
-    }
-    if (activeCategory === 'makeup') {
-      return ['All makeup', 'Face', 'Lips'];
-    }
-    if (activeCategory === 'lifestyle') {
-      return ['All lifestyle', 'Daily Essentials', 'Accessories'];
-    }
-    return ['All products', 'Electrical', 'Skincare', 'Makeup', 'Lifestyle'];
-  }, [activeCategory]);
-
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
       // Category filter
       if (activeCategory !== 'all' && p.category !== activeCategory) {
         return false;
-      }
-      // Subcategory filter
-      if (activeSubcategory !== 'all' && !activeSubcategory.startsWith('All ')) {
-        const subLower = activeSubcategory.toLowerCase();
-        const matchesSub =
-          (p.subcategory && p.subcategory.toLowerCase().includes(subLower)) ||
-          p.category.toLowerCase().includes(subLower) ||
-          p.tagline.toLowerCase().includes(subLower) ||
-          p.name.toLowerCase().includes(subLower);
-        if (!matchesSub) return false;
       }
       // Search term
       if (searchFilter.trim()) {
@@ -121,7 +128,7 @@ function ShopContent() {
       if (sortBy === 'newest') return b.id.localeCompare(a.id);
       return 0; // featured default
     });
-  }, [products, activeCategory, activeSubcategory, searchFilter, inStockOnly, maxPrice, sortBy]);
+  }, [products, activeCategory, searchFilter, inStockOnly, maxPrice, sortBy]);
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full">
@@ -232,19 +239,10 @@ function ShopContent() {
       {/* Main Category Tabs */}
       <div className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-2 pb-2">
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-          {[
-            { id: 'all', label: 'All Products' },
-            { id: 'electrical', label: 'Electrical & Gadgets' },
-            { id: 'skincare', label: 'Skincare' },
-            { id: 'makeup', label: 'Makeup' },
-            { id: 'lifestyle', label: 'Lifestyle & Variety' },
-          ].map((cat) => (
+          {categoriesList.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => {
-                setActiveCategory(cat.id);
-                setActiveSubcategory('all');
-              }}
+              onClick={() => setActiveCategory(cat.id)}
               className={`h-[36px] sm:h-[38px] px-4 sm:px-5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all cursor-pointer ${
                 activeCategory === cat.id
                   ? 'bg-[#38262e] text-white shadow-xs'
@@ -254,6 +252,12 @@ function ShopContent() {
               {cat.label}
             </button>
           ))}
+          <button
+            onClick={() => setShowCategoryModal(true)}
+            className="h-[36px] sm:h-[38px] px-4 rounded-full text-[13px] font-bold whitespace-nowrap bg-[#faf7f8] text-[#b73d67] border border-[#eedfe5] hover:bg-[#fceef2] transition-colors cursor-pointer shrink-0 flex items-center gap-1"
+          >
+            <span>+ Others</span>
+          </button>
         </div>
       </div>
 
@@ -267,13 +271,13 @@ function ShopContent() {
               Showing <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'product' : 'products'}
             </span>
 
-            {activeSubcategory !== 'all' && (
+            {activeCategory !== 'all' && (
               <span className="inline-flex items-center gap-1.5 bg-[#fceef2] text-[#b73d67] text-[12px] font-semibold px-2.5 py-0.5 rounded-full border border-[#f5d9e3]">
-                <span>{activeSubcategory}</span>
+                <span>{categoriesList.find((c) => c.id === activeCategory)?.label || activeCategory}</span>
                 <button
-                  onClick={() => setActiveSubcategory('all')}
+                  onClick={() => setActiveCategory('all')}
                   className="hover:text-[#38262e] cursor-pointer ml-0.5"
-                  title="Remove filter"
+                  title="Show all products"
                 >
                   ✕
                 </button>
@@ -299,7 +303,7 @@ function ShopContent() {
             <button
               onClick={() => setShowFilterModal(true)}
               className={`h-[38px] px-3.5 sm:px-4 rounded-[9px] border flex items-center gap-2 text-[13px] transition-colors cursor-pointer ${
-                activeSubcategory !== 'all' || maxPrice < 60000 || !inStockOnly
+                maxPrice < 60000 || !inStockOnly || activeCategory !== 'all'
                   ? 'bg-[#fceef2] border-[#b73d67] text-[#b73d67] font-semibold'
                   : 'bg-white border-[#eedfe5] text-[#38262e] hover:border-[#b73d67]'
               }`}
@@ -316,7 +320,7 @@ function ShopContent() {
                 <line x1="17" y1="16" x2="23" y2="16" />
               </svg>
               <span>Filters</span>
-              {(activeSubcategory !== 'all' || maxPrice < 60000 || !inStockOnly) && (
+              {(maxPrice < 60000 || !inStockOnly || activeCategory !== 'all') && (
                 <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />
               )}
             </button>
@@ -389,9 +393,8 @@ function ShopContent() {
             <button
               onClick={() => {
                 setActiveCategory('all');
-                setActiveSubcategory('all');
                 setSearchFilter('');
-                setMaxPrice(50000);
+                setMaxPrice(60000);
                 setInStockOnly(false);
               }}
               className="mt-5 px-6 py-2.5 bg-[#b73d67] text-white rounded-[10px] text-[13px] font-bold hover:bg-[#a33259] transition-colors"
@@ -430,19 +433,10 @@ function ShopContent() {
               <div>
                 <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">Category</p>
                 <div className="flex flex-wrap gap-2">
-                  {[
-                    { id: 'all', label: 'All Products' },
-                    { id: 'electrical', label: 'Electrical & Gadgets' },
-                    { id: 'skincare', label: 'Skincare' },
-                    { id: 'makeup', label: 'Makeup' },
-                    { id: 'lifestyle', label: 'Lifestyle & Variety' },
-                  ].map((cat) => (
+                  {categoriesList.map((cat) => (
                     <button
                       key={cat.id}
-                      onClick={() => {
-                        setActiveCategory(cat.id);
-                        setActiveSubcategory('all');
-                      }}
+                      onClick={() => setActiveCategory(cat.id)}
                       className={`h-[34px] px-3.5 rounded-[17px] text-[12px] transition-colors cursor-pointer ${
                         activeCategory === cat.id
                           ? 'bg-[#38262e] text-white font-medium'
@@ -454,29 +448,6 @@ function ShopContent() {
                   ))}
                 </div>
               </div>
-
-              {/* Subcategories (when a specific category is selected) */}
-              {activeCategory !== 'all' && (
-                <div>
-                  <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">Subcategory</p>
-                  <div className="flex flex-wrap gap-2">
-                    {subcategoryList.map((sub) => {
-                      const isSelected = activeSubcategory === sub || (sub.startsWith('All ') && activeSubcategory === 'all');
-                      return (
-                        <button
-                          key={sub}
-                          onClick={() => setActiveSubcategory(sub.startsWith('All ') ? 'all' : sub)}
-                          className={`h-[32px] px-3 rounded-[16px] text-[12px] transition-colors cursor-pointer ${
-                            isSelected ? 'bg-[#38262e] text-white font-medium' : 'bg-[#fceef2] text-[#38262e]'
-                          }`}
-                        >
-                          {sub}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
 
               {/* Price range */}
               <div>
@@ -521,9 +492,8 @@ function ShopContent() {
                 <button
                   onClick={() => {
                     setActiveCategory('all');
-                    setActiveSubcategory('all');
                     setSearchFilter('');
-                    setMaxPrice(50000);
+                    setMaxPrice(60000);
                     setInStockOnly(true);
                     setSortBy('featured');
                   }}
@@ -532,6 +502,76 @@ function ShopContent() {
                   Clear all filters
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Category Popup Modal ("+ Others") */}
+      {showCategoryModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-[#38262e]/50 backdrop-blur-xs transition-opacity"
+            onClick={() => setShowCategoryModal(false)}
+          />
+
+          {/* Dialog */}
+          <div className="relative w-full sm:max-w-lg bg-white rounded-t-[20px] sm:rounded-2xl p-6 max-h-[85vh] overflow-y-auto shadow-2xl z-10 animate-in fade-in slide-in-from-bottom-6 sm:zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-[#eedfe5]">
+              <div>
+                <h3 className="font-serif text-[22px] font-medium text-[#38262e]">
+                  All Categories
+                </h3>
+                <p className="text-[12px] text-[#7a6870] mt-0.5">
+                  Select a category to view
+                </p>
+              </div>
+              <button
+                onClick={() => setShowCategoryModal(false)}
+                className="w-8 h-8 rounded-full bg-[#fceef2] flex items-center justify-center text-[#38262e] hover:bg-[#f6e1e8] transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="py-4 space-y-2.5">
+              {categoriesList.map((cat) => {
+                const isSelected = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      setActiveCategory(cat.id);
+                      setShowCategoryModal(false);
+                    }}
+                    className={`w-full text-left p-3.5 rounded-[12px] border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                      isSelected
+                        ? 'bg-[#fceef2] border-[#b73d67] shadow-xs'
+                        : 'bg-white border-[#eedfe5] hover:border-[#b73d67] hover:bg-[#faf7f8]'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[14px] font-bold ${isSelected ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                          {cat.label}
+                        </span>
+                        {isSelected && (
+                          <span className="text-[10px] bg-[#b73d67] text-white font-bold px-1.5 py-0.5 rounded-full">
+                            Active
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[12px] text-[#7a6870] mt-0.5 line-clamp-1">
+                        {cat.description}
+                      </p>
+                    </div>
+                    <span className="text-[12px] font-semibold text-[#7a6870] bg-[#faf7f8] px-2.5 py-1 rounded-full border border-[#eedfe5] shrink-0">
+                      {cat.count} items
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
