@@ -240,9 +240,9 @@ export default function CheckoutPage() {
         <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-start">
           {/* Left Column: Delivery Form & Payment Methods */}
           <div className="md:col-span-7 lg:col-span-8 space-y-6">
-            {/* Elegant Notification if form invalid */}
+            {/* Elegant Notification on desktop if form invalid */}
             {formAlert && (
-              <div className="p-3.5 sm:p-4 rounded-xl bg-[#fdf2f5] border border-[#f3ccd8] text-[#38262e] flex items-center justify-between gap-3 shadow-[0_4px_20px_rgba(183,61,103,0.06)] animate-in fade-in duration-200">
+              <div className="hidden md:flex p-3.5 sm:p-4 rounded-xl bg-[#fdf2f5] border border-[#f3ccd8] text-[#38262e] items-center justify-between gap-3 shadow-[0_4px_20px_rgba(183,61,103,0.06)] animate-in fade-in duration-200">
                 <div className="flex items-center gap-2.5">
                   <span className="w-2 h-2 rounded-full bg-[#b73d67] shrink-0" />
                   <span className="text-[13px] font-medium text-[#842a4b]">{formAlert}</span>
@@ -565,10 +565,27 @@ export default function CheckoutPage() {
                 <span className="text-[#b73d67]">{grandTotal.toLocaleString()} MMK</span>
               </div>
 
+              {/* Notification around confirm button (visible on mobile without scrolling up) */}
+              {formAlert && (
+                <div className="mt-3.5 p-3 rounded-xl bg-[#fdf2f5] border border-[#f3ccd8] text-[#842a4b] text-[12px] flex items-center justify-between gap-2 shadow-xs animate-in fade-in duration-200">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#b73d67] shrink-0" />
+                    <span className="font-medium leading-tight">{formAlert}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormAlert(null)}
+                    className="w-5 h-5 rounded-full hover:bg-white/60 text-[#b73d67] flex items-center justify-center text-xs font-bold cursor-pointer shrink-0"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
               {/* Place Order CTA Button */}
               <button
                 type="submit"
-                className="w-full mt-5 h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer whitespace-nowrap"
+                className={`w-full ${formAlert ? 'mt-3' : 'mt-5'} h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer whitespace-nowrap`}
               >
                 {paymentMethod === 'Cash on Delivery' ? 'Confirm Order' : 'Proceed to Payment'}
               </button>
