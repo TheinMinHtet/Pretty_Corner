@@ -4,32 +4,52 @@ import React from 'react';
 
 interface OrderingStepBarProps {
   currentStep: 1 | 2 | 3;
+  isCOD?: boolean;
 }
 
-const STEPS = [
+const THREE_STEPS = [
   { step: 1, label: 'Delivery' },
   { step: 2, label: 'Payment' },
   { step: 3, label: 'Confirmation' },
 ];
 
-export default function OrderingStepBar({ currentStep }: OrderingStepBarProps) {
+const TWO_STEPS = [
+  { step: 1, label: 'Delivery' },
+  { step: 2, label: 'Confirmation' },
+];
+
+export default function OrderingStepBar({ currentStep, isCOD = false }: OrderingStepBarProps) {
+  const steps = isCOD ? TWO_STEPS : THREE_STEPS;
+  const activeStep = isCOD && currentStep >= 2 ? 2 : currentStep;
+
+  // Track progress calculation
+  const progressWidth = isCOD
+    ? activeStep === 1
+      ? '0%'
+      : '100%'
+    : activeStep === 1
+    ? '0%'
+    : activeStep === 2
+    ? '50%'
+    : '100%';
+
   return (
     <div className="w-full py-2">
       {/* Unified Responsive Step Bar */}
-      <div className="relative flex items-center justify-between max-w-sm sm:max-w-md mx-auto px-2">
+      <div className={`relative flex items-center justify-between mx-auto px-2 ${isCOD ? 'max-w-[280px] sm:max-w-xs' : 'max-w-sm sm:max-w-md'}`}>
         {/* Track Line behind steps */}
         <div className="absolute left-6 right-6 sm:left-8 sm:right-8 top-1/2 -translate-y-1/2 h-[2px] bg-[#eedfe5] z-0">
           <div
             className="h-full bg-[#b73d67] transition-all duration-300"
             style={{
-              width: currentStep === 1 ? '0%' : currentStep === 2 ? '50%' : '100%',
+              width: progressWidth,
             }}
           />
         </div>
 
-        {STEPS.map((s) => {
-          const isCompleted = s.step < currentStep;
-          const isCurrent = s.step === currentStep;
+        {steps.map((s) => {
+          const isCompleted = s.step < activeStep;
+          const isCurrent = s.step === activeStep;
 
           return (
             <div key={s.step} className="relative z-10 flex flex-col items-center">

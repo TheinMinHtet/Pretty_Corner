@@ -217,7 +217,7 @@ export default function CheckoutPage() {
 
           {/* Unified Step Bar */}
           <div className="w-full md:w-auto shrink-0">
-            <OrderingStepBar currentStep={1} />
+            <OrderingStepBar currentStep={1} isCOD={paymentMethod === 'Cash on Delivery'} />
           </div>
         </div>
       </div>
@@ -568,11 +568,9 @@ export default function CheckoutPage() {
               {/* Place Order CTA Button */}
               <button
                 type="submit"
-                className="w-full mt-5 h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer"
+                className="w-full mt-5 h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer whitespace-nowrap"
               >
-                {paymentMethod === 'Cash on Delivery'
-                  ? `Confirm order · ${grandTotal.toLocaleString()} MMK (Cash on Delivery)`
-                  : `Proceed to payment · ${grandTotal.toLocaleString()} MMK`}
+                {paymentMethod === 'Cash on Delivery' ? 'Confirm Order' : 'Proceed to Payment'}
               </button>
 
               <p className="text-[11px] text-center text-[#7a6870] mt-3 leading-normal">

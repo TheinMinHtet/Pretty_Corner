@@ -13,6 +13,7 @@ function OrderConfirmationContent() {
 
   const orderId = searchParams.get('orderId') || 'PC-261117-024';
   const order = orders.find((o) => o.id === orderId) || orders[0];
+  const isCOD = order.paymentMethod === 'Cash on Delivery';
 
   const [copied, setCopied] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
@@ -188,7 +189,7 @@ function OrderConfirmationContent() {
       <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-6 sm:p-8 flex flex-col">
         {/* Step Bar */}
         <div className="mb-4 print:hidden">
-          <OrderingStepBar currentStep={3} />
+          <OrderingStepBar currentStep={isCOD ? 2 : 3} isCOD={isCOD} />
         </div>
 
         {/* Confirmation State */}
