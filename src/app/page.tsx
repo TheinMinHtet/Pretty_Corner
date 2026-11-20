@@ -162,7 +162,7 @@ export default function HomePage() {
       </section>
 
       {/* 5. Bestsellers - Responsive Grid */}
-      <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-4 pb-10">
+      <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-4 pb-6 sm:pb-8">
         <div className="flex items-start sm:items-baseline justify-between gap-3 mb-5">
           <div className="min-w-0">
             <h3 className="font-serif text-[22px] sm:text-[32px] font-medium text-[#38262e] leading-tight">
@@ -234,7 +234,7 @@ export default function HomePage() {
       </section>
 
       {/* 6. Address Card Banner */}
-      <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pb-3 sm:pb-4">
+      <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pb-6 sm:pb-8">
         <div className="bg-[#fceef2] rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-[#eedfe5]">
           {/* Address Card Image */}
           <div className="w-full md:max-w-2xl bg-white rounded-xl shadow-xs overflow-hidden border border-[#eedfe5]/80">
