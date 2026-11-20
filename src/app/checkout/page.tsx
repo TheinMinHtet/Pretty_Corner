@@ -380,6 +380,8 @@ export default function CheckoutPage() {
                   className={`px-3.5 py-2 rounded-lg text-[12px] font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer self-start sm:self-auto ${
                     isLocating
                       ? 'bg-[#fceef2] text-[#b73d67] border border-[#f5d9e3]'
+                      : gpsStatus === 'success'
+                      ? 'bg-[#fceef2] text-[#b73d67] border border-[#f5d9e3]'
                       : 'bg-[#b73d67] hover:bg-[#a33259] text-white active:scale-95'
                   }`}
                 >
@@ -387,7 +389,13 @@ export default function CheckoutPage() {
                     <circle cx="12" cy="12" r="10" />
                     <circle cx="12" cy="12" r="3" />
                   </svg>
-                  <span>{isLocating ? 'Detecting GPS…' : 'Locate my GPS'}</span>
+                  <span>
+                    {isLocating
+                      ? 'Detecting GPS…'
+                      : gpsStatus === 'success'
+                      ? 'Located'
+                      : 'Locate my GPS'}
+                  </span>
                 </button>
               </div>
 
@@ -454,40 +462,32 @@ export default function CheckoutPage() {
                   src={`https://www.openstreetmap.org/export/embed.html?bbox=${(pinCoords.lng - 0.005).toFixed(5)}%2C${(pinCoords.lat - 0.0035).toFixed(5)}%2C${(pinCoords.lng + 0.005).toFixed(5)}%2C${(pinCoords.lat + 0.0035).toFixed(5)}&layer=mapnik&marker=${pinCoords.lat.toFixed(5)}%2C${pinCoords.lng.toFixed(5)}`}
                 />
 
-                {/* Top Overlay: Google Maps external link button */}
-                <div className="absolute top-2.5 right-2.5 z-10">
-                  <a
-                    href={`https://www.google.com/maps?q=${pinCoords.lat},${pinCoords.lng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-white/95 hover:bg-white text-[#38262e] hover:text-[#b73d67] text-[11px] font-bold px-2.5 py-1.5 rounded-lg shadow-md border border-[#eedfe5] flex items-center gap-1.5 transition-all cursor-pointer backdrop-blur-xs"
-                    title="View pin location in Google Maps"
-                  >
-                    <svg className="w-3.5 h-3.5 text-[#b73d67]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-                      <path d="M15 3h6v6" />
-                      <path d="M10 14L21 3" />
-                    </svg>
-                    <span>Google Maps</span>
-                  </a>
-                </div>
-
-                {/* Bottom Overlay: Live GPS Coordinates & Accuracy Bar */}
-                <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-sm border border-[#eedfe5] flex items-center justify-between text-[11px]">
+                {/* Bottom Overlay: Live GPS Coordinates & Google Maps Link (non-overlapping) */}
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-sm border border-[#eedfe5] flex items-center justify-between gap-2 text-[11px]">
                   <div className="flex items-center gap-2 truncate">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
                     <span className="font-mono text-[#38262e] font-medium truncate">
                       {pinCoords.lat.toFixed(5)}, {pinCoords.lng.toFixed(5)}
                     </span>
-                    {locationAccuracy && (
-                      <span className="text-[#7a6870] text-[10px] hidden sm:inline">
-                        (±{locationAccuracy}m GPS accuracy)
-                      </span>
-                    )}
+                    <span className="text-[#b73d67] font-bold text-[10px] tracking-wide uppercase shrink-0 bg-[#fceef2] px-1.5 py-0.5 rounded">
+                      Pinned
+                    </span>
                   </div>
-                  <span className="text-[#b73d67] font-bold text-[10px] tracking-wide uppercase shrink-0 bg-[#fceef2] px-2 py-0.5 rounded">
-                    Pinned
-                  </span>
+
+                  <a
+                    href={`https://www.google.com/maps?q=${pinCoords.lat},${pinCoords.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-[#b73d67] text-[#38262e] text-[11px] font-bold px-2 py-1 rounded bg-[#faf7f8] hover:bg-[#fceef2] border border-[#eedfe5] flex items-center gap-1 transition-colors shrink-0 cursor-pointer"
+                    title="Open location in Google Maps"
+                  >
+                    <span>Google Maps</span>
+                    <svg className="w-3 h-3 text-[#b73d67]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                      <path d="M15 3h6v6" />
+                      <path d="M10 14L21 3" />
+                    </svg>
+                  </a>
                 </div>
               </div>
             </div>
