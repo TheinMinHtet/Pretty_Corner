@@ -258,7 +258,7 @@ export default function HomePage() {
                 You&apos;re always welcome to visit us.
               </h4>
               <p className="text-[13px] text-[#7a6870] leading-relaxed mt-1">
-                Find our store address and contact details above, or easily order your favorite beauty &amp; gadgets online with doorstep delivery in Yangon.
+                Find our store address and contact details above, or easily order your favorite beauty &amp; gadgets online with doorstep delivery.
               </p>
             </div>
           </div>
