@@ -22,10 +22,23 @@ export default function ShoppingBagPage() {
     <div className="w-full bg-white flex flex-col min-h-full pb-12">
       {/* Breadcrumb & Heading - Consistent across mobile and desktop */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-4">
-        <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870] mb-2 sm:mb-3">
-          <Link href="/" className="hover:text-[#38262e]">Home</Link>
-          <span>/</span>
-          <span className="text-[#38262e] font-medium">  Beauty Bag</span>
+        <div className="flex items-center justify-between gap-3 mb-2 sm:mb-3">
+          <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870]">
+            <Link href="/" className="hover:text-[#38262e]">Home</Link>
+            <span>/</span>
+            <span className="text-[#38262e] font-medium">Beauty Bag</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-1.5 text-[12px] sm:text-[12.5px] font-semibold text-[#b73d67] hover:text-[#8e294d] bg-[#fceef2] hover:bg-[#fadce6] px-3 py-1.5 rounded-full transition-all cursor-pointer shadow-2xs group shrink-0"
+          >
+            <svg className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            <span>Back</span>
+          </button>
         </div>
 
         <h1 className="font-serif text-[30px] sm:text-[38px] font-medium text-[#38262e]">
