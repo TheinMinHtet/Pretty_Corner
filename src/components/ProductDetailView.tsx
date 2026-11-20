@@ -145,7 +145,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {unitPrice.toLocaleString()} MMK
               </span>
               <span className="text-[12px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium">
-                In stock · Ready to dispatch
+                In stock
               </span>
             </div>
 
@@ -209,11 +209,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 >
                   Add to bag · {totalPrice.toLocaleString()} MMK
                 </button>
-              </div>
-
-              <div className="mt-4 flex items-center justify-between text-[12px] text-[#7a6870]">
-                <span>✓ Yangon Cash on Delivery available</span>
-                <span>✓ 100% Genuine product</span>
               </div>
             </div>
 
