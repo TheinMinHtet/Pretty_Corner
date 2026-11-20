@@ -20,7 +20,7 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
 
           {/* Column 2: Customer Care */}
           <div className="col-span-1 md:pl-12 lg:pl-20">
-            <h4 className="font-serif text-[15px] sm:text-[17px] font-medium text-[#38262e] mb-2 sm:mb-3 tracking-tight">
+            <h4 className="font-serif text-[15px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight">
               Customer Care
             </h4>
             <ul className="space-y-1.5 sm:space-y-2 text-[12px] sm:text-[13px] text-[#7a6870] leading-snug">
@@ -59,7 +59,7 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
 
           {/* Column 3: Payment & Delivery */}
           <div className="col-span-1">
-            <h4 className="font-serif text-[15px] sm:text-[17px] font-medium text-[#38262e] mb-2 sm:mb-3 tracking-tight">
+            <h4 className="font-serif text-[15px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight">
               Payment & Delivery
             </h4>
             <p className="text-[12px] sm:text-[13px] text-[#7a6870] leading-relaxed mb-2.5">
