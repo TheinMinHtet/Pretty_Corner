@@ -46,23 +46,11 @@ export default function Header() {
           <Link
             href="/shop"
             className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
-              isShop && !pathname.includes('category=') ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
+              isShop ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
             }`}
           >
             All Products
-            {isShop && !pathname.includes('category=') && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
-            )}
-          </Link>
-
-          <Link
-            href="/shop?category=electrical"
-            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
-              pathname.includes('category=electrical') ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
-            }`}
-          >
-            ⚡ Electrical
-            {pathname.includes('category=electrical') && (
+            {isShop && (
               <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
             )}
           </Link>

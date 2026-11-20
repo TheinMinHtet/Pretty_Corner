@@ -8,7 +8,7 @@ export default function Footer() {
     <footer className="w-full bg-[#fdfafb] border-t border-[#eedfe5] mt-auto">
       {/* 1. Main Footer Grid */}
       <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-8 sm:pb-10 lg:pb-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
           {/* Column 1: Brand & Philosophy */}
           <div className="flex flex-col space-y-4">
             <Link href="/" className="inline-block group">
@@ -20,7 +20,7 @@ export default function Footer() {
               </p>
             </Link>
 
-            <p className="text-[13px] text-[#7a6870] leading-relaxed max-w-xs">
+            <p className="text-[13px] text-[#7a6870] leading-relaxed max-w-sm">
               A corner for all your everyday favorites. Curated authentic cosmetics, smart electrical gadgets, and lifestyle variety lovingly delivered in Myanmar.
             </p>
 
@@ -32,80 +32,46 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Collections */}
-          <div>
-            <h4 className="font-serif text-[18px] font-medium text-[#38262e] mb-4 tracking-tight">
-              Collections
-            </h4>
-            <ul className="space-y-2.5 text-[13px] text-[#7a6870]">
-              <li>
-                <Link href="/shop" className="hover:text-[#b73d67] transition-colors inline-block">
-                  All Products
-                </Link>
-              </li>
-              <li>
-                <Link href="/shop?category=electrical" className="hover:text-[#b73d67] transition-colors inline-block">
-                  ⚡ Electrical & Gadgets
-                </Link>
-              </li>
-              <li>
-                <Link href="/shop?category=skincare" className="hover:text-[#b73d67] transition-colors inline-block">
-                  ✨ Skincare Essentials
-                </Link>
-              </li>
-              <li>
-                <Link href="/shop?category=makeup" className="hover:text-[#b73d67] transition-colors inline-block">
-                  💄 Everyday Makeup
-                </Link>
-              </li>
-              <li>
-                <Link href="/shop?category=lifestyle" className="hover:text-[#b73d67] transition-colors inline-block">
-                  🌿 Lifestyle & Variety
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 3: Customer Care */}
+          {/* Column 2: Customer Care */}
           <div>
             <h4 className="font-serif text-[18px] font-medium text-[#38262e] mb-4 tracking-tight">
               Customer Care
             </h4>
             <ul className="space-y-2.5 text-[13px] text-[#7a6870]">
               <li>
-                <Link href="/order-lookup" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Track Your Order
+                <Link href="/about" className="hover:text-[#b73d67] transition-colors inline-block">
+                  About us →
                 </Link>
               </li>
               <li>
                 <Link href="/faq" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Frequently Asked Questions
+                  Frequently asked questions →
                 </Link>
               </li>
               <li>
                 <Link href="/policies/shipping" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Delivery & Townships
+                  Shipping & Yangon Townships →
                 </Link>
               </li>
               <li>
                 <Link href="/policies/returns" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Returns & Exchange Policy
+                  Return & Refund policy →
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-[#b73d67] transition-colors inline-block">
-                  About Pretty Corner
+                <Link href="/policies/privacy" className="hover:text-[#b73d67] transition-colors inline-block">
+                  Privacy policy →
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Contact & Support
+                <Link href="/policies/terms" className="hover:text-[#b73d67] transition-colors inline-block">
+                  Terms and conditions →
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 4: Payment & Delivery */}
+          {/* Column 3: Payment & Delivery */}
           <div>
             <h4 className="font-serif text-[18px] font-medium text-[#38262e] mb-4 tracking-tight">
               Payment & Delivery
@@ -113,28 +79,13 @@ export default function Footer() {
             <p className="text-[13px] text-[#7a6870] leading-relaxed mb-3">
               Flexible digital payments and doorstep delivery across Yangon:
             </p>
-            <div className="flex flex-wrap gap-1.5 text-[11px] font-medium text-[#38262e] mb-4">
-              <span className="bg-white border border-[#eedfe5] px-2.5 py-1 rounded-[6px] shadow-2xs">
-                KBZPay
-              </span>
-              <span className="bg-white border border-[#eedfe5] px-2.5 py-1 rounded-[6px] shadow-2xs">
-                WavePay
-              </span>
-              <span className="bg-white border border-[#eedfe5] px-2.5 py-1 rounded-[6px] shadow-2xs">
-                Cash on Delivery
-              </span>
-              <span className="bg-white border border-[#eedfe5] px-2.5 py-1 rounded-[6px] shadow-2xs">
+            <div className="flex flex-wrap gap-2 text-[12px] font-medium text-[#38262e]">
+              <span className="bg-white border border-[#eedfe5] px-3 py-1.5 rounded-[6px] shadow-2xs">
                 Mobile Banking
               </span>
-            </div>
-
-            <div className="p-3 bg-white border border-[#eedfe5] rounded-[10px] text-[12px] text-[#7a6870] space-y-1 shadow-2xs">
-              <div className="flex items-center gap-1.5 text-[#b73d67] font-semibold text-[11px]">
-                <span>🚚 Delivery in Yangon</span>
-              </div>
-              <p className="text-[11px] leading-snug">
-                Same-day & next-day delivery available across Yangon townships.
-              </p>
+              <span className="bg-white border border-[#eedfe5] px-3 py-1.5 rounded-[6px] shadow-2xs">
+                Cash on Delivery
+              </span>
             </div>
           </div>
         </div>

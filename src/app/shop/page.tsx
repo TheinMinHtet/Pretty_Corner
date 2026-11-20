@@ -239,10 +239,10 @@ function ShopContent() {
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
           {[
             { id: 'all', label: 'All Products' },
-            { id: 'electrical', label: '⚡ Electrical & Gadgets' },
-            { id: 'skincare', label: '✨ Skincare' },
-            { id: 'makeup', label: '💄 Makeup' },
-            { id: 'lifestyle', label: '🌿 Lifestyle & Variety' },
+            { id: 'electrical', label: 'Electrical & Gadgets' },
+            { id: 'skincare', label: 'Skincare' },
+            { id: 'makeup', label: 'Makeup' },
+            { id: 'lifestyle', label: 'Lifestyle & Variety' },
           ].map((cat) => (
             <button
               key={cat.id}
@@ -417,10 +417,10 @@ function ShopContent() {
                 <div className="flex flex-wrap gap-2">
                   {[
                     { id: 'all', label: 'All Products' },
-                    { id: 'electrical', label: '⚡ Electrical & Gadgets' },
-                    { id: 'skincare', label: '✨ Skincare' },
-                    { id: 'makeup', label: '💄 Makeup' },
-                    { id: 'lifestyle', label: '🌿 Lifestyle & Variety' },
+                    { id: 'electrical', label: 'Electrical & Gadgets' },
+                    { id: 'skincare', label: 'Skincare' },
+                    { id: 'makeup', label: 'Makeup' },
+                    { id: 'lifestyle', label: 'Lifestyle & Variety' },
                   ].map((cat) => (
                     <button
                       key={cat.id}

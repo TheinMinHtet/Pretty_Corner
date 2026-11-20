@@ -144,7 +144,7 @@ export default function HomePage() {
                 : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
             }`}
           >
-            All Finds
+            All Products
           </button>
           <button
             onClick={() => setActiveCategory('electrical')}
@@ -154,7 +154,7 @@ export default function HomePage() {
                 : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
             }`}
           >
-            ⚡ Electrical & Gadgets
+            Electrical & Gadgets
           </button>
           <button
             onClick={() => setActiveCategory('skincare')}
@@ -164,7 +164,7 @@ export default function HomePage() {
                 : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
             }`}
           >
-            ✨ Skincare
+            Skincare
           </button>
           <button
             onClick={() => setActiveCategory('makeup')}
@@ -174,7 +174,7 @@ export default function HomePage() {
                 : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
             }`}
           >
-            💄 Makeup
+            Makeup
           </button>
           <button
             onClick={() => setActiveCategory('lifestyle')}
@@ -184,7 +184,7 @@ export default function HomePage() {
                 : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
             }`}
           >
-            🌿 Lifestyle & Others
+            Lifestyle & Others
           </button>
         </div>
       </section>
