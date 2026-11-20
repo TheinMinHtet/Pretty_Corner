@@ -253,22 +253,6 @@ export default function CheckoutPage() {
         <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-start">
           {/* Left Column: Delivery Form & Payment Methods */}
           <div className="md:col-span-7 lg:col-span-8 space-y-6">
-            {/* Elegant Notification on desktop if form invalid */}
-            {formAlert && (
-              <div className="hidden md:flex p-3.5 sm:p-4 rounded-xl bg-[#fdf2f5] border border-[#f3ccd8] text-[#38262e] items-center justify-between gap-3 shadow-[0_4px_20px_rgba(183,61,103,0.06)] animate-in fade-in duration-200">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2 h-2 rounded-full bg-[#b73d67] shrink-0" />
-                  <span className="text-[13px] font-medium text-[#842a4b]">{formAlert}</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setFormAlert(null)}
-                  className="w-6 h-6 rounded-full hover:bg-white/60 text-[#b73d67] flex items-center justify-center text-xs font-bold cursor-pointer transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-            )}
             {/* Step 1: Contact Details */}
             <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
               <h2 className="font-serif text-[24px] sm:text-[26px] font-medium text-[#38262e] mb-4">
