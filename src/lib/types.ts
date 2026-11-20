@@ -9,9 +9,9 @@ export interface Product {
   slug: string;
   name: string;
   brand?: string;
-  category: 'skincare' | 'makeup' | 'lenses' | 'more';
+  category: 'electrical' | 'skincare' | 'makeup' | 'lifestyle' | 'lenses' | 'more' | string;
   subcategory?: string;
-  badge?: 'BESTSELLER' | 'NEW' | 'DAILY ESSENTIAL' | 'TRAVEL SIZE';
+  badge?: 'BESTSELLER' | 'NEW' | 'DAILY ESSENTIAL' | 'TRAVEL SIZE' | 'TOP TECH' | 'POPULAR';
   tagline: string;
   subtitle: string;
   price: number;
@@ -22,6 +22,7 @@ export interface Product {
   benefits: string[];
   usage: string;
   ingredients: string;
+  specs?: string;
   inStock: boolean;
   rating: number;
   reviewsCount: number;

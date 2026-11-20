@@ -36,3 +36,13 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+@media print {
+  header, footer, nav, .print\:hidden, .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+}

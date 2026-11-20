@@ -32,35 +32,9 @@ export default function ProductDetailView({ product }: { product: Product }) {
   };
 
   return (
-    <div className="w-full bg-white flex flex-col min-h-full pb-[100px] md:pb-12">
-      {/* 1. Mobile Top Header (hidden on desktop because desktop Header renders it) */}
-      <header className="md:hidden px-5 h-[64px] flex items-center justify-between border-b border-transparent">
-        <button
-          onClick={() => router.back()}
-          className="p-1 -ml-1 text-[#38262e] hover:opacity-70 transition-opacity cursor-pointer"
-          aria-label="Go back"
-        >
-          <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-        </button>
-
-        <h1 className="font-serif text-[28px] font-medium text-[#38262e]">
-          Pretty Corner
-        </h1>
-
-        <Link href="/bag" className="relative p-1 text-[#38262e] hover:opacity-80 transition-opacity">
-          <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
-            <path d="M3 6h18" />
-            <path d="M16 10a4 4 0 01-8 0" />
-          </svg>
-          <CartBadge className="absolute -top-1 -right-1 bg-[#b73d67] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center" />
-        </Link>
-      </header>
-
-      {/* 2. Desktop Breadcrumb (md and up) */}
-      <div className="hidden md:flex w-full max-w-7xl mx-auto px-6 lg:px-8 pt-8 pb-4 items-center gap-2 text-[13px] text-[#7a6870]">
+    <div className="w-full bg-white flex flex-col min-h-full pb-12">
+      {/* Breadcrumb - Consistent across mobile and desktop */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-3 flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870]">
         <Link href="/" className="hover:text-[#38262e]">Home</Link>
         <span>/</span>
         <Link href={`/shop?category=${product.category}`} className="hover:text-[#38262e] capitalize">
@@ -70,12 +44,12 @@ export default function ProductDetailView({ product }: { product: Product }) {
         <span className="text-[#38262e] font-medium truncate">{product.name}</span>
       </div>
 
-      {/* 3. Main Product Detail Section - Responsive 2-Column Grid on Tablet/Desktop */}
-      <div className="w-full max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 sm:pt-4">
+      {/* Main Product Detail Section - Responsive 2-Column Grid */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 sm:pt-4">
         <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-16 items-start">
           {/* Left Column: Gallery (col-span-12 on mobile, col-span-6 on tablet, col-span-7 on desktop) */}
           <div className="md:col-span-6 lg:col-span-7">
-            <div className="relative w-full h-[360px] sm:h-[440px] md:h-[480px] lg:h-[540px] bg-[#faf7f8] sm:rounded-2xl overflow-hidden">
+            <div className="relative w-full h-[360px] sm:h-[440px] md:h-[480px] lg:h-[540px] bg-[#faf7f8] rounded-2xl overflow-hidden">
               <Image
                 src={product.gallery[selectedGalleryIdx] || product.image}
                 alt={product.name}
@@ -93,8 +67,8 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 </div>
               )}
 
-              {/* Mobile Gallery Dots */}
-              <div className="md:hidden absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
+            {/* Gallery Dots (mobile & desktop) */}
+            <div className="md:hidden absolute bottom-3 left-0 right-0 flex justify-center items-center gap-2">
                 {product.gallery.map((_, idx) => (
                   <button
                     key={idx}
@@ -109,13 +83,13 @@ export default function ProductDetailView({ product }: { product: Product }) {
               </div>
             </div>
 
-            {/* Desktop Gallery Thumbnails Strip (md and up) */}
-            <div className="hidden md:flex gap-3 mt-4">
+            {/* Desktop Gallery Thumbnails Strip */}
+            <div className="flex gap-2.5 sm:gap-3 mt-4 overflow-x-auto no-scrollbar pb-1">
               {product.gallery.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setSelectedGalleryIdx(idx)}
-                  className={`relative w-20 h-20 rounded-xl overflow-hidden bg-[#faf7f8] border-2 transition-all cursor-pointer ${
+                  className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-[#faf7f8] border-2 transition-all cursor-pointer shrink-0 ${
                     selectedGalleryIdx === idx
                       ? 'border-[#b73d67] ring-2 ring-[#b73d67]/20'
                       : 'border-transparent hover:border-[#eedfe5]'
@@ -145,7 +119,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {unitPrice.toLocaleString()} MMK
               </span>
               <span className="text-[12px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium">
-                In stock · Ready to dispatch
+                In stock
               </span>
             </div>
 
@@ -182,7 +156,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
               </div>
             </div>
 
-            {/* Desktop Purchase Controls (Quantity + Add to Bag) - Always visible in column on md: screens */}
+            {/* Purchase Controls (Quantity + Add to Bag) */}
             <div className="mt-6 pt-6 border-t border-[#eedfe5]">
               <div className="flex items-center gap-4">
                 {/* Quantity Selector */}
@@ -205,15 +179,10 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {/* Big Add to Bag Button */}
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer"
+                  className="flex-1 h-[52px] bg-[#b73d67]/80 hover:bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer"
                 >
                   Add to bag · {totalPrice.toLocaleString()} MMK
                 </button>
-              </div>
-
-              <div className="mt-4 flex items-center justify-between text-[12px] text-[#7a6870]">
-                <span>✓ Yangon Cash on Delivery available</span>
-                <span>✓ 100% Genuine product</span>
               </div>
             </div>
 
@@ -256,7 +225,11 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   onClick={() => setOpenHowToUse(!openHowToUse)}
                   className="w-full flex items-center justify-between text-left cursor-pointer"
                 >
-                  <span className="text-[15px] font-bold text-[#38262e]">How to use & ingredients</span>
+                  <span className="text-[15px] font-bold text-[#38262e]">
+                    {product.category === 'electrical' || product.category === 'lifestyle'
+                      ? 'How to use & specifications'
+                      : 'How to use & ingredients'}
+                  </span>
                   <span className="text-[20px] text-[#38262e] font-normal leading-none">
                     {openHowToUse ? '−' : '+'}
                   </span>
@@ -264,10 +237,15 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {openHowToUse && (
                   <div className="pt-2 text-[14px] text-[#7a6870] leading-relaxed space-y-2">
                     <p>
-                      <strong className="text-[#38262e]">Directions:</strong> {product.usage}
+                      <strong className="text-[#38262e]">Directions / Usage:</strong> {product.usage}
                     </p>
                     <p>
-                      <strong className="text-[#38262e]">Ingredients:</strong> {product.ingredients}
+                      <strong className="text-[#38262e]">
+                        {product.category === 'electrical' || product.category === 'lifestyle'
+                          ? 'Specifications:'
+                          : 'Ingredients:'}
+                      </strong>{' '}
+                      {product.specs || product.ingredients}
                     </p>
                   </div>
                 )}
@@ -277,42 +255,12 @@ export default function ProductDetailView({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* 4. Mobile Bottom Purchase Bar (hidden on desktop md:hidden) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md border-t border-[#eedfe5] px-5 py-3 z-40 shadow-lg">
-        <div className="max-w-md mx-auto flex items-center gap-3">
-          {/* Quantity Selector */}
-          <div className="h-[50px] w-[105px] border border-[#eedfe5] rounded-[10px] flex items-center justify-between px-3 text-[#38262e] bg-white">
-            <button
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="p-1 hover:text-[#b73d67] text-[18px] font-medium"
-            >
-              −
-            </button>
-            <span className="text-[15px] font-medium">{quantity}</span>
-            <button
-              onClick={() => setQuantity(quantity + 1)}
-              className="p-1 hover:text-[#b73d67] text-[18px] font-medium"
-            >
-              +
-            </button>
-          </div>
-
-          {/* Add to Bag Button */}
-          <button
-            onClick={handleAddToCart}
-            className="flex-1 h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-xs cursor-pointer"
-          >
-            Add to bag · {totalPrice.toLocaleString()}
-          </button>
-        </div>
-      </div>
-
-      {/* 5. Added to Bag Toast Notification */}
+      {/* Added to Bag Toast Notification */}
       {showAddedToast && (
-        <div className="fixed bottom-[85px] md:bottom-8 left-1/2 -translate-x-1/2 bg-[#38262e] text-white text-[13px] font-medium px-5 py-3 rounded-full shadow-2xl z-50 flex items-center gap-3 animate-in fade-in zoom-in-95">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#38262e]/90 backdrop-blur-md border border-white/20 text-white text-[13px] font-medium px-5 py-3 rounded-full shadow-2xl z-50 flex items-center gap-3 animate-in fade-in zoom-in-95">
           <span>✓ Added to your bag!</span>
           <Link href="/bag" className="text-[#fceef2] underline font-bold ml-1">
-            View Bag →
+            View Bag
           </Link>
         </div>
       )}

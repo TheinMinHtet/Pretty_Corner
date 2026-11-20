@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
+import OrderingStepBar from '@/components/OrderingStepBar';
 
 function PaymentPendingContent() {
   const router = useRouter();
@@ -41,31 +42,15 @@ function PaymentPendingContent() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-4 md:py-8 flex flex-col min-h-full pb-12">
-      <div className="bg-white md:bg-[#faf7f8] md:border md:border-[#eedfe5] md:rounded-2xl md:p-8 flex flex-col">
-      {/* 1. Header (2:29) */}
-      <header className="px-5 pt-3.5 pb-3 border-b border-[#eedfe5]">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push('/')}
-            className="p-1 -ml-1 text-[#38262e] hover:opacity-70 transition-opacity"
-            aria-label="Back to home"
-          >
-            <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="font-serif text-[29px] font-medium text-[#38262e]">
-            Secure payment
-          </h1>
+    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-5 md:py-8 flex flex-col min-h-full pb-12">
+      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-6 sm:p-8 flex flex-col">
+        {/* Step indicator */}
+        <div className="mb-4">
+          <OrderingStepBar currentStep={2} />
         </div>
-        <p className="font-sans text-[12px] text-center text-[#b73d67] mt-3 tracking-wide">
-          Delivery — <strong className="font-bold">2 Payment</strong> — Done
-        </p>
-      </header>
 
-      {/* 2. Payment Instructions (2:30) */}
-      <section className="px-5 pt-6 flex flex-col items-center text-center">
+        {/* Payment Instructions */}
+        <section className="pt-4 flex flex-col items-center text-center">
         {/* Lock disk */}
         <div className="w-[72px] h-[72px] rounded-full bg-[#fceef2] flex items-center justify-center text-[#b73d67] mb-4">
           <svg className="w-[28px] h-[28px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -3,77 +3,35 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { usePathname, useRouter } from 'next/navigation';
-import { useStore } from '@/context/StoreContext';
+import { usePathname } from 'next/navigation';
 
 const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false });
 
 export default function Header() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { cartCount, cartSubtotal, isMounted, setSearchQuery } = useStore();
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isHome = pathname === '/';
   const isShop = pathname.startsWith('/shop') || pathname.startsWith('/product');
-  const isBag = pathname.startsWith('/bag');
   const isTrack = pathname.startsWith('/order-lookup') || pathname.startsWith('/order-tracking');
-  const isAbout = pathname.startsWith('/about');
   const isContact = pathname.startsWith('/contact');
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchInput.trim()) {
-      setSearchQuery(searchInput.trim());
-      router.push(`/shop?q=${encodeURIComponent(searchInput.trim())}`);
-      setSearchOpen(false);
-    } else {
-      router.push('/shop');
-    }
-  };
-
   return (
-    <header className="hidden md:block w-full sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#eedfe5] transition-all">
-      {/* 1. Desktop Top Ribbon */}
-      <div className="bg-[#38262e] text-white text-[12px] py-1.5 px-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#b73d67]" />
-            <p className="font-sans tracking-wide">
-              A little beauty, delivered to your door. · Cash on Delivery & Mobile Banking in Yangon
-            </p>
-          </div>
-          <div className="flex items-center gap-4 text-[11px] text-white/80">
-            <Link href="/order-lookup" className="hover:text-white transition-colors">
-              Track Order
-            </Link>
-            <span>·</span>
-            <Link href="/faq" className="hover:text-white transition-colors">
-              FAQ
-            </Link>
-            <span>·</span>
-            <Link href="/contact" className="hover:text-white transition-colors">
-              Help & Contact
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Main Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 h-[74px] flex items-center justify-between gap-6">
+    <header className="w-full sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#eedfe5] transition-all">
+      {/* Main Navigation Bar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[64px] md:h-[74px] flex items-center justify-between gap-4">
         {/* Brand Logo */}
-        <Link href="/" className="flex flex-col group shrink-0">
-          <span className="font-serif text-[30px] lg:text-[34px] font-medium leading-none text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
+        <Link href="/" className="flex flex-col group shrink-0" onClick={() => setMobileMenuOpen(false)}>
+          <span className="font-serif text-[24px] sm:text-[28px] md:text-[30px] lg:text-[34px] font-medium leading-none text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
             Pretty Corner
           </span>
-          <span className="font-sans text-[9px] font-bold tracking-[2px] text-[#7a6870] uppercase mt-1">
-            Your Everyday Beauty Edit
+          <span className="font-sans text-[8px] sm:text-[9px] font-bold tracking-[1.5px] sm:tracking-[2px] text-[#7a6870] uppercase mt-0.5 sm:mt-1">
+            Beauty, Gadgets & Variety Edit
           </span>
         </Link>
 
-        {/* Center Nav Links */}
-        <nav className="flex items-center gap-6 lg:gap-8 text-[14px]">
+        {/* Center Nav Links (md and above) */}
+        <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-[14px]">
           <Link
             href="/"
             className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
@@ -87,37 +45,13 @@ export default function Header() {
           </Link>
 
           <Link
-            href="/shop?category=skincare"
-            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
-              pathname.includes('category=skincare') ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
-            }`}
-          >
-            Skincare
-            {pathname.includes('category=skincare') && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
-            )}
-          </Link>
-
-          <Link
-            href="/shop?category=makeup"
-            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
-              pathname.includes('category=makeup') ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
-            }`}
-          >
-            Makeup
-            {pathname.includes('category=makeup') && (
-              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
-            )}
-          </Link>
-
-          <Link
             href="/shop"
             className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
-              isShop && !pathname.includes('category=') ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
+              isShop ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
             }`}
           >
             All Products
-            {isShop && !pathname.includes('category=') && (
+            {isShop && (
               <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
             )}
           </Link>
@@ -129,15 +63,9 @@ export default function Header() {
             }`}
           >
             Track Order
-          </Link>
-
-          <Link
-            href="/about"
-            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
-              isAbout ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
-            }`}
-          >
-            About
+            {isTrack && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
+            )}
           </Link>
 
           <Link
@@ -147,47 +75,101 @@ export default function Header() {
             }`}
           >
             Contact
+            {isContact && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
+            )}
           </Link>
         </nav>
 
-        {/* Right Action Icons & Search */}
-        <div className="flex items-center gap-3 lg:gap-4 shrink-0">
-          {/* Quick Search Input */}
-          <form onSubmit={handleSearchSubmit} className="relative">
-            <div className="bg-[#f7f4f5] h-[38px] w-[190px] lg:w-[240px] rounded-full flex items-center px-3.5 gap-2 transition-all focus-within:ring-1 focus-within:ring-[#b73d67] focus-within:w-[260px]">
-              <svg className="w-4 h-4 text-[#7a6870] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Search products…"
-                className="bg-transparent text-[12px] text-[#38262e] placeholder-[#7a6870] outline-none w-full"
-              />
-            </div>
-          </form>
-
+        {/* Right Action Icons */}
+        <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0">
           {/* Bag Button */}
           <Link
             href="/bag"
-            className="flex items-center gap-2 bg-[#fceef2] hover:bg-[#fae2ea] text-[#38262e] px-4 py-2 rounded-full transition-all group"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-1.5 sm:gap-2 bg-[#fceef2] hover:bg-[#fae2ea] text-[#38262e] px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all group"
           >
             <div className="relative">
-              <svg className="w-5 h-5 text-[#38262e] group-hover:text-[#b73d67] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#38262e] group-hover:text-[#b73d67] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
                 <path d="M3 6h18" />
                 <path d="M16 10a4 4 0 01-8 0" />
               </svg>
               <CartBadge className="absolute -top-1.5 -right-2 bg-[#b73d67] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center" />
             </div>
-            <span className="font-bold text-[13px] text-[#38262e]">
+            <span className="font-bold text-[12px] sm:text-[13px] text-[#38262e]">
               Bag
             </span>
           </Link>
+
+          {/* Mobile Menu Toggle Button (visible on mobile only) */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg text-[#38262e] hover:bg-[#fceef2] transition-colors cursor-pointer"
+            aria-label="Toggle navigation menu"
+          >
+            {mobileMenuOpen ? (
+              <svg className="w-5 h-5 text-[#38262e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5 text-[#38262e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Dropdown Menu for Navigation Links */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-white/98 border-t border-[#eedfe5] px-5 py-4 space-y-1 shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
+          <Link
+            href="/"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-[14px] font-medium transition-colors ${
+              isHome ? 'bg-[#fceef2] text-[#b73d67] font-bold' : 'text-[#38262e] hover:bg-[#faf7f8]'
+            }`}
+          >
+            <span>Home</span>
+            {isHome && <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />}
+          </Link>
+
+          <Link
+            href="/shop"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-[14px] font-medium transition-colors ${
+              isShop ? 'bg-[#fceef2] text-[#b73d67] font-bold' : 'text-[#38262e] hover:bg-[#faf7f8]'
+            }`}
+          >
+            <span>All Products</span>
+            {isShop && <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />}
+          </Link>
+
+          <Link
+            href="/order-lookup"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-[14px] font-medium transition-colors ${
+              isTrack ? 'bg-[#fceef2] text-[#b73d67] font-bold' : 'text-[#38262e] hover:bg-[#faf7f8]'
+            }`}
+          >
+            <span>Track Order</span>
+            {isTrack && <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />}
+          </Link>
+
+          <Link
+            href="/contact"
+            onClick={() => setMobileMenuOpen(false)}
+            className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-[14px] font-medium transition-colors ${
+              isContact ? 'bg-[#fceef2] text-[#b73d67] font-bold' : 'text-[#38262e] hover:bg-[#faf7f8]'
+            }`}
+          >
+            <span>Contact & Help</span>
+            {isContact && <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />}
+          </Link>
+        </div>
+      )}
     </header>
   );
 }
+

@@ -28,9 +28,9 @@ export default function FloatingCartBar() {
         isVisible
           ? 'translate-y-0 opacity-100 pointer-events-auto'
           : 'translate-y-20 opacity-0 pointer-events-none'
-      } bottom-[66px] md:bottom-6 left-3 right-3 md:left-1/2 md:-translate-x-1/2 max-w-[420px] md:max-w-xl md:w-full mx-auto`}
+      } bottom-4 md:bottom-6 left-3 right-3 md:left-1/2 md:-translate-x-1/2 max-w-[420px] md:max-w-xl md:w-full mx-auto`}
     >
-      <div className="bg-[#38262e] text-white rounded-2xl p-3 sm:px-5 sm:py-3.5 shadow-2xl border border-white/10 flex items-center justify-between gap-3 backdrop-blur-md">
+      <div className="bg-[#38262e]/85 text-white rounded-2xl p-3 sm:px-5 sm:py-3.5 shadow-2xl border border-white/15 flex items-center justify-between gap-3 backdrop-blur-lg">
         {/* Left Side: Bag Item Counter & Total Price */}
         <div className="flex items-center gap-3">
           <div className="relative w-10 h-10 rounded-xl bg-[#b73d67] flex items-center justify-center text-white shrink-0 shadow-sm">
@@ -57,10 +57,9 @@ export default function FloatingCartBar() {
         {/* Right Side: View Cart / Bag Action */}
         <Link
           href="/bag"
-          className="h-[42px] px-5 sm:px-6 bg-[#b73d67] hover:bg-[#a33259] active:scale-95 text-white text-[13px] sm:text-[14px] font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-md shrink-0 cursor-pointer"
+          className="h-[42px] px-5 sm:px-6 bg-[#b73d67] hover:bg-[#a33259] active:scale-95 text-white text-[13px] sm:text-[14px] font-bold rounded-xl flex items-center justify-center transition-all shadow-md shrink-0 cursor-pointer"
         >
           <span>View Cart</span>
-          <span className="text-sm">→</span>
         </Link>
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
@@ -22,26 +22,134 @@ function ShopContent() {
   const searchParams = useSearchParams();
   const { products, cartCount, addToCart, isMounted } = useStore();
 
-  const initialCat = searchParams.get('category') || 'skincare';
+  const initialCat = searchParams.get('category') || 'all';
   const initialQuery = searchParams.get('q') || '';
 
   const [activeCategory, setActiveCategory] = useState<string>(initialCat);
-  const [activeSubcategory, setActiveSubcategory] = useState<string>('all');
   const [searchFilter, setSearchFilter] = useState<string>(initialQuery);
   const [sortBy, setSortBy] = useState<'featured' | 'newest' | 'price-asc' | 'price-desc'>('featured');
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
+  const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
+
+  // Sync state when URL query params change (e.g. from Home page Others popup)
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    setActiveCategory(cat || 'all');
+  }, [searchParams]);
+
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q !== null) {
+      setSearchFilter(q);
+    }
+  }, [searchParams]);
 
   // Filter Modal specific states
-  const [filterBrand, setFilterBrand] = useState<'all' | 'pretty-essentials'>('pretty-essentials');
-  const [maxPrice, setMaxPrice] = useState<number>(50000);
+  const [maxPrice, setMaxPrice] = useState<number>(60000);
   const [inStockOnly, setInStockOnly] = useState<boolean>(true);
 
-  const subcategoryList = useMemo(() => {
-    if (activeCategory === 'skincare') {
-      return ['All skincare', 'Serums', 'Moisturizers', 'SPF & Sun care'];
+  const categoriesList = useMemo(() => [
+    {
+      id: 'all',
+      label: 'All Products',
+      description: 'Explore full catalog across beauty, tech & variety',
+      count: products.length,
+      aliases: ['all', 'everything', 'catalog', 'products', 'store'],
+    },
+    {
+      id: 'electrical',
+      label: 'Electrical & Gadgets',
+      description: 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
+      count: products.filter((p) => p.category === 'electrical').length,
+      aliases: ['electrical', 'electronics', 'gadget', 'gadgets', 'tech', 'device', 'devices', 'mirror', 'humidifier', 'sonic'],
+    },
+    {
+      id: 'skincare',
+      label: 'Skincare',
+      description: 'Gentle barrier serums, moisturizers & UV daily defense',
+      count: products.filter((p) => p.category === 'skincare').length,
+      aliases: ['skincare', 'skin', 'serum', 'cream', 'moisturizer', 'barrier', 'sunscreen', 'uv', 'cleanser'],
+    },
+    {
+      id: 'makeup',
+      label: 'Makeup',
+      description: 'Breathable cheek tints, lip glazes & complexion picks',
+      count: products.filter((p) => p.category === 'makeup').length,
+      aliases: ['makeup', 'cosmetics', 'tint', 'lip', 'blush', 'cheek', 'glaze', 'complexion'],
+    },
+    {
+      id: 'lifestyle',
+      label: 'Lifestyle & Variety',
+      description: 'Silk hair accessories, vacuum tumblers & daily finds',
+      count: products.filter((p) => p.category === 'lifestyle').length,
+      aliases: ['lifestyle', 'variety', 'tumbler', 'hair', 'scrunchie', 'accessories', 'everyday'],
+    },
+    {
+      id: 'lenses',
+      label: 'Contact Lenses',
+      description: 'Hydrated daily and monthly comfort beauty lenses',
+      count: products.filter((p) => p.category === 'lenses').length,
+      aliases: ['lenses', 'lens', 'contact lens', 'contact lenses', 'eyes', 'eye'],
+    },
+    {
+      id: 'more',
+      label: 'Accessories & More',
+      description: 'Pure silk ties, beauty tools & thoughtful additions',
+      count: products.filter((p) => p.category === 'more').length,
+      aliases: ['more', 'accessories', 'tools', 'silk', 'additions'],
+    },
+  ], [products]);
+
+  // Limit visible pill bar to 5 categories (including All Products); others go into '+ Others'
+  const visibleCategories = useMemo(() => {
+    const top5 = categoriesList.slice(0, 5);
+    // If an "other" category is active, display it so the active state is always visible
+    if (activeCategory !== 'all' && !top5.some((c) => c.id === activeCategory)) {
+      const activeObj = categoriesList.find((c) => c.id === activeCategory);
+      if (activeObj) {
+        return [...top5.slice(0, 4), activeObj];
+      }
     }
-    return ['All products'];
-  }, [activeCategory]);
+    return top5;
+  }, [categoriesList, activeCategory]);
+
+  const getCategoryTitle = () => {
+    switch (activeCategory) {
+      case 'electrical':
+        return 'Electrical & Smart Gadgets';
+      case 'skincare':
+        return 'Skincare Essentials';
+      case 'makeup':
+        return 'Everyday Makeup';
+      case 'lifestyle':
+        return 'Lifestyle & Variety';
+      case 'lenses':
+        return 'Contact Lenses & Eye Care';
+      case 'more':
+        return 'Accessories & More';
+      default:
+        return 'The Variety Corner';
+    }
+  };
+
+  const getCategorySubtitle = () => {
+    switch (activeCategory) {
+      case 'electrical':
+        return 'Sonic beauty devices, touch LED mirrors, humidifiers & smart lifestyle tech.';
+      case 'skincare':
+        return 'Gentle serums, barrier moisturizers, and UV daily defense formulas.';
+      case 'makeup':
+        return 'Breathable cheek tints, cushion lip glazes, and daily complexion picks.';
+      case 'lifestyle':
+        return 'Silk hair ties, vacuum tumblers, and thoughtful everyday accessories.';
+      case 'lenses':
+        return 'Moisture-rich daily and monthly contact lenses for natural beauty.';
+      case 'more':
+        return 'Pure mulberry silk scrunchies, cosmetic tools & everyday add-ons.';
+      default:
+        return 'From genuine skincare & makeup to smart electrical gadgets and variety essentials.';
+    }
+  };
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
@@ -49,22 +157,21 @@ function ShopContent() {
       if (activeCategory !== 'all' && p.category !== activeCategory) {
         return false;
       }
-      // Subcategory filter
-      if (activeSubcategory !== 'all') {
-        const subLower = activeSubcategory.toLowerCase();
-        const matchesSub =
-          p.category.toLowerCase().includes(subLower) ||
-          p.tagline.toLowerCase().includes(subLower) ||
-          p.name.toLowerCase().includes(subLower);
-        if (!matchesSub) return false;
-      }
-      // Search term
+      // Search term (searches by product name, tagline, description, category ID, category label, or category aliases)
       if (searchFilter.trim()) {
-        const q = searchFilter.toLowerCase();
+        const q = searchFilter.toLowerCase().trim();
+        const categoryObj = categoriesList.find((c) => c.id === p.category);
+        const matchesCategory =
+          p.category.toLowerCase().includes(q) ||
+          (categoryObj && (
+            categoryObj.label.toLowerCase().includes(q) ||
+            categoryObj.aliases.some((alias) => alias.includes(q) || q.includes(alias))
+          ));
         const matchesQuery =
           p.name.toLowerCase().includes(q) ||
           p.tagline.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q);
+          p.description.toLowerCase().includes(q) ||
+          matchesCategory;
         if (!matchesQuery) return false;
       }
       // In stock
@@ -75,10 +182,6 @@ function ShopContent() {
       if (p.price > maxPrice) {
         return false;
       }
-      // Brand filter
-      if (filterBrand === 'pretty-essentials' && p.brand && !p.brand.includes('Pretty Essentials')) {
-        return false;
-      }
       return true;
     }).sort((a, b) => {
       if (sortBy === 'price-asc') return a.price - b.price;
@@ -86,120 +189,147 @@ function ShopContent() {
       if (sortBy === 'newest') return b.id.localeCompare(a.id);
       return 0; // featured default
     });
-  }, [products, activeCategory, activeSubcategory, searchFilter, inStockOnly, maxPrice, filterBrand, sortBy]);
+  }, [products, activeCategory, searchFilter, inStockOnly, maxPrice, sortBy]);
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full">
-      {/* 1. Mobile Header (hidden on desktop because desktop Header renders it) */}
-      <header className="md:hidden px-5 pt-3.5 pb-2 border-b border-transparent">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => router.push('/')}
-            className="p-1 -ml-1 text-[#38262e] hover:opacity-70 transition-opacity"
-            aria-label="Back to home"
-          >
-            <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-          </button>
-
-          <h1 className="font-serif text-[28px] font-medium text-[#38262e]">
-            {activeCategory === 'skincare' ? 'The skincare corner' : 'The beauty corner'}
-          </h1>
-
-          <Link href="/bag" className="relative p-1 text-[#38262e] hover:opacity-80 transition-opacity">
-            <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
-              <path d="M3 6h18" />
-              <path d="M16 10a4 4 0 01-8 0" />
-            </svg>
-            <CartBadge className="absolute -top-1 -right-1 bg-[#b73d67] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center" />
-          </Link>
-        </div>
-
-        <p className="font-sans text-[12px] text-[#7a6870] mt-2">
-          A little everyday care, for every kind of skin.
-        </p>
-
-        {/* Mobile Search input */}
-        <div className="mt-3.5 bg-[#f7f4f5] h-[44px] rounded-[9px] flex items-center px-3.5 gap-2.5 focus-within:ring-1 focus-within:ring-[#b73d67]">
-          <svg className="w-[20px] h-[20px] text-[#7a6870] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
-          <input
-            type="text"
-            value={searchFilter}
-            onChange={(e) => setSearchFilter(e.target.value)}
-            placeholder="Serums, moisturizers, SPF…"
-            className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full"
-          />
-          {searchFilter && (
-            <button onClick={() => setSearchFilter('')} className="text-[#7a6870] text-xs hover:text-[#38262e]">
-              ✕
-            </button>
-          )}
-        </div>
-      </header>
-
-      {/* 2. Desktop Catalog Header & Breadcrumb (md and up) */}
-      <div className="hidden md:block w-full max-w-7xl mx-auto px-6 lg:px-8 pt-8 pb-4">
+      {/* Catalog Header & Breadcrumb - Consistent across mobile and desktop */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-4">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-[12px] text-[#7a6870] mb-3">
+        <div className="flex items-center gap-2 text-[12px] text-[#7a6870] mb-2 sm:mb-3">
           <Link href="/" className="hover:text-[#38262e]">Home</Link>
           <span>/</span>
           <span className="text-[#38262e] font-medium capitalize">{activeCategory}</span>
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
           <div>
-            <h1 className="font-serif text-[36px] lg:text-[42px] font-medium text-[#38262e] leading-tight">
-              {activeCategory === 'skincare' ? 'The skincare corner' : 'The beauty corner'}
+            <h1 className="font-serif text-[28px] sm:text-[36px] lg:text-[42px] font-medium text-[#38262e] leading-tight">
+              {getCategoryTitle()}
             </h1>
-            <p className="font-sans text-[14px] text-[#7a6870] mt-1.5 max-w-xl">
-              A little everyday care, for every kind of skin. Thoughtfully picked formulations for balanced daily rituals.
+            <p className="font-sans text-[13px] sm:text-[14px] text-[#7a6870] mt-1 sm:mt-1.5 max-w-xl">
+              {getCategorySubtitle()}
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="text-[13px] text-[#7a6870]">
-              Showing <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'product' : 'products'}
-            </span>
+          {/* Search Bar - Consistent on mobile and desktop */}
+          <div className="w-full md:w-[320px] lg:w-[380px] shrink-0 mt-2 md:mt-0">
+            <div className="bg-[#f7f4f5] border border-[#eedfe5] focus-within:border-[#b73d67] focus-within:bg-white h-[44px] rounded-full flex items-center px-4 gap-2.5 transition-all shadow-2xs">
+              <svg className="w-4 h-4 text-[#7a6870] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+              <input
+                type="text"
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                placeholder="Search products, electricals, gadgets…"
+                className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full font-normal"
+              />
+              {searchFilter && (
+                <button
+                  onClick={() => setSearchFilter('')}
+                  className="text-[#7a6870] hover:text-[#38262e] text-xs p-1 transition-colors"
+                  title="Clear search"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            <div className="hidden md:block text-right mt-1.5">
+              <span className="text-[12px] text-[#7a6870]">
+                Showing <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'product' : 'products'}
+              </span>
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Main Category Tabs */}
+      <div className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-2 pb-2">
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          {visibleCategories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`h-[36px] sm:h-[38px] px-4 sm:px-5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all cursor-pointer ${
+                activeCategory === cat.id
+                  ? 'bg-[#38262e] text-white shadow-xs'
+                  : 'bg-[#faf7f8] text-[#38262e] border border-[#eedfe5] hover:bg-[#fceef2]'
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+          <button
+            onClick={() => setShowCategoryModal(true)}
+            className={`h-[36px] sm:h-[38px] px-3.5 sm:px-4 rounded-full text-[13px] font-bold whitespace-nowrap border transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
+              !categoriesList.slice(0, 5).some((c) => c.id === activeCategory) && activeCategory !== 'all'
+                ? 'bg-[#38262e] text-white border-[#38262e]'
+                : 'bg-[#faf7f8] text-[#b73d67] border-[#eedfe5] hover:bg-[#fceef2]'
+            }`}
+          >
+            <span>
+              <span className="hidden sm:inline">+ More Categories</span>
+              <span className="sm:hidden">+ More</span>
+            </span>
+            {categoriesList.length > 5 && (
+              <span className="text-[11px] opacity-75">
+                ({categoriesList.length - 5})
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
       {/* 3. Catalog Section - Responsive Container */}
       <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-3 pb-12">
-        {/* Controls Toolbar: Subcategories, Filter Button, Sort Selector */}
+        {/* Controls Toolbar: Active Filters & Count on Left, Filter & Sort on Right */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#eedfe5]">
-          {/* Subcategory Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
-            {subcategoryList.map((sub) => {
-              const isSelected = activeSubcategory === sub || (sub === 'All skincare' && activeSubcategory === 'all');
-              return (
+          {/* Left: Product Counter & Active Filter Badges */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <span className="text-[13px] text-[#7a6870]">
+              Showing <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'product' : 'products'}
+            </span>
+
+            {activeCategory !== 'all' && (
+              <span className="inline-flex items-center gap-1.5 bg-[#fceef2] text-[#b73d67] text-[12px] font-semibold px-2.5 py-0.5 rounded-full border border-[#f5d9e3]">
+                <span>{categoriesList.find((c) => c.id === activeCategory)?.label || activeCategory}</span>
                 <button
-                  key={sub}
-                  onClick={() => setActiveSubcategory(sub === 'All skincare' ? 'all' : sub)}
-                  className={`h-[36px] px-4 rounded-[18px] text-[13px] whitespace-nowrap transition-colors cursor-pointer ${
-                    isSelected
-                      ? 'bg-[#38262e] text-white font-medium'
-                      : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
-                  }`}
+                  onClick={() => setActiveCategory('all')}
+                  className="hover:text-[#38262e] cursor-pointer ml-0.5"
+                  title="Show all products"
                 >
-                  {sub}
+                  ✕
                 </button>
-              );
-            })}
+              </span>
+            )}
+
+            {searchFilter && (
+              <span className="inline-flex items-center gap-1.5 bg-[#f7f4f5] text-[#38262e] text-[12px] font-medium px-2.5 py-0.5 rounded-full border border-[#eedfe5]">
+                <span>&quot;{searchFilter}&quot;</span>
+                <button
+                  onClick={() => setSearchFilter('')}
+                  className="hover:text-[#b73d67] cursor-pointer ml-0.5"
+                  title="Clear search"
+                >
+                  ✕
+                </button>
+              </span>
+            )}
           </div>
 
-          {/* Filter & Sort Bar */}
+          {/* Right: Filter & Sort Bar */}
           <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0">
             <button
               onClick={() => setShowFilterModal(true)}
-              className="h-[38px] px-4 rounded-[9px] bg-white border border-[#eedfe5] flex items-center gap-2 text-[#38262e] text-[13px] hover:border-[#b73d67] transition-colors cursor-pointer"
+              className={`h-[38px] px-3.5 sm:px-4 rounded-[9px] border flex items-center gap-2 text-[13px] transition-colors cursor-pointer ${
+                maxPrice < 60000 || !inStockOnly || activeCategory !== 'all'
+                  ? 'bg-[#fceef2] border-[#b73d67] text-[#b73d67] font-semibold'
+                  : 'bg-white border-[#eedfe5] text-[#38262e] hover:border-[#b73d67]'
+              }`}
             >
-              <svg className="w-[18px] h-[18px] text-[#38262e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="4" y1="21" x2="4" y2="14" />
                 <line x1="4" y1="10" x2="4" y2="3" />
                 <line x1="12" y1="21" x2="12" y2="12" />
@@ -211,6 +341,9 @@ function ShopContent() {
                 <line x1="17" y1="16" x2="23" y2="16" />
               </svg>
               <span>Filters</span>
+              {(maxPrice < 60000 || !inStockOnly || activeCategory !== 'all') && (
+                <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />
+              )}
             </button>
 
             <div className="relative">
@@ -281,9 +414,8 @@ function ShopContent() {
             <button
               onClick={() => {
                 setActiveCategory('all');
-                setActiveSubcategory('all');
                 setSearchFilter('');
-                setMaxPrice(50000);
+                setMaxPrice(60000);
                 setInStockOnly(false);
               }}
               className="mt-5 px-6 py-2.5 bg-[#b73d67] text-white rounded-[10px] text-[13px] font-bold hover:bg-[#a33259] transition-colors"
@@ -322,46 +454,19 @@ function ShopContent() {
               <div>
                 <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">Category</p>
                 <div className="flex flex-wrap gap-2">
-                  {['all', 'skincare', 'makeup', 'lenses'].map((cat) => (
+                  {categoriesList.map((cat) => (
                     <button
-                      key={cat}
-                      onClick={() => setActiveCategory(cat)}
-                      className={`h-[34px] px-3.5 rounded-[17px] text-[12px] capitalize transition-colors ${
-                        activeCategory === cat
+                      key={cat.id}
+                      onClick={() => setActiveCategory(cat.id)}
+                      className={`h-[34px] px-3.5 rounded-[17px] text-[12px] transition-colors cursor-pointer ${
+                        activeCategory === cat.id
                           ? 'bg-[#38262e] text-white font-medium'
                           : 'bg-[#fceef2] text-[#38262e]'
                       }`}
                     >
-                      {cat}
+                      {cat.label}
                     </button>
                   ))}
-                </div>
-              </div>
-
-              {/* Brands */}
-              <div>
-                <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">Brand</p>
-                <div className="space-y-2 text-[13px] text-[#38262e]">
-                  <label className="flex items-center gap-2.5 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="brand"
-                      checked={filterBrand === 'pretty-essentials'}
-                      onChange={() => setFilterBrand('pretty-essentials')}
-                      className="accent-[#b73d67]"
-                    />
-                    Pretty Essentials (Direct Edit)
-                  </label>
-                  <label className="flex items-center gap-2.5 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="brand"
-                      checked={filterBrand === 'all'}
-                      onChange={() => setFilterBrand('all')}
-                      className="accent-[#b73d67]"
-                    />
-                    All other brands
-                  </label>
                 </div>
               </div>
 
@@ -408,9 +513,8 @@ function ShopContent() {
                 <button
                   onClick={() => {
                     setActiveCategory('all');
-                    setActiveSubcategory('all');
                     setSearchFilter('');
-                    setMaxPrice(50000);
+                    setMaxPrice(60000);
                     setInStockOnly(true);
                     setSortBy('featured');
                   }}
@@ -419,6 +523,76 @@ function ShopContent() {
                   Clear all filters
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Category Popup Modal ("+ Others") */}
+      {showCategoryModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-[#38262e]/50 backdrop-blur-xs transition-opacity"
+            onClick={() => setShowCategoryModal(false)}
+          />
+
+          {/* Dialog */}
+          <div className="relative w-full sm:max-w-lg bg-white rounded-t-[20px] sm:rounded-2xl p-6 max-h-[85vh] overflow-y-auto shadow-2xl z-10 animate-in fade-in slide-in-from-bottom-6 sm:zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-[#eedfe5]">
+              <div>
+                <h3 className="font-serif text-[22px] font-medium text-[#38262e]">
+                  All Categories
+                </h3>
+                <p className="text-[12px] text-[#7a6870] mt-0.5">
+                  Select a category to view
+                </p>
+              </div>
+              <button
+                onClick={() => setShowCategoryModal(false)}
+                className="w-8 h-8 rounded-full bg-[#fceef2] flex items-center justify-center text-[#38262e] hover:bg-[#f6e1e8] transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="py-4 space-y-2.5">
+              {categoriesList.map((cat) => {
+                const isSelected = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      setActiveCategory(cat.id);
+                      setShowCategoryModal(false);
+                    }}
+                    className={`w-full text-left p-3.5 rounded-[12px] border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                      isSelected
+                        ? 'bg-[#fceef2] border-[#b73d67] shadow-xs'
+                        : 'bg-white border-[#eedfe5] hover:border-[#b73d67] hover:bg-[#faf7f8]'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[14px] font-bold ${isSelected ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                          {cat.label}
+                        </span>
+                        {isSelected && (
+                          <span className="text-[10px] bg-[#b73d67] text-white font-bold px-1.5 py-0.5 rounded-full">
+                            Active
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[12px] text-[#7a6870] mt-0.5 line-clamp-1">
+                        {cat.description}
+                      </p>
+                    </div>
+                    <span className="text-[12px] font-semibold text-[#7a6870] bg-[#faf7f8] px-2.5 py-1 rounded-full border border-[#eedfe5] shrink-0">
+                      {cat.count} items
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -8,16 +8,9 @@ export default function HelpAndContactPage() {
   const router = useRouter();
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-10 flex flex-col min-h-full pb-12">
-      {/* 1. Mobile Header (hidden on desktop) */}
-      <header className="md:hidden px-5 pt-4 pb-2 text-center border-b border-transparent">
-        <h1 className="font-serif text-[29px] font-medium text-[#38262e]">
-          Pretty Corner
-        </h1>
-      </header>
-
-      {/* 2. Desktop Breadcrumb (md and up) */}
-      <div className="hidden md:flex items-center gap-2 text-[13px] text-[#7a6870] mb-6">
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-10 flex flex-col min-h-full pb-12">
+      {/* Breadcrumb - Consistent across mobile and desktop */}
+      <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870] mb-4 sm:mb-6">
         <Link href="/" className="hover:text-[#38262e]">Home</Link>
         <span>/</span>
         <span className="text-[#38262e] font-medium">Help & Contact</span>
@@ -29,9 +22,12 @@ export default function HelpAndContactPage() {
         <div className="md:col-span-6 lg:col-span-7 flex flex-col gap-5">
           <button
             onClick={() => router.back()}
-            className="text-[12px] font-bold text-[#b73d67] hover:underline text-left cursor-pointer md:hidden"
+            className="inline-flex items-center gap-2 text-[13px] font-semibold text-[#b73d67] hover:text-[#8e294d] bg-[#fceef2] hover:bg-[#fadce6] px-3.5 py-1.5 rounded-full transition-all w-fit cursor-pointer shadow-2xs group"
           >
-            ‹ Back
+            <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            <span>Back</span>
           </button>
 
           <div>
@@ -48,7 +44,7 @@ export default function HelpAndContactPage() {
             href="/order-lookup"
             className="w-full h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-xs cursor-pointer"
           >
-            Track an existing order →
+            Track an existing order
           </Link>
 
           {/* Order Help Banner */}
@@ -117,7 +113,6 @@ export default function HelpAndContactPage() {
             className="w-full h-[52px] bg-[#f9f5f7] hover:bg-[#fceef2] rounded-xl px-5 flex items-center justify-between text-[#38262e] font-bold text-[14px] transition-colors"
           >
             <span>About us</span>
-            <span className="text-[#b73d67]">→</span>
           </Link>
 
           <Link
@@ -125,7 +120,6 @@ export default function HelpAndContactPage() {
             className="w-full h-[52px] bg-[#f9f5f7] hover:bg-[#fceef2] rounded-xl px-5 flex items-center justify-between text-[#38262e] font-bold text-[14px] transition-colors"
           >
             <span>Frequently asked questions</span>
-            <span className="text-[#b73d67]">→</span>
           </Link>
 
           <Link
@@ -133,7 +127,6 @@ export default function HelpAndContactPage() {
             className="w-full h-[52px] bg-[#f9f5f7] hover:bg-[#fceef2] rounded-xl px-5 flex items-center justify-between text-[#38262e] font-bold text-[14px] transition-colors"
           >
             <span>Shipping & Yangon Townships</span>
-            <span className="text-[#b73d67]">→</span>
           </Link>
 
           <Link
@@ -141,7 +134,6 @@ export default function HelpAndContactPage() {
             className="w-full h-[52px] bg-[#f9f5f7] hover:bg-[#fceef2] rounded-xl px-5 flex items-center justify-between text-[#38262e] font-bold text-[14px] transition-colors"
           >
             <span>Return & Refund policy</span>
-            <span className="text-[#b73d67]">→</span>
           </Link>
 
           <Link
@@ -149,7 +141,6 @@ export default function HelpAndContactPage() {
             className="w-full h-[52px] bg-[#f9f5f7] hover:bg-[#fceef2] rounded-xl px-5 flex items-center justify-between text-[#38262e] font-bold text-[14px] transition-colors"
           >
             <span>Privacy policy</span>
-            <span className="text-[#b73d67]">→</span>
           </Link>
 
           <Link
@@ -157,7 +148,6 @@ export default function HelpAndContactPage() {
             className="w-full h-[52px] bg-[#f9f5f7] hover:bg-[#fceef2] rounded-xl px-5 flex items-center justify-between text-[#38262e] font-bold text-[14px] transition-colors"
           >
             <span>Terms and conditions</span>
-            <span className="text-[#b73d67]">→</span>
           </Link>
 
           <p className="text-[12px] text-center text-[#7a6870] pt-4">

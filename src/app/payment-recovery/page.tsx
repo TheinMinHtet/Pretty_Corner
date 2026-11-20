@@ -18,23 +18,23 @@ export default function PaymentRecoveryPage() {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto px-4 sm:px-6 py-4 md:py-10 flex flex-col min-h-full pb-12">
-      <div className="bg-white md:bg-[#faf7f8] md:border md:border-[#eedfe5] md:rounded-2xl md:p-8 flex flex-col">
-      {/* 1. Header (35:645) */}
-      <header className="px-5 pt-4 pb-2 text-center border-b border-transparent">
-        <h1 className="font-serif text-[29px] font-medium text-[#38262e]">
-          Pretty Corner
-        </h1>
-      </header>
+    <div className="w-full max-w-xl mx-auto px-4 sm:px-6 py-5 md:py-10 flex flex-col min-h-full pb-12">
+      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-6 sm:p-8 flex flex-col">
+        {/* Breadcrumb / Back */}
+        <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870] mb-4">
+          <Link href="/" className="hover:text-[#38262e]">Home</Link>
+          <span>/</span>
+          <span className="text-[#38262e] font-medium">Payment Recovery</span>
+        </div>
 
-      {/* 2. Page Details (35:647) */}
-      <div className="px-5 pt-3 flex flex-col gap-5">
-        <button
-          onClick={() => router.back()}
-          className="text-[12px] font-bold text-[#b73d67] hover:underline text-left"
-        >
-          ‹ Back
-        </button>
+        {/* Page Details */}
+        <div className="flex flex-col gap-5">
+          <button
+            onClick={() => router.back()}
+            className="text-[12px] font-bold text-[#b73d67] hover:underline text-left cursor-pointer"
+          >
+            Back
+          </button>
 
         <div>
           <h2 className="font-serif text-[30px] font-medium text-[#38262e]">
