@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
@@ -28,8 +28,24 @@ function ShopContent() {
   const [activeCategory, setActiveCategory] = useState<string>(initialCat);
   const [searchFilter, setSearchFilter] = useState<string>(initialQuery);
   const [sortBy, setSortBy] = useState<'featured' | 'newest' | 'price-asc' | 'price-desc'>('featured');
+  const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false);
+  const sortDropdownRef = useRef<HTMLDivElement>(null);
   const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
   const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target as Node)) {
+        setShowSortDropdown(false);
+      }
+    }
+    if (showSortDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSortDropdown]);
 
   // Sync state when URL query params change (e.g. from Home page Others popup)
   useEffect(() => {
@@ -346,18 +362,55 @@ function ShopContent() {
               )}
             </button>
 
-            <div className="relative">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="appearance-none bg-[#fdfbfa] hover:bg-[#fcf7f9] border border-[#eedfe5] rounded-full text-[13px] text-[#38262e] pr-8 pl-4 h-[38px] focus:outline-none focus:border-[#b73d67] cursor-pointer font-medium transition-colors shadow-[0_2px_8px_rgba(56,38,46,0.02)]"
+            {/* Custom Aesthetic Sort Dropdown Menu */}
+            <div className="relative" ref={sortDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setShowSortDropdown(!showSortDropdown)}
+                className={`flex items-center gap-2 bg-[#fdfbfa] hover:bg-[#fcf7f9] border rounded-full text-[13px] text-[#38262e] px-4 h-[38px] cursor-pointer font-medium transition-all shadow-[0_2px_8px_rgba(56,38,46,0.02)] ${
+                  showSortDropdown ? 'border-[#b73d67] ring-1 ring-[#b73d67]/20 bg-[#fcf7f9]' : 'border-[#eedfe5]'
+                }`}
               >
-                <option value="featured">Sort: Featured</option>
-                <option value="newest">Sort: Newest</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-              </select>
-              <span className="absolute right-3.5 top-2.5 pointer-events-none text-[#b73d67] text-xs">⌄</span>
+                <span>
+                  {sortBy === 'featured' && 'Sort: Featured'}
+                  {sortBy === 'newest' && 'Sort: Newest'}
+                  {sortBy === 'price-asc' && 'Price: Low to High'}
+                  {sortBy === 'price-desc' && 'Price: High to Low'}
+                </span>
+                <span className={`text-[#b73d67] text-xs transition-transform duration-200 ${showSortDropdown ? 'rotate-180' : ''}`}>
+                  ⌄
+                </span>
+              </button>
+
+              {showSortDropdown && (
+                <div className="absolute right-0 top-[calc(100%+6px)] z-30 min-w-[190px] bg-white/95 backdrop-blur-md rounded-2xl border border-[#eedfe5] shadow-[0_12px_32px_rgba(56,38,46,0.12)] py-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                  {[
+                    { value: 'featured', label: 'Sort: Featured' },
+                    { value: 'newest', label: 'Sort: Newest' },
+                    { value: 'price-asc', label: 'Price: Low to High' },
+                    { value: 'price-desc', label: 'Price: High to Low' },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => {
+                        setSortBy(option.value as any);
+                        setShowSortDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-[13px] transition-colors flex items-center justify-between cursor-pointer ${
+                        sortBy === option.value
+                          ? 'bg-[#fdf2f5] text-[#b73d67] font-semibold'
+                          : 'text-[#38262e] hover:bg-[#faf6f7]'
+                      }`}
+                    >
+                      <span>{option.label}</span>
+                      {sortBy === option.value && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] shrink-0" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
