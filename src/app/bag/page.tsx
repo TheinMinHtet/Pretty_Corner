@@ -119,10 +119,6 @@ export default function ShoppingBagPage() {
                   <span className="text-[#38262e] font-medium">{selectedTownship.fee.toLocaleString()} MMK</span>
                 </div>
 
-                <p className="text-[11px] text-[#7a6870] mt-1">
-                  Final fee is confirmed with your delivery address in Yangon.
-                </p>
-
                 <div className="my-4 border-t border-[#eedfe5]" />
 
                 <div className="flex justify-between items-center text-[18px] font-bold text-[#38262e]">
