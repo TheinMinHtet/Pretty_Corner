@@ -61,7 +61,7 @@ export default function Header() {
               isTrack ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
             }`}
           >
-            Track Order
+            Order Receipt
             {isTrack && (
               <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
             )}

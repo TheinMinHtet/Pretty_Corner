@@ -44,7 +44,7 @@ export default function OrderLookupPage() {
         <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870] mb-4">
           <Link href="/" className="hover:text-[#38262e]">Home</Link>
           <span>/</span>
-          <span className="text-[#38262e] font-medium">Track Order</span>
+          <span className="text-[#38262e] font-medium">Find Receipt</span>
         </div>
 
         {/* Page Details */}
@@ -55,10 +55,10 @@ export default function OrderLookupPage() {
 
           <div>
             <h2 className="font-serif text-[30px] font-medium text-[#38262e]">
-              Find your order.
+              Find your order receipt.
             </h2>
             <p className="text-[13px] text-[#7a6870] mt-1">
-              Enter your order reference and phone number to check your delivery status.
+              Enter your order reference and phone number to view your order summary &amp; receipt.
             </p>
           </div>
 
@@ -117,7 +117,7 @@ export default function OrderLookupPage() {
               type="submit"
               className="w-full h-[48px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-xs cursor-pointer"
             >
-              Track order
+              View Order Receipt
             </button>
           </form>
 

@@ -36,12 +36,12 @@ export default function HelpAndContactPage() {
             </h1>
           </div>
 
-          {/* Track existing order CTA */}
+          {/* Find existing order receipt CTA */}
           <Link
             href="/order-lookup"
             className="w-full h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-xs cursor-pointer"
           >
-            Track an existing order
+            Find an order receipt
           </Link>
 
           {/* Order Help Banner */}

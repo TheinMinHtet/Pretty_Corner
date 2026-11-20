@@ -328,7 +328,7 @@ function OrderConfirmationContent() {
           href={`/order-tracking?orderId=${order.id}`}
           className="w-full h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-xs"
         >
-          Track your order
+          View Order Receipt
         </Link>
 
         <p className="text-[11px] text-center text-[#7a6870]">
