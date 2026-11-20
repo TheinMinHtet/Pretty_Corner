@@ -163,9 +163,9 @@ export default function HomePage() {
           </h3>
           <button
             onClick={() => setShowCategoryModal(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#fceef2] text-[#b73d67] text-[12px] sm:text-[13px] font-bold hover:bg-[#f6e1e8] transition-colors cursor-pointer shrink-0"
+            className="text-[13px] font-bold text-[#b73d67] hover:underline cursor-pointer shrink-0"
           >
-            <span>+ Others</span>
+            Others →
           </button>
         </div>
 
@@ -183,12 +183,6 @@ export default function HomePage() {
               {cat.label}
             </button>
           ))}
-          <button
-            onClick={() => setShowCategoryModal(true)}
-            className="h-[36px] sm:h-[40px] px-4 rounded-[20px] text-[13px] font-bold whitespace-nowrap bg-[#faf7f8] text-[#b73d67] border border-[#eedfe5] hover:bg-[#fceef2] transition-colors cursor-pointer shrink-0 flex items-center gap-1"
-          >
-            <span>+ Others</span>
-          </button>
         </div>
       </section>
 
