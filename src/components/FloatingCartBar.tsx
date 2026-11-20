@@ -28,7 +28,7 @@ export default function FloatingCartBar() {
         isVisible
           ? 'translate-y-0 opacity-100 pointer-events-auto'
           : 'translate-y-20 opacity-0 pointer-events-none'
-      } bottom-4 md:bottom-6 left-3 right-3 md:left-1/2 md:-translate-x-1/2 max-w-[420px] md:max-w-xl md:w-full mx-auto`}
+      } bottom-[calc(66px+env(safe-area-inset-bottom,0px))] md:bottom-6 left-3 right-3 md:left-1/2 md:-translate-x-1/2 max-w-[420px] md:max-w-xl md:w-full mx-auto`}
     >
       <div className="bg-[#38262e]/85 text-white rounded-2xl p-3 sm:px-5 sm:py-3.5 shadow-2xl border border-white/15 flex items-center justify-between gap-3 backdrop-blur-lg">
         {/* Left Side: Bag Item Counter & Total Price */}

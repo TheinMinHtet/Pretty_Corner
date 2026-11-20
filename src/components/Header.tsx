@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
@@ -9,7 +9,6 @@ const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false }
 
 export default function Header() {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isHome = pathname === '/';
   const isShop = pathname.startsWith('/shop') || pathname.startsWith('/product');
@@ -21,7 +20,7 @@ export default function Header() {
       {/* Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[64px] md:h-[74px] flex items-center justify-between gap-4">
         {/* Brand Logo */}
-        <Link href="/" className="flex flex-col group shrink-0" onClick={() => setMobileMenuOpen(false)}>
+        <Link href="/" className="flex flex-col group shrink-0">
           <span className="font-serif text-[24px] sm:text-[28px] md:text-[30px] lg:text-[34px] font-medium leading-none text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
             Pretty Corner
           </span>
@@ -86,7 +85,6 @@ export default function Header() {
           {/* Bag Button */}
           <Link
             href="/bag"
-            onClick={() => setMobileMenuOpen(false)}
             className="flex items-center gap-1.5 sm:gap-2 bg-[#fceef2] hover:bg-[#fae2ea] text-[#38262e] px-3 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all group"
           >
             <div className="relative">
@@ -101,75 +99,8 @@ export default function Header() {
               Bag
             </span>
           </Link>
-
-          {/* Mobile Menu Toggle Button (visible on mobile only) */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg text-[#38262e] hover:bg-[#fceef2] transition-colors cursor-pointer"
-            aria-label="Toggle navigation menu"
-          >
-            {mobileMenuOpen ? (
-              <svg className="w-5 h-5 text-[#38262e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5 text-[#38262e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
         </div>
       </div>
-
-      {/* Mobile Dropdown Menu for Navigation Links */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white/98 border-t border-[#eedfe5] px-5 py-4 space-y-1 shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
-          <Link
-            href="/"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-[14px] font-medium transition-colors ${
-              isHome ? 'bg-[#fceef2] text-[#b73d67] font-bold' : 'text-[#38262e] hover:bg-[#faf7f8]'
-            }`}
-          >
-            <span>Home</span>
-            {isHome && <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />}
-          </Link>
-
-          <Link
-            href="/shop"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-[14px] font-medium transition-colors ${
-              isShop ? 'bg-[#fceef2] text-[#b73d67] font-bold' : 'text-[#38262e] hover:bg-[#faf7f8]'
-            }`}
-          >
-            <span>All Products</span>
-            {isShop && <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />}
-          </Link>
-
-          <Link
-            href="/order-lookup"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-[14px] font-medium transition-colors ${
-              isTrack ? 'bg-[#fceef2] text-[#b73d67] font-bold' : 'text-[#38262e] hover:bg-[#faf7f8]'
-            }`}
-          >
-            <span>Track Order</span>
-            {isTrack && <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />}
-          </Link>
-
-          <Link
-            href="/contact"
-            onClick={() => setMobileMenuOpen(false)}
-            className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-[14px] font-medium transition-colors ${
-              isContact ? 'bg-[#fceef2] text-[#b73d67] font-bold' : 'text-[#38262e] hover:bg-[#faf7f8]'
-            }`}
-          >
-            <span>Contact & Help</span>
-            {isContact && <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />}
-          </Link>
-        </div>
-      )}
     </header>
   );
 }
-
