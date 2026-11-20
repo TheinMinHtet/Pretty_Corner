@@ -59,7 +59,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [selectedTownship, setSelectedTownship] = useState<TownshipOption>(MOCK_TOWNSHIPS[0]);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Persist cart & orders or load from localStorage if client-side
+  // Persist cart or load from localStorage if client-side
   useEffect(() => {
     setIsMounted(true);
     try {
@@ -67,22 +67,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (savedCart) {
         setCart(JSON.parse(savedCart));
       }
-      const savedOrders = localStorage.getItem('pretty_corner_orders');
-      if (savedOrders) {
-        const parsed: Order[] = JSON.parse(savedOrders);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const map = new Map<string, Order>();
-          parsed.forEach((o) => {
-            if (o && o.id) map.set(o.id.toUpperCase(), o);
-          });
-          INITIAL_ORDERS.forEach((o) => {
-            if (!map.has(o.id.toUpperCase())) {
-              map.set(o.id.toUpperCase(), o);
-            }
-          });
-          setOrders(Array.from(map.values()));
-        }
-      }
+      // Ensure orders are not stored on local device
+      localStorage.removeItem('pretty_corner_orders');
     } catch {
       // fallback to initial
     }
@@ -92,13 +78,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setCart(updatedCart);
     try {
       localStorage.setItem('pretty_corner_cart', JSON.stringify(updatedCart));
-    } catch {}
-  };
-
-  const saveOrdersToStorage = (updatedOrders: Order[]) => {
-    setOrders(updatedOrders);
-    try {
-      localStorage.setItem('pretty_corner_orders', JSON.stringify(updatedOrders));
     } catch {}
   };
 
@@ -206,8 +185,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       createdAt: formattedDate,
     };
 
-    const nextOrders = [newOrder, ...orders.filter((o) => o.id.toUpperCase() !== orderId.toUpperCase())];
-    saveOrdersToStorage(nextOrders);
+    setOrders((prev) => [newOrder, ...prev.filter((o) => o.id.toUpperCase() !== orderId.toUpperCase())]);
     return newOrder;
   };
 
@@ -227,17 +205,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const updatePaymentStatus = (orderId: string, status: Order['paymentStatus']) => {
     const cleanId = orderId.trim().toUpperCase();
-    const updatedOrders = orders.map((o) => {
-      if (o.id.toUpperCase() === cleanId) {
-        return {
-          ...o,
-          paymentStatus: status,
-          fulfillmentStatus: status === 'paid' ? 'confirmed' : o.fulfillmentStatus,
-        };
-      }
-      return o;
-    });
-    saveOrdersToStorage(updatedOrders);
+    setOrders((prev) =>
+      prev.map((o) => {
+        if (o.id.toUpperCase() === cleanId) {
+          return {
+            ...o,
+            paymentStatus: status,
+            fulfillmentStatus: status === 'paid' ? 'confirmed' : o.fulfillmentStatus,
+          };
+        }
+        return o;
+      })
+    );
     if (status === 'paid') {
       clearCart();
     }

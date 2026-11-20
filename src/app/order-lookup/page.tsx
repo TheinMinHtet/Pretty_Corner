@@ -7,7 +7,7 @@ import { useStore } from '@/context/StoreContext';
 
 export default function OrderLookupPage() {
   const router = useRouter();
-  const { orders, getOrder, isMounted } = useStore();
+  const { getOrder } = useStore();
 
   const [orderRef, setOrderRef] = useState('');
   const [lookupError, setLookupError] = useState(false);
@@ -28,9 +28,6 @@ export default function OrderLookupPage() {
     setLookupError(false);
     router.push(`/order-tracking?orderId=${order.id}`);
   };
-
-  // Recent orders stored on this device
-  const recentOrders = isMounted ? orders.slice(0, 4) : [];
 
   return (
     <div className="w-full max-w-xl mx-auto px-4 sm:px-6 py-5 md:py-10 flex flex-col min-h-full pb-12">
@@ -86,41 +83,6 @@ export default function OrderLookupPage() {
               View Order Receipt
             </button>
           </form>
-
-          {/* Recent Orders on this device */}
-          {recentOrders.length > 0 && (
-            <div className="bg-white rounded-xl p-4 border border-[#eedfe5] flex flex-col gap-2.5">
-              <span className="text-[12px] font-bold text-[#38262e]">
-                Recent orders on this device:
-              </span>
-              <div className="flex flex-col gap-2">
-                {recentOrders.map((o) => (
-                  <button
-                    key={o.id}
-                    type="button"
-                    onClick={() => {
-                      setOrderRef(o.id);
-                      setLookupError(false);
-                      router.push(`/order-tracking?orderId=${o.id}`);
-                    }}
-                    className="flex items-center justify-between p-2.5 rounded-lg hover:bg-[#fceef2]/50 border border-[#eedfe5]/60 transition-colors text-left cursor-pointer group"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-mono text-[13px] font-bold text-[#b73d67] group-hover:underline">
-                        {o.id}
-                      </span>
-                      <span className="text-[11px] text-[#7a6870]">
-                        {o.createdAt} · {o.items.length} item{o.items.length > 1 ? 's' : ''}
-                      </span>
-                    </div>
-                    <span className="text-[12px] font-bold text-[#38262e]">
-                      {o.total.toLocaleString()} MMK →
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Validation Error Banner */}
           {lookupError && (
