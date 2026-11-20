@@ -182,7 +182,7 @@ export default function HomePage() {
             onClick={() => setShowCategoryModal(true)}
             className="text-[13px] font-bold text-[#b73d67] hover:underline cursor-pointer shrink-0"
           >
-            Others →
+            All Categories →
           </button>
         </div>
 

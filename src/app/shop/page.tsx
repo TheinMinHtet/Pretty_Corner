@@ -300,13 +300,16 @@ function ShopContent() {
           ))}
           <button
             onClick={() => setShowCategoryModal(true)}
-            className={`h-[36px] sm:h-[38px] px-4 rounded-full text-[13px] font-bold whitespace-nowrap border transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
+            className={`h-[36px] sm:h-[38px] px-3.5 sm:px-4 rounded-full text-[13px] font-bold whitespace-nowrap border transition-colors cursor-pointer shrink-0 flex items-center gap-1.5 ${
               !categoriesList.slice(0, 5).some((c) => c.id === activeCategory) && activeCategory !== 'all'
                 ? 'bg-[#38262e] text-white border-[#38262e]'
                 : 'bg-[#faf7f8] text-[#b73d67] border-[#eedfe5] hover:bg-[#fceef2]'
             }`}
           >
-            <span>+ Others</span>
+            <span>
+              <span className="hidden sm:inline">+ More Categories</span>
+              <span className="sm:hidden">+ More</span>
+            </span>
             {categoriesList.length > 5 && (
               <span className="text-[11px] opacity-75">
                 ({categoriesList.length - 5})
