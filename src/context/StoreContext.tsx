@@ -165,7 +165,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const cartCount = isMounted ? cart.reduce((sum, item) => sum + item.quantity, 0) : 0;
   const cartSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const cartTotal = cartSubtotal + (selectedTownship?.fee || 3000);
+  const cartTotal = cartSubtotal;
 
   const createOrder = (orderData: Omit<Order, 'id' | 'createdAt'>): Order => {
     const date = new Date();

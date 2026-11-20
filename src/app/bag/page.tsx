@@ -8,7 +8,7 @@ import { useStore } from '@/context/StoreContext';
 
 export default function ShoppingBagPage() {
   const router = useRouter();
-  const { cart, updateCartQuantity, removeFromCart, cartSubtotal, cartTotal, selectedTownship, isMounted } = useStore();
+  const { cart, updateCartQuantity, removeFromCart, cartCount, cartSubtotal, cartTotal, selectedTownship, isMounted } = useStore();
 
   if (!isMounted) {
     return (
@@ -104,31 +104,62 @@ export default function ShoppingBagPage() {
 
             {/* Right Column: Order Summary Card (sticky on desktop) */}
             <div className="md:col-span-5 lg:col-span-4 mt-6 md:mt-0">
-              <div className="sticky top-28 bg-[#fcf9fa] p-6 lg:p-7 rounded-2xl border border-[#eedfe5]">
-                <h2 className="font-serif text-[24px] sm:text-[28px] font-medium text-[#38262e] mb-4">
-                  Order summary
-                </h2>
-
-                <div className="flex justify-between items-center text-[14px] text-[#7a6870] py-2">
-                  <span>Subtotal</span>
-                  <span className="text-[#38262e] font-medium">{cartSubtotal.toLocaleString()} MMK</span>
+              <div className="sticky top-28 bg-[#fcf9fa] p-5 sm:p-6 lg:p-7 rounded-2xl border border-[#eedfe5]">
+                <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-[#eedfe5]">
+                  <h2 className="font-serif text-[22px] sm:text-[26px] font-medium text-[#38262e]">
+                    Order summary
+                  </h2>
+                  <span className="text-[12px] font-medium text-[#7a6870]">
+                    {cartCount} {cartCount === 1 ? 'item' : 'items'}
+                  </span>
                 </div>
 
-                <div className="my-4 border-t border-[#eedfe5]" />
+                {/* Products miniature list with customer quantity and item total */}
+                <div className="max-h-56 overflow-y-auto divide-y divide-[#eedfe5]/70 pr-1 mb-3">
+                  {cart.map((item) => (
+                    <div key={item.id} className="py-2.5 flex items-center justify-between gap-3 text-[13px]">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="relative w-10 h-10 rounded-lg bg-white border border-[#eedfe5] overflow-hidden shrink-0">
+                          <Image src={item.image} alt={item.name} fill className="object-cover" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-medium text-[#38262e] truncate">{item.name}</p>
+                          <p className="text-[11px] text-[#7a6870]">
+                            Qty: <strong className="text-[#38262e] font-semibold">{item.quantity}</strong>
+                            {item.size ? ` · ${item.size}` : ''}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="font-bold text-[#38262e] shrink-0 whitespace-nowrap">
+                        {(item.price * item.quantity).toLocaleString()} MMK
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Subtotal & Total (NO delivery fee added) */}
+                <div className="border-t border-[#eedfe5] pt-3.5 space-y-2 text-[14px]">
+                  <div className="flex justify-between items-center text-[#7a6870]">
+                    <span>Subtotal</span>
+                    <span className="text-[#38262e] font-medium">{cartSubtotal.toLocaleString()} MMK</span>
+                  </div>
+                </div>
+
+                <div className="my-3.5 border-t border-[#eedfe5]" />
 
                 <div className="flex justify-between items-center text-[18px] font-bold text-[#38262e]">
                   <span>Total</span>
-                  <span className="text-[#b73d67]">{cartTotal.toLocaleString()} MMK</span>
+                  <span className="text-[#b73d67]">{cartSubtotal.toLocaleString()} MMK</span>
                 </div>
 
                 <Link
                   href="/checkout"
-                  className="w-full mt-6 h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-sm cursor-pointer"
+                  className="w-full mt-5 h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-sm cursor-pointer"
                 >
-                  Checkout
+                  Checkout · {cartSubtotal.toLocaleString()} MMK
                 </Link>
 
-                <div className="text-center mt-4">
+                <div className="text-center mt-3.5">
                   <Link href="/shop" className="text-[13px] font-bold text-[#b73d67] hover:underline">
                     Continue shopping
                   </Link>
