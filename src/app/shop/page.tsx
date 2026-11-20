@@ -530,15 +530,15 @@ function ShopContent() {
 
       {/* Category Popup Modal ("+ Others") */}
       {showCategoryModal && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-[#38262e]/50 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-[#38262e]/45 backdrop-blur-xs transition-opacity"
             onClick={() => setShowCategoryModal(false)}
           />
 
-          {/* Dialog */}
-          <div className="relative w-full sm:max-w-lg bg-white rounded-t-[20px] sm:rounded-2xl p-6 max-h-[85vh] overflow-y-auto shadow-2xl z-10 animate-in fade-in slide-in-from-bottom-6 sm:zoom-in-95">
+          {/* Dialog - Centered on screen */}
+          <div className="relative w-full max-w-lg bg-white rounded-2xl p-5 sm:p-6 max-h-[80vh] overflow-y-auto shadow-2xl z-10 border border-[#eedfe5] animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-3 border-b border-[#eedfe5]">
               <div>
                 <h3 className="font-serif text-[22px] font-medium text-[#38262e]">

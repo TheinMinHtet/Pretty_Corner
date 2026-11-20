@@ -34,9 +34,6 @@ export default function HelpAndContactPage() {
             <h1 className="font-serif text-[30px] sm:text-[38px] font-medium text-[#38262e]">
               A little help, always.
             </h1>
-            <p className="text-[14px] sm:text-[15px] text-[#7a6870] mt-1.5">
-              Shopping questions or an order to check? We’re always here for you.
-            </p>
           </div>
 
           {/* Track existing order CTA */}
@@ -104,9 +101,6 @@ export default function HelpAndContactPage() {
           <h2 className="font-serif text-[24px] sm:text-[28px] font-medium text-[#38262e] mb-1">
             Helpful information
           </h2>
-          <p className="text-[14px] text-[#7a6870] mb-2">
-            Browse our policies and learn more about our Yangon doorstep delivery.
-          </p>
 
           <Link
             href="/about"
@@ -149,10 +143,6 @@ export default function HelpAndContactPage() {
           >
             <span>Terms and conditions</span>
           </Link>
-
-          <p className="text-[12px] text-center text-[#7a6870] pt-4">
-            No account needed to browse, shop or place an order.
-          </p>
         </div>
       </div>
     </div>
