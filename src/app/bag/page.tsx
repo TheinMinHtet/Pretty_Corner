@@ -137,17 +137,8 @@ export default function ShoppingBagPage() {
                   ))}
                 </div>
 
-                {/* Subtotal & Total (NO delivery fee added) */}
-                <div className="border-t border-[#eedfe5] pt-3.5 space-y-2 text-[14px]">
-                  <div className="flex justify-between items-center text-[#7a6870]">
-                    <span>Subtotal</span>
-                    <span className="text-[#38262e] font-medium">{cartSubtotal.toLocaleString()} MMK</span>
-                  </div>
-                </div>
-
-                <div className="my-3.5 border-t border-[#eedfe5]" />
-
-                <div className="flex justify-between items-center text-[18px] font-bold text-[#38262e]">
+                {/* Total */}
+                <div className="border-t border-[#eedfe5] pt-4 flex justify-between items-center text-[18px] font-bold text-[#38262e]">
                   <span>Total</span>
                   <span className="text-[#b73d67]">{cartSubtotal.toLocaleString()} MMK</span>
                 </div>
