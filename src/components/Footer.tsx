@@ -28,7 +28,7 @@ export default function Footer() {
           {/* Column 2: Customer Care (Centered with balanced 3 & 3 links) */}
           <div className="sm:col-span-1 md:col-span-1 flex flex-col md:items-center">
             <div className="w-fit">
-              <h4 className="font-serif text-[16px] sm:text-[17px] font-medium text-[#38262e] mb-2.5 sm:mb-3 tracking-tight">
+              <h4 className="font-serif text-[16px] sm:text-[17px] font-medium text-[#38262e] mb-2.5 sm:mb-3 tracking-tight text-center">
                 Customer Care
               </h4>
               <ul className="grid grid-cols-2 gap-x-5 sm:gap-x-7 gap-y-2 text-[12px] sm:text-[13px] text-[#7a6870] leading-snug">
