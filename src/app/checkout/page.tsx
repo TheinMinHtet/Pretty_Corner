@@ -388,6 +388,7 @@ export default function CheckoutPage() {
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
+                        e.stopPropagation();
                         handleMapSearch();
                       }
                     }}
