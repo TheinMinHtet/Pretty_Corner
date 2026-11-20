@@ -54,7 +54,7 @@ export default function PrivacyPolicyPage() {
           <div className="bg-[#faf7f8] p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
             <h3 className="font-serif text-[20px] font-medium text-[#38262e]">Payment Data Safety</h3>
             <p className="mt-2 text-[#7a6870]">
-              Payment transactions are secured through certified payment gateway integrations (MyanMyanPay, KBZPay, WavePay). Pretty Corner never stores your banking credentials or PINs.
+              Payment transactions are secured through certified payment channels (Mobile Banking, Cash on Delivery). Pretty Corner never stores your banking credentials or PINs.
             </p>
           </div>
         </div>

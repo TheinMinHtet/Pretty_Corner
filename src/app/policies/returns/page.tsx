@@ -54,7 +54,7 @@ export default function ReturnsPolicyPage() {
           <div className="bg-[#faf7f8] p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
             <h3 className="font-serif text-[20px] font-medium text-[#38262e]">Refund Timeline</h3>
             <p className="mt-2 text-[#7a6870]">
-              Approved refunds are processed back to your original payment channel (KBZPay, WavePay, or bank account) within 24 to 48 hours.
+              Approved refunds are processed back to your original payment channel (Mobile Banking or bank account) within 24 to 48 hours.
             </p>
           </div>
         </div>

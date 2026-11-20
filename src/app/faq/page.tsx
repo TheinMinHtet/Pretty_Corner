@@ -20,11 +20,11 @@ const FAQS: FaqItem[] = [
   },
   {
     q: 'What payment methods do you accept?',
-    a: 'We accept MyanMyanPay, KBZPay, WavePay, and mobile banking instant transfers. All payments are verified securely.',
+    a: 'We accept Mobile Banking and Cash on Delivery. All payments are verified securely.',
   },
   {
-    q: 'How can I track my parcel without logging in?',
-    a: 'Visit our "Find your order" page anytime with your order reference (e.g. PC-261117-024) and your checkout phone number.',
+    q: 'How can I check my order receipt without logging in?',
+    a: 'Visit our "Order Receipt" page anytime with your Order ID (e.g. PC-261117-024). No login or account is required.',
   },
   {
     q: 'Are all products authentic?',

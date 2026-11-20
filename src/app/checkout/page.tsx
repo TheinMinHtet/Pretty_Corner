@@ -478,56 +478,36 @@ export default function CheckoutPage() {
                 3. Payment method
               </h2>
               <p className="text-[13px] text-[#7a6870] mb-4">
-                Choose your preferred payment method. Verified securely in Yangon.
+                Choose your preferred payment method.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {/* 1. Mobile Banking */}
                 <div
                   onClick={() => setPaymentMethod('Mobile Banking')}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center ${
                     paymentMethod === 'Mobile Banking'
                       ? 'bg-[#fceef2] border-[#b73d67] ring-1 ring-[#b73d67]'
                       : 'bg-white border-[#eedfe5] hover:border-[#b73d67]'
                   }`}
                 >
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-[15px] font-bold ${paymentMethod === 'Mobile Banking' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
-                        {paymentMethod === 'Mobile Banking' ? '●' : '○'} Mobile Banking
-                      </span>
-                      <span className="text-[10px] font-bold text-[#b73d67] bg-white px-2 py-0.5 rounded border border-[#eedfe5]">
-                        KBZPay · WavePay
-                      </span>
-                    </div>
-                    <p className="text-[12px] text-[#7a6870] mt-1.5 leading-relaxed">
-                      Instant transfer via KBZPay, WavePay, or mobile banking with digital payment verification.
-                    </p>
-                  </div>
+                  <span className={`text-[15px] font-bold ${paymentMethod === 'Mobile Banking' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                    {paymentMethod === 'Mobile Banking' ? '●' : '○'} Mobile Banking
+                  </span>
                 </div>
 
                 {/* 2. Cash on Delivery */}
                 <div
                   onClick={() => setPaymentMethod('Cash on Delivery')}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center ${
                     paymentMethod === 'Cash on Delivery'
                       ? 'bg-[#fceef2] border-[#b73d67] ring-1 ring-[#b73d67]'
                       : 'bg-white border-[#eedfe5] hover:border-[#b73d67]'
                   }`}
                 >
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <span className={`text-[15px] font-bold ${paymentMethod === 'Cash on Delivery' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
-                        {paymentMethod === 'Cash on Delivery' ? '●' : '○'} Cash on Delivery
-                      </span>
-                      <span className="text-[10px] font-bold text-[#38262e] bg-[#faf7f8] px-2 py-0.5 rounded border border-[#eedfe5]">
-                        Pay at Doorstep
-                      </span>
-                    </div>
-                    <p className="text-[12px] text-[#7a6870] mt-1.5 leading-relaxed">
-                      Pay cash directly to the delivery rider when your package arrives safely at your doorstep.
-                    </p>
-                  </div>
+                  <span className={`text-[15px] font-bold ${paymentMethod === 'Cash on Delivery' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                    {paymentMethod === 'Cash on Delivery' ? '●' : '○'} Cash on Delivery
+                  </span>
                 </div>
               </div>
             </div>
