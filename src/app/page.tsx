@@ -363,8 +363,12 @@ export default function HomePage() {
                   <button
                     key={cat.id}
                     onClick={() => {
-                      setActiveCategory(cat.id);
                       setShowCategoryModal(false);
+                      if (cat.id === 'all') {
+                        router.push('/shop');
+                      } else {
+                        router.push(`/shop?category=${cat.id}`);
+                      }
                     }}
                     className={`w-full text-left p-3.5 rounded-[12px] border transition-all cursor-pointer flex items-center justify-between gap-3 ${
                       isSelected
