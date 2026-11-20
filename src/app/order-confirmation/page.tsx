@@ -332,7 +332,7 @@ function OrderConfirmationContent() {
         </Link>
 
         <p className="text-[11px] text-center text-[#7a6870]">
-          Use your order reference and phone number.
+          Save your Order ID! You can check your receipt anytime using only your ID — no login needed.
         </p>
 
         <div className="text-center pt-2">

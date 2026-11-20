@@ -4,31 +4,23 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
-import { validatePhoneNumber } from '@/lib/validation';
 
 export default function OrderLookupPage() {
   const router = useRouter();
-  const { getOrder } = useStore();
+  const { orders, getOrder, isMounted } = useStore();
 
   const [orderRef, setOrderRef] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [phoneError, setPhoneError] = useState('');
   const [lookupError, setLookupError] = useState(false);
 
   const handleLookup = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!orderRef.trim()) {
+    const cleanRef = orderRef.trim();
+    if (!cleanRef) {
       setLookupError(true);
       return;
     }
-    const phoneCheck = validatePhoneNumber(phoneNumber);
-    if (!phoneCheck.isValid) {
-      setPhoneError(phoneCheck.error || 'Please enter a valid phone number.');
-      return;
-    }
-    setPhoneError('');
 
-    const order = getOrder(orderRef.trim(), phoneNumber.trim());
+    const order = getOrder(cleanRef);
     if (!order) {
       setLookupError(true);
       return;
@@ -36,6 +28,9 @@ export default function OrderLookupPage() {
     setLookupError(false);
     router.push(`/order-tracking?orderId=${order.id}`);
   };
+
+  // Recent orders stored on this device
+  const recentOrders = isMounted ? orders.slice(0, 4) : [];
 
   return (
     <div className="w-full max-w-xl mx-auto px-4 sm:px-6 py-5 md:py-10 flex flex-col min-h-full pb-12">
@@ -50,7 +45,7 @@ export default function OrderLookupPage() {
         {/* Page Details */}
         <div className="flex flex-col gap-5">
           <Link href="/shop" className="text-[12px] font-bold text-[#b73d67] hover:underline">
-            Back to shop
+            ← Back to shop
           </Link>
 
           <div>
@@ -58,7 +53,7 @@ export default function OrderLookupPage() {
               Find your order receipt.
             </h2>
             <p className="text-[13px] text-[#7a6870] mt-1">
-              Enter your order reference and phone number to view your order summary &amp; receipt.
+              Enter your Order ID to view your receipt anytime. No login or password required.
             </p>
           </div>
 
@@ -66,7 +61,7 @@ export default function OrderLookupPage() {
           <form onSubmit={handleLookup} className="flex flex-col gap-4">
             <div>
               <label className="block text-[12px] font-bold text-[#38262e] mb-1.5">
-                Order reference *
+                Order ID / Reference *
               </label>
               <input
                 type="text"
@@ -77,41 +72,12 @@ export default function OrderLookupPage() {
                   setLookupError(false);
                 }}
                 placeholder="e.g. PC-261117-024"
-                className="w-full h-[46px] px-3 bg-white border border-[#eedfe5] rounded-[10px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67]"
+                className="w-full h-[48px] px-3.5 bg-white border border-[#eedfe5] rounded-[10px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67] font-mono uppercase"
               />
+              <p className="text-[12px] text-[#7a6870] mt-1.5">
+                Simply enter the Order ID provided when you placed your order.
+              </p>
             </div>
-
-            <div>
-              <label className="block text-[12px] font-bold text-[#38262e] mb-1.5">
-                Checkout phone number *
-              </label>
-              <input
-                type="tel"
-                required
-                value={phoneNumber}
-                onChange={(e) => {
-                  setPhoneNumber(e.target.value);
-                  setLookupError(false);
-                  setPhoneError('');
-                }}
-                placeholder="e.g. 09 765 432 100"
-                className={`w-full h-[46px] px-3 bg-white border rounded-[10px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none transition-colors ${
-                  phoneError
-                    ? 'border-red-400 focus:border-red-500 bg-red-50/10'
-                    : 'border-[#eedfe5] focus:border-[#b73d67]'
-                }`}
-              />
-              {phoneError && (
-                <p className="text-red-600 text-[11px] font-semibold mt-1 flex items-center gap-1">
-                  <span>⚠</span>
-                  <span>{phoneError}</span>
-                </p>
-              )}
-            </div>
-
-            <p className="text-[12px] text-[#7a6870] -mt-1">
-              Use the phone number you entered during checkout.
-            </p>
 
             <button
               type="submit"
@@ -121,14 +87,49 @@ export default function OrderLookupPage() {
             </button>
           </form>
 
+          {/* Recent Orders on this device */}
+          {recentOrders.length > 0 && (
+            <div className="bg-white rounded-xl p-4 border border-[#eedfe5] flex flex-col gap-2.5">
+              <span className="text-[12px] font-bold text-[#38262e]">
+                Recent orders on this device:
+              </span>
+              <div className="flex flex-col gap-2">
+                {recentOrders.map((o) => (
+                  <button
+                    key={o.id}
+                    type="button"
+                    onClick={() => {
+                      setOrderRef(o.id);
+                      setLookupError(false);
+                      router.push(`/order-tracking?orderId=${o.id}`);
+                    }}
+                    className="flex items-center justify-between p-2.5 rounded-lg hover:bg-[#fceef2]/50 border border-[#eedfe5]/60 transition-colors text-left cursor-pointer group"
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-mono text-[13px] font-bold text-[#b73d67] group-hover:underline">
+                        {o.id}
+                      </span>
+                      <span className="text-[11px] text-[#7a6870]">
+                        {o.createdAt} · {o.items.length} item{o.items.length > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                    <span className="text-[12px] font-bold text-[#38262e]">
+                      {o.total.toLocaleString()} MMK →
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Validation Error Banner */}
           {lookupError && (
             <div className="bg-[#fceef2] border border-[#eedfe5] rounded-[10px] p-4 flex flex-col gap-1.5">
               <p className="text-[14px] font-bold text-[#38262e]">
-                We couldn’t find an order with those details.
+                We couldn’t find an order with that reference.
               </p>
               <p className="text-[13px] text-[#7a6870] leading-relaxed">
-                Please double check your order reference and phone number, then try again.
+                Please double-check your Order ID (e.g. PC-261117-024) and try again.
               </p>
             </div>
           )}

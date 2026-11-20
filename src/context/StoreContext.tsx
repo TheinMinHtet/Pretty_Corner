@@ -59,13 +59,29 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [selectedTownship, setSelectedTownship] = useState<TownshipOption>(MOCK_TOWNSHIPS[0]);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Persist cart or load from localStorage if client-side
+  // Persist cart & orders or load from localStorage if client-side
   useEffect(() => {
     setIsMounted(true);
     try {
       const savedCart = localStorage.getItem('pretty_corner_cart');
       if (savedCart) {
         setCart(JSON.parse(savedCart));
+      }
+      const savedOrders = localStorage.getItem('pretty_corner_orders');
+      if (savedOrders) {
+        const parsed: Order[] = JSON.parse(savedOrders);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const map = new Map<string, Order>();
+          parsed.forEach((o) => {
+            if (o && o.id) map.set(o.id.toUpperCase(), o);
+          });
+          INITIAL_ORDERS.forEach((o) => {
+            if (!map.has(o.id.toUpperCase())) {
+              map.set(o.id.toUpperCase(), o);
+            }
+          });
+          setOrders(Array.from(map.values()));
+        }
       }
     } catch {
       // fallback to initial
@@ -76,6 +92,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setCart(updatedCart);
     try {
       localStorage.setItem('pretty_corner_cart', JSON.stringify(updatedCart));
+    } catch {}
+  };
+
+  const saveOrdersToStorage = (updatedOrders: Order[]) => {
+    setOrders(updatedOrders);
+    try {
+      localStorage.setItem('pretty_corner_orders', JSON.stringify(updatedOrders));
     } catch {}
   };
 
@@ -183,15 +206,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       createdAt: formattedDate,
     };
 
-    setOrders((prev) => [newOrder, ...prev]);
+    const nextOrders = [newOrder, ...orders.filter((o) => o.id.toUpperCase() !== orderId.toUpperCase())];
+    saveOrdersToStorage(nextOrders);
     return newOrder;
   };
 
   const getOrder = (id: string, phone?: string): Order | undefined => {
     const cleanId = id.trim().toUpperCase();
-    const found = orders.find((o) => o.id.toUpperCase() === cleanId);
+    const found = orders.find((o) => o.id.trim().toUpperCase() === cleanId);
     if (!found) return undefined;
-    if (phone) {
+    if (phone && phone.trim()) {
       const cleanPhone = phone.replace(/[\s-]/g, '');
       const orderPhone = found.phone.replace(/[\s-]/g, '');
       if (orderPhone !== cleanPhone && !orderPhone.endsWith(cleanPhone) && !cleanPhone.endsWith(orderPhone)) {
@@ -202,18 +226,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updatePaymentStatus = (orderId: string, status: Order['paymentStatus']) => {
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id === orderId) {
-          return {
-            ...o,
-            paymentStatus: status,
-            fulfillmentStatus: status === 'paid' ? 'pending_review' : o.fulfillmentStatus,
-          };
-        }
-        return o;
-      })
-    );
+    const cleanId = orderId.trim().toUpperCase();
+    const updatedOrders = orders.map((o) => {
+      if (o.id.toUpperCase() === cleanId) {
+        return {
+          ...o,
+          paymentStatus: status,
+          fulfillmentStatus: status === 'paid' ? 'confirmed' : o.fulfillmentStatus,
+        };
+      }
+      return o;
+    });
+    saveOrdersToStorage(updatedOrders);
     if (status === 'paid') {
       clearCart();
     }
