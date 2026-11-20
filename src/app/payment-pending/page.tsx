@@ -14,19 +14,8 @@ function PaymentPendingContent() {
   const orderId = searchParams.get('orderId') || 'PC-261117-024';
   const order = orders.find((o) => o.id === orderId) || orders[0];
 
-  const [isVerifying, setIsVerifying] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [mockPaymentSuccess, setMockPaymentSuccess] = useState(false);
-
-  // Check payment status simulation
-  const handleCheckStatus = () => {
-    setIsVerifying(true);
-    setTimeout(() => {
-      setIsVerifying(false);
-      updatePaymentStatus(order.id, 'paid');
-      router.push(`/order-confirmation?orderId=${order.id}`);
-    }, 1200);
-  };
 
   const handleSimulatePaymentGateway = () => {
     setShowPaymentModal(true);
@@ -86,58 +75,19 @@ function PaymentPendingContent() {
         {/* Open Secure Payment Page CTA (2:370) */}
         <button
           onClick={handleSimulatePaymentGateway}
-          className="w-full h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] mt-4 hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-xs"
+          className="w-full h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] mt-4 hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-xs cursor-pointer"
         >
           Open secure payment page ↗
         </button>
-      </section>
 
-      {/* 3. Payment Status & Recovery (2:31) */}
-      <section className="px-5 pt-7 flex flex-col gap-4">
-        {/* Pending status banner (2:372) */}
-        <div className="bg-[#fff6e7] border border-[#f5dfb8] rounded-[9px] px-4 py-3 flex items-center gap-3 text-left">
-          <svg className="w-[21px] h-[21px] text-[#805619] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10" />
-            <polyline points="12 6 12 12 16 14" />
-          </svg>
-          <span className="text-[13px] font-bold text-[#805619]">
-            Awaiting verified payment
-          </span>
-        </div>
-
-        <p className="text-[13px] text-[#7a6870] leading-relaxed">
-          After paying, return here. Your order updates automatically once payment is verified.
-        </p>
-
-        {/* Check status button (2:378) */}
-        <button
-          onClick={handleCheckStatus}
-          disabled={isVerifying}
-          className="w-full h-[50px] bg-white border border-[#eedfe5] rounded-[10px] text-[#38262e] font-bold text-[14px] hover:border-[#b73d67] transition-all flex items-center justify-center"
-        >
-          {isVerifying ? (
-            <span className="flex items-center gap-2">
-              <span className="w-4 h-4 border-2 border-[#b73d67] border-t-transparent rounded-full animate-spin" />
-              Verifying payment...
-            </span>
-          ) : (
-            'Check payment status'
-          )}
-        </button>
-
-        <div className="pt-2">
-          <h3 className="text-[13px] font-bold text-[#38262e]">
-            Payment failed or page didn’t open?
-          </h3>
-          <p className="text-[12px] text-[#7a6870] leading-relaxed mt-1">
-            Try again safely, or contact us with your order reference. Please don’t pay a second time if your payment is still pending.
+        {/* Help & Recovery */}
+        <div className="w-full pt-5 border-t border-[#eedfe5]/70 flex flex-col items-center text-center mt-6">
+          <p className="text-[12px] text-[#7a6870] leading-relaxed">
+            Need help or page didn’t open? Contact us with order reference <span className="font-mono font-bold text-[#38262e]">{order.id}</span>.
           </p>
-        </div>
-
-        <div className="text-center pt-2">
           <Link
-            href="/payment-recovery"
-            className="text-[12px] font-bold text-[#b73d67] hover:underline"
+            href="/contact"
+            className="text-[12px] font-bold text-[#b73d67] hover:underline mt-1.5 inline-block"
           >
             Need help? Contact Pretty Corner
           </Link>

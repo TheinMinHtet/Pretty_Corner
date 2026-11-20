@@ -36,9 +36,15 @@ export default function OrderingStepBar({ currentStep, isCOD = false }: Ordering
   return (
     <div className="w-full py-2">
       {/* Unified Responsive Step Bar */}
-      <div className={`relative flex items-center justify-between mx-auto px-2 ${isCOD ? 'max-w-[280px] sm:max-w-xs' : 'max-w-sm sm:max-w-md'}`}>
+      <div
+        className={`relative flex items-center justify-between mx-auto px-2 ${
+          isCOD
+            ? 'w-[280px] sm:w-[300px]'
+            : 'w-full max-w-[360px] sm:max-w-none sm:w-[390px] md:w-[410px]'
+        }`}
+      >
         {/* Track Line behind steps */}
-        <div className="absolute left-6 right-6 sm:left-8 sm:right-8 top-1/2 -translate-y-1/2 h-[2px] bg-[#eedfe5] z-0">
+        <div className="absolute left-7 right-7 sm:left-8 sm:right-8 top-1/2 -translate-y-1/2 h-[2px] bg-[#eedfe5] z-0">
           <div
             className="h-full bg-[#b73d67] transition-all duration-300"
             style={{

@@ -205,8 +205,8 @@ export default function CheckoutPage() {
           <span className="text-[#38262e] font-medium">Checkout</span>
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
+        <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-center">
+          <div className="md:col-span-7 lg:col-span-8">
             <h1 className="font-serif text-[30px] sm:text-[38px] font-medium text-[#38262e]">
               Checkout
             </h1>
@@ -215,8 +215,8 @@ export default function CheckoutPage() {
             </p>
           </div>
 
-          {/* Unified Step Bar */}
-          <div className="w-full md:w-auto shrink-0">
+          {/* Unified Step Bar - Centered evenly over the Review & Pay column */}
+          <div className="md:col-span-5 lg:col-span-4 flex justify-center items-center mt-3 md:mt-0">
             <OrderingStepBar currentStep={1} isCOD={paymentMethod === 'Cash on Delivery'} />
           </div>
         </div>
