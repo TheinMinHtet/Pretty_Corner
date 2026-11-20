@@ -138,7 +138,7 @@ function OrderConfirmationContent() {
 
     y += 26;
     ctx.textAlign = 'left';
-    ctx.fillText(`Delivery (${order.township.split(',')[0]})`, 60, y);
+    ctx.fillText('Delivery', 60, y);
     ctx.textAlign = 'right';
     ctx.fillText(`${order.deliveryFee.toLocaleString()} MMK`, canvas.width - 60, y);
 
@@ -270,7 +270,7 @@ function OrderConfirmationContent() {
 
           <div className="flex justify-between items-center text-[13px]">
             <span className="text-[#7a6870]">
-              Delivery · {order.township.split(',')[0]}
+              Delivery
             </span>
             <span className="font-bold text-[#38262e]">
               {order.deliveryFee.toLocaleString()} MMK

@@ -59,8 +59,8 @@ export default function CheckoutPage() {
     const newOrder = createOrder({
       customerName,
       phone: phoneNumber,
-      township: selectedTownship.name,
-      deliveryAddress: `${streetAddress}, ${selectedTownship.name}`,
+      township: selectedTownship?.name || 'Yangon',
+      deliveryAddress: streetAddress ? `${streetAddress}, Yangon` : 'Yangon',
       coordinates: pinCoords,
       landmarkNote,
       items: cart,
@@ -187,29 +187,6 @@ export default function CheckoutPage() {
                       <span>{phoneError}</span>
                     </p>
                   )}
-                </div>
-
-                <div className="sm:col-span-2">
-                  <label className="block text-[12px] font-bold text-[#38262e] mb-1.5">
-                    Township / city *
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={selectedTownship.name}
-                      onChange={(e) => {
-                        const match = MOCK_TOWNSHIPS.find((t) => t.name === e.target.value);
-                        if (match) setSelectedTownship(match);
-                      }}
-                      className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] outline-none appearance-none focus:border-[#b73d67] cursor-pointer"
-                    >
-                      {MOCK_TOWNSHIPS.map((township) => (
-                        <option key={township.name} value={township.name}>
-                          {township.name} · {township.fee.toLocaleString()} MMK delivery
-                        </option>
-                      ))}
-                    </select>
-                    <span className="absolute right-3.5 top-3.5 pointer-events-none text-[#7a6870] text-xs">⌄</span>
-                  </div>
                 </div>
 
                 <div className="sm:col-span-2">
@@ -407,7 +384,7 @@ export default function CheckoutPage() {
                   <span className="text-[#38262e] font-medium">{cartSubtotal.toLocaleString()} MMK</span>
                 </div>
                 <div className="flex justify-between text-[#7a6870]">
-                  <span>Delivery ({selectedTownship.name.split(',')[0]})</span>
+                  <span>Delivery</span>
                   <span className="text-[#38262e] font-medium">{deliveryFee.toLocaleString()} MMK</span>
                 </div>
               </div>

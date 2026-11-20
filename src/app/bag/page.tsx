@@ -115,7 +115,7 @@ export default function ShoppingBagPage() {
                 </div>
 
                 <div className="flex justify-between items-center text-[14px] text-[#7a6870] py-2">
-                  <span>Delivery · {selectedTownship.name.split(',')[0]}</span>
+                  <span>Delivery</span>
                   <span className="text-[#38262e] font-medium">{selectedTownship.fee.toLocaleString()} MMK</span>
                 </div>
 
