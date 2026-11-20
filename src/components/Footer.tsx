@@ -40,32 +40,32 @@ export default function Footer() {
             <ul className="space-y-2.5 text-[13px] text-[#7a6870]">
               <li>
                 <Link href="/about" className="hover:text-[#b73d67] transition-colors inline-block">
-                  About us →
+                  About us
                 </Link>
               </li>
               <li>
                 <Link href="/faq" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Frequently asked questions →
+                  Frequently asked questions
                 </Link>
               </li>
               <li>
                 <Link href="/policies/shipping" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Shipping & Yangon Townships →
+                  Shipping & Yangon Townships
                 </Link>
               </li>
               <li>
                 <Link href="/policies/returns" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Return & Refund policy →
+                  Return & Refund policy
                 </Link>
               </li>
               <li>
                 <Link href="/policies/privacy" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Privacy policy →
+                  Privacy policy
                 </Link>
               </li>
               <li>
                 <Link href="/policies/terms" className="hover:text-[#b73d67] transition-colors inline-block">
-                  Terms and conditions →
+                  Terms and conditions
                 </Link>
               </li>
             </ul>
