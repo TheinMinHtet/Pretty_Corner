@@ -19,7 +19,8 @@ export default function CheckoutPage() {
   const [phoneTouched, setPhoneTouched] = useState(false);
   const [streetAddress, setStreetAddress] = useState('');
   const [landmarkNote, setLandmarkNote] = useState('');
-  const [confirmedAddress, setConfirmedAddress] = useState(false);
+  const [nameTouched, setNameTouched] = useState(false);
+  const [addressTouched, setAddressTouched] = useState(false);
   const [pinCoords, setPinCoords] = useState({ lat: 16.8302, lng: 96.1301 });
   const [paymentMethod, setPaymentMethod] = useState<'MyanMyanPay' | 'KBZPay' | 'WavePay'>('MyanMyanPay');
   const [mapSearch, setMapSearch] = useState('');
@@ -41,18 +42,17 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
+    setNameTouched(true);
+    setPhoneTouched(true);
+    setAddressTouched(true);
+
     if (!customerName.trim() || !phoneNumber.trim() || !streetAddress.trim()) {
       setFormAlert('Please fill in your name, phone number, and delivery address.');
       return;
     }
     const phoneCheck = validatePhoneNumber(phoneNumber);
     if (!phoneCheck.isValid) {
-      setPhoneTouched(true);
       setPhoneError(phoneCheck.error || 'Please enter a valid phone number.');
-      return;
-    }
-    if (!confirmedAddress) {
-      setFormAlert('Please verify and confirm your delivery address.');
       return;
     }
 
@@ -113,7 +113,7 @@ export default function CheckoutPage() {
       </div>
 
       {/* Main Form Area - 2-Column Responsive Layout */}
-      <form onSubmit={handlePlaceOrder} className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
+      <form onSubmit={handlePlaceOrder} noValidate className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
         <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-start">
           {/* Left Column: Delivery Form & Payment Methods */}
           <div className="md:col-span-7 lg:col-span-8 space-y-6">
@@ -146,12 +146,22 @@ export default function CheckoutPage() {
                   </label>
                   <input
                     type="text"
-                    required
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
+                    onBlur={() => setNameTouched(true)}
                     placeholder="e.g. Daw Su Su / Ma Thida"
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67]"
+                    className={`w-full h-[46px] px-3.5 bg-white border rounded-[9px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none transition-colors ${
+                      nameTouched && !customerName.trim()
+                        ? 'border-[#b73d67] bg-[#fdf2f5]/20'
+                        : 'border-[#eedfe5] focus:border-[#b73d67]'
+                    }`}
                   />
+                  {nameTouched && !customerName.trim() && (
+                    <p className="text-[#b73d67] text-[11px] font-medium mt-1 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] shrink-0 inline-block" />
+                      <span>Full name is required</span>
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -195,12 +205,22 @@ export default function CheckoutPage() {
                   </label>
                   <input
                     type="text"
-                    required
                     value={streetAddress}
                     onChange={(e) => setStreetAddress(e.target.value)}
+                    onBlur={() => setAddressTouched(true)}
                     placeholder="e.g. No. 24, Insein Road, Building A, 3rd floor"
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67]"
+                    className={`w-full h-[46px] px-3.5 bg-white border rounded-[9px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none transition-colors ${
+                      addressTouched && !streetAddress.trim()
+                        ? 'border-[#b73d67] bg-[#fdf2f5]/20'
+                        : 'border-[#eedfe5] focus:border-[#b73d67]'
+                    }`}
                   />
+                  {addressTouched && !streetAddress.trim() && (
+                    <p className="text-[#b73d67] text-[11px] font-medium mt-1 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] shrink-0 inline-block" />
+                      <span>Street & apartment details are required</span>
+                    </p>
+                  )}
                 </div>
 
                 <div className="sm:col-span-2">
@@ -395,20 +415,6 @@ export default function CheckoutPage() {
                 <span>Grand Total</span>
                 <span className="text-[#b73d67]">{grandTotal.toLocaleString()} MMK</span>
               </div>
-
-              {/* Address verification checkbox */}
-              <label className="flex items-start gap-2.5 mt-5 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  required
-                  checked={confirmedAddress}
-                  onChange={(e) => setConfirmedAddress(e.target.checked)}
-                  className="w-4 h-4 mt-0.5 rounded accent-[#b73d67] cursor-pointer"
-                />
-                <span className="text-[12px] text-[#38262e] leading-snug">
-                  I’ve confirmed my Yangon address and landmark note.
-                </span>
-              </label>
 
               {/* Place Order CTA Button */}
               <button
