@@ -63,7 +63,7 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
               Payment & Delivery
             </h4>
             <p className="text-[12px] sm:text-[13px] text-[#7a6870] leading-relaxed mb-2.5">
-              Doorstep delivery in Yangon & digital payment:
+              Doorstep delivery &amp; digital payment:
             </p>
             <div className="flex flex-col sm:flex-row flex-wrap gap-2 text-[11.5px] sm:text-[12px] font-medium text-[#38262e]">
               <span className="bg-white border border-[#eedfe5] px-2.5 py-1 rounded-[6px] shadow-2xs inline-block w-fit">
