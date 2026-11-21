@@ -128,9 +128,18 @@ export default function ProductDetailView({ product }: { product: Product }) {
               <span className="text-[22px] sm:text-[26px] font-bold text-[#b73d67]">
                 {unitPrice.toLocaleString()} MMK
               </span>
-              <span className="text-[12px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium">
-                In stock
-              </span>
+              {product.inStock ? (
+                <span className="text-[12px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium">
+                  In stock
+                  {typeof product.stockQuantity === 'number'
+                    ? ` · ${product.stockQuantity} left`
+                    : ''}
+                </span>
+              ) : (
+                <span className="text-[12px] text-rose-700 bg-rose-50 px-2 py-0.5 rounded font-medium">
+                  Out of stock
+                </span>
+              )}
             </div>
 
             {/* Short Description */}
@@ -161,9 +170,12 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {/* Big Add to Bag Button */}
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 h-[52px] bg-[#b73d67]/80 hover:bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer"
+                  disabled={!product.inStock}
+                  className="flex-1 h-[52px] bg-[#b73d67]/80 hover:bg-[#b73d67] disabled:bg-[#d8c1ca] disabled:cursor-not-allowed text-white rounded-[10px] font-bold text-[15px] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer"
                 >
-                  Add to bag · {totalPrice.toLocaleString()} MMK
+                  {product.inStock
+                    ? `Add to bag · ${totalPrice.toLocaleString()} MMK`
+                    : 'Out of stock'}
                 </button>
               </div>
             </div>

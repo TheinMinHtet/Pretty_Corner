@@ -2,12 +2,20 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Product, CartItem, Order, TownshipOption } from '@/lib/types';
-import { MOCK_PRODUCTS, INITIAL_ORDERS, MOCK_TOWNSHIPS } from '@/lib/mockData';
+import { MOCK_TOWNSHIPS } from '@/lib/mockData';
 import { supabase } from '@/lib/supabase';
+import {
+  createStorefrontOrderApi,
+  fetchStorefrontOrders,
+  fetchStorefrontProducts,
+  updateStorefrontOrderPaymentApi,
+} from '@/lib/api';
 
 interface StoreContextType {
   isMounted: boolean;
   products: Product[];
+  productsLoading: boolean;
+  refreshProducts: () => Promise<void>;
   cart: CartItem[];
   orders: Order[];
   selectedTownship: TownshipOption;
@@ -34,32 +42,12 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-const INITIAL_CART: CartItem[] = [
-  {
-    id: 'dew-drop-serum-30ml',
-    productId: 'dew-drop-serum',
-    name: 'Dew Drop Serum',
-    size: '30 ml',
-    price: 28000,
-    quantity: 1,
-    image: '/assets/dew-drop-serum.png',
-  },
-  {
-    id: 'cloud-soft-cream-50g',
-    productId: 'cloud-soft-cream',
-    name: 'Cloud Soft Cream',
-    size: '50 g',
-    price: 32000,
-    quantity: 1,
-    image: '/assets/cloud-soft-cream.png',
-  },
-];
-
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
-  const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS);
-  const [cart, setCart] = useState<CartItem[]>(INITIAL_CART);
-  const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [selectedTownship, setSelectedTownship] = useState<TownshipOption>(MOCK_TOWNSHIPS[0]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [discount, setDiscount] = useState<number>(0);
@@ -131,7 +119,26 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     loadLiveProducts();
   }, []);
 
-  // Persist cart or load from localStorage if client-side
+  const refreshProducts = useCallback(async () => {
+    try {
+      const list = await fetchStorefrontProducts();
+      setProducts(list);
+    } catch (error) {
+      console.error('Failed to fetch products from shared API:', error);
+    } finally {
+      setProductsLoading(false);
+    }
+  }, []);
+
+  const refreshOrders = useCallback(async () => {
+    try {
+      const list = await fetchStorefrontOrders();
+      setOrders(list);
+    } catch (error) {
+      console.error('Failed to fetch orders from shared API:', error);
+    }
+  }, []);
+
   useEffect(() => {
     setIsMounted(true);
     try {
@@ -141,15 +148,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       }
       localStorage.removeItem('pretty_corner_orders');
     } catch {
-      // fallback to initial
+      // fallback to empty cart
     }
-  }, []);
+
+    void refreshProducts();
+    void refreshOrders();
+  }, [refreshProducts, refreshOrders]);
 
   const saveCartToStorage = (updatedCart: CartItem[]) => {
     setCart(updatedCart);
     try {
       localStorage.setItem('pretty_corner_cart', JSON.stringify(updatedCart));
-    } catch {}
+    } catch { }
   };
 
   const addToCart = (productId: string, sizeName?: string, quantity: number = 1) => {
@@ -210,7 +220,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (prev.length === 0) return prev;
       try {
         localStorage.setItem('pretty_corner_cart', JSON.stringify([]));
-      } catch {}
+      } catch { }
       return [];
     });
   }, []);
@@ -258,48 +268,42 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       createdAt: formattedDate,
     };
 
-    setOrders((prev) => [newOrder, ...prev.filter((o) => o.id.toUpperCase() !== orderId.toUpperCase())]);
+    setOrders((prev) => [
+      newOrder,
+      ...prev.filter((o) => o.id.toUpperCase() !== orderId.toUpperCase()),
+    ]);
 
-    // Asynchronously insert order & order_items into Supabase
-    if (supabase) {
-      (async () => {
-        try {
-          await supabase.from('orders').insert({
-            id: orderId,
-            customer_name: orderData.customerName,
-            phone: orderData.phone,
-            delivery_address: orderData.deliveryAddress,
-            landmark_note: orderData.landmarkNote || null,
-            total_amount: orderData.total,
-            payment_method: orderData.paymentMethod,
-            payment_status: orderData.paymentStatus,
-            fulfillment_status: orderData.fulfillmentStatus,
-            payment_slip_url: null,
-          });
-
-          if (orderData.items && orderData.items.length > 0) {
-            const itemsToInsert = orderData.items.map((it) => {
-              const matchedProd = products.find(
-                (p) => p.slug === it.productId || p.id === it.productId || p.name === it.name
-              );
-              return {
-                order_id: orderId,
-                product_id: matchedProd?.id && matchedProd.id.length === 36 ? matchedProd.id : null,
-                product_name: it.name,
-                unit_price: it.price,
-                quantity: it.quantity,
-                item_total: it.price * it.quantity,
-                product_image: it.image || null,
-              };
+    void createStorefrontOrderApi(orderData).then((savedOrder) => {
+      if (savedOrder) {
+        setOrders((prev) => [
+          savedOrder,
+          ...prev.filter(
+            (o) =>
+              o.id.toUpperCase() !== orderId.toUpperCase() &&
+              o.id.toUpperCase() !== savedOrder.id.toUpperCase()
+          ),
+        ]);
+      } else if (supabase) {
+        (async () => {
+          try {
+            await supabase.from('orders').insert({
+              id: orderId,
+              customer_name: orderData.customerName,
+              phone: orderData.phone,
+              delivery_address: orderData.deliveryAddress,
+              landmark_note: orderData.landmarkNote || null,
+              total_amount: orderData.total,
+              payment_method: orderData.paymentMethod,
+              payment_status: orderData.paymentStatus,
+              fulfillment_status: orderData.fulfillmentStatus,
+              payment_slip_url: null,
             });
-
-            await supabase.from('order_items').insert(itemsToInsert);
+          } catch (err) {
+            console.warn('Failed to insert order into Supabase:', err);
           }
-        } catch (err) {
-          console.warn('Failed to insert order into Supabase:', err);
-        }
-      })();
-    }
+        })();
+      }
+    });
 
     return newOrder;
   };
@@ -390,12 +394,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           updated_at: new Date().toISOString(),
         })
         .eq('id', cleanId)
-        .then(() => {});
+        .then(() => { });
     }
 
     if (status === 'paid') {
       clearCart();
     }
+    void updateStorefrontOrderPaymentApi(orderId, status);
   };
 
   return (
@@ -403,6 +408,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       value={{
         isMounted,
         products,
+        productsLoading,
+        refreshProducts,
         cart,
         orders,
         selectedTownship,

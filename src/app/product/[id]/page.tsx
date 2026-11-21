@@ -1,14 +1,16 @@
-import React from 'react';
-import { MOCK_PRODUCTS } from '@/lib/mockData';
+import React, { Suspense } from 'react';
+import { fetchStorefrontProduct } from '@/lib/api';
 import ProductDetailView from '@/components/ProductDetailView';
 import { notFound } from 'next/navigation';
 
-export const instant = false;
+async function ProductDetailContent({ id }: { id: string }) {
+  const product = await fetchStorefrontProduct(id);
 
-export function generateStaticParams() {
-  return MOCK_PRODUCTS.map((product) => ({
-    id: product.id,
-  }));
+  if (!product) {
+    notFound();
+  }
+
+  return <ProductDetailView product={product} />;
 }
 
 export default async function ProductDetailPage({
@@ -17,11 +19,16 @@ export default async function ProductDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const resolvedParams = await params;
-  const product = MOCK_PRODUCTS.find((p) => p.id === resolvedParams.id);
 
-  if (!product) {
-    notFound();
-  }
-
-  return <ProductDetailView product={product} />;
+  return (
+    <Suspense
+      fallback={
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center text-sm text-[#7a6870]">
+          Loading product details...
+        </div>
+      }
+    >
+      <ProductDetailContent id={resolvedParams.id} />
+    </Suspense>
+  );
 }
