@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { Product, CartItem, Order, TownshipOption } from '@/lib/types';
+import { Product, CartItem, Order, TownshipOption, Promotion } from '@/lib/types';
 import { MOCK_TOWNSHIPS } from '@/lib/mockData';
 import { translations, Language, TranslationSchema } from '@/lib/translations';
 import { supabase } from '@/lib/supabase';
@@ -9,6 +9,7 @@ import {
   createStorefrontOrderApi,
   fetchStorefrontOrders,
   fetchStorefrontProducts,
+  fetchStorefrontPromotions,
   updateStorefrontOrderPaymentApi,
 } from '@/lib/api';
 
@@ -20,6 +21,9 @@ interface StoreContextType {
   products: Product[];
   productsLoading: boolean;
   refreshProducts: () => Promise<void>;
+  promotions: Promotion[];
+  promotionsLoading: boolean;
+  refreshPromotions: () => Promise<void>;
   cart: CartItem[];
   orders: Order[];
   selectedTownship: TownshipOption;
@@ -72,6 +76,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en');
   const [products, setProducts] = useState<Product[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [promotionsLoading, setPromotionsLoading] = useState(true);
   const [cart, setCart] = useState<CartItem[]>(INITIAL_CART);
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedTownship, setSelectedTownship] = useState<TownshipOption>(MOCK_TOWNSHIPS[0]);
@@ -79,6 +85,18 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [discount, setDiscount] = useState<number>(0);
 
   const t = translations[language];
+
+  const loadPromotions = useCallback(async () => {
+    setPromotionsLoading(true);
+    try {
+      const data = await fetchStorefrontPromotions();
+      setPromotions(data);
+    } catch (err) {
+      console.warn('Failed to load promotions from Supabase:', err);
+    } finally {
+      setPromotionsLoading(false);
+    }
+  }, []);
 
   const loadProducts = useCallback(async () => {
     setProductsLoading(true);
@@ -143,7 +161,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     void loadProducts();
-  }, [loadProducts]);
+    void loadPromotions();
+  }, [loadProducts, loadPromotions]);
 
   // Persist cart and language or load from localStorage if client-side
   useEffect(() => {
@@ -452,6 +471,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         products,
         productsLoading,
         refreshProducts: loadProducts,
+        promotions,
+        promotionsLoading,
+        refreshPromotions: loadPromotions,
         cart,
         orders,
         selectedTownship,

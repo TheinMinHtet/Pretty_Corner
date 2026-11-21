@@ -66,3 +66,21 @@ export interface Order {
   fulfillmentStatus: 'pending_review' | 'confirmed' | 'processing' | 'shipped' | 'delivered';
   createdAt: string;
 }
+
+export interface Promotion {
+  id: string;
+  code: string;
+  title: string;
+  subtitle?: string;
+  discountPercentage: number;
+  startDate: string;
+  endDate: string;
+  active: boolean;
+  bannerColor?: string;
+  imageUrl?: string;
+  bannerBadge?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  featuredProductIds?: string[];
+  usageCount?: number;
+}

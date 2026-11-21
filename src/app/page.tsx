@@ -6,6 +6,7 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
+import HeroBannerSlider from '@/components/HeroBannerSlider';
 
 const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false });
 const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper'), {
@@ -93,47 +94,8 @@ export default function HomePage() {
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full">
-      {/* Hero Editorial - Responsive Container */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 md:pt-6">
-        <div className="relative w-full h-[386px] sm:h-[460px] md:h-[500px] lg:h-[540px] rounded-2xl md:rounded-3xl overflow-hidden bg-[#faf7f8]">
-          <Image
-            src="/assets/hero-banner.jpg"
-            alt="Pretty Corner Hero"
-            fill
-            priority
-            className="object-cover pointer-events-none"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/60 via-white/25 to-transparent pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-transparent pointer-events-none" />
-
-          <div className="absolute inset-0 p-6 sm:p-10 md:p-12 lg:p-16 flex flex-col justify-between">
-            <div className="max-w-lg">
-              <span className="inline-block font-sans text-[11px] sm:text-[12px] font-bold tracking-[2px] text-[#b73d67] uppercase">
-                {t.heroBadge}
-              </span>
-              <h2 className={`font-serif font-medium leading-[1.1] text-[#38262e] mt-2 ${
-                language === 'my'
-                  ? 'text-[28px] sm:text-[36px] md:text-[42px] lg:text-[48px]'
-                  : 'text-[41px] sm:text-[50px] md:text-[58px] lg:text-[64px]'
-              }`}>
-                {t.heroTitleLine1}<br />{t.heroTitleLine2}
-              </h2>
-              <p className="font-sans text-[15px] sm:text-[16.5px] font-medium text-[#2e1d25] leading-relaxed mt-3 max-w-md">
-                {t.heroDescription}
-              </p>
-            </div>
-
-            <div>
-              <Link
-                href="/shop"
-                className="inline-flex items-center justify-center bg-[#b73d67] text-white text-[14px] sm:text-[15px] font-bold h-[48px] sm:h-[52px] px-7 sm:px-8 rounded-[12px] shadow-sm hover:bg-[#a33259] active:scale-[0.98] transition-all"
-              >
-                {t.heroCta}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero Editorial / Dynamic Promotion Slideshow */}
+      <HeroBannerSlider />
 
       {/* 4. Categories - Responsive Container */}
       <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-8 pb-3">

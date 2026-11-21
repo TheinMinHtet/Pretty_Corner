@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Order, Product } from './types';
+import { Order, Product, Promotion } from './types';
 import { supabase } from './supabase';
 
 export function getApiBaseUrl(): string {
@@ -263,4 +263,55 @@ export async function updateStorefrontOrderPaymentApi(
   } catch {
     return null;
   }
+}
+
+export async function fetchStorefrontPromotions(): Promise<Promotion[]> {
+  // 1. Fetch directly from Supabase
+  try {
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('promotions')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        return data.map((row: any) => ({
+          id: row.id,
+          code: row.code,
+          title: row.title,
+          subtitle: row.subtitle || undefined,
+          discountPercentage: Number(row.discount_percentage) || 0,
+          startDate: row.start_date,
+          endDate: row.end_date,
+          active: Boolean(row.is_active),
+          bannerColor: '#FCEEF2',
+          usageCount: Number(row.usage_count) || 0,
+          featuredProductIds: Array.isArray(row.featured_product_ids)
+            ? row.featured_product_ids
+            : [],
+          imageUrl: row.image_url || undefined,
+          bannerBadge: row.banner_badge || undefined,
+          ctaText: row.cta_text || undefined,
+          ctaLink: row.cta_link || undefined,
+        }));
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to query promotions from Supabase:', err);
+  }
+
+  // 2. Fallback to API if available
+  try {
+    const baseUrl = getApiBaseUrl();
+    const res = await fetch(`${baseUrl}/api/promotions`, { cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      if (Array.isArray(json.promotions) && json.promotions.length > 0) {
+        return json.promotions.filter((p: any) => p.active !== false);
+      }
+    }
+  } catch {}
+
+  return [];
 }
