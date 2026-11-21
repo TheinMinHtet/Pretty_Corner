@@ -21,11 +21,9 @@ export default function CheckoutPage() {
   const [landmarkNote, setLandmarkNote] = useState('');
   const [nameTouched, setNameTouched] = useState(false);
   const [addressTouched, setAddressTouched] = useState(false);
-  const [pinCoords, setPinCoords] = useState({ lat: 16.8302, lng: 96.1301 });
+  const [pinCoords, setPinCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'Mobile Banking' | 'Cash on Delivery'>('Mobile Banking');
-  const [mapSearch, setMapSearch] = useState('');
   const [isLocating, setIsLocating] = useState(false);
-  const [isSearchingMap, setIsSearchingMap] = useState(false);
   const [gpsStatus, setGpsStatus] = useState<'idle' | 'locating' | 'success' | 'error'>('idle');
   const [gpsErrorMsg, setGpsErrorMsg] = useState('');
   const [locationAccuracy, setLocationAccuracy] = useState<number | null>(null);
@@ -54,7 +52,7 @@ export default function CheckoutPage() {
         setGpsStatus('success');
         setIsLocating(false);
 
-        // Real reverse geocoding to auto-fill street address if empty
+        // Real reverse geocoding to auto-fill delivery address (unconditionally overwrites)
         try {
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
@@ -68,20 +66,42 @@ export default function CheckoutPage() {
             const data = await res.json();
             if (data && data.address) {
               const addr = data.address;
-              const parts = [
-                addr.road || addr.street,
-                addr.quarter || addr.neighbourhood,
-                addr.suburb || addr.township || addr.city_district,
-                addr.city || 'Yangon',
-              ].filter(Boolean);
+              const buildingOrRoad = [
+                addr.house_number,
+                addr.building,
+                addr.road || addr.street || addr.pedestrian || addr.footway,
+              ]
+                .filter(Boolean)
+                .join(' ');
 
-              if (parts.length > 0 && (!streetAddress.trim() || streetAddress.startsWith('Near Insein'))) {
-                setStreetAddress(parts.join(', '));
+              const area = addr.quarter || addr.neighbourhood || addr.suburb || addr.residential || addr.village;
+              const township = addr.township || addr.city_district || addr.district || addr.municipality;
+              const city = addr.city || addr.town || 'Yangon';
+
+              const parts = [buildingOrRoad, area, township, city].filter(Boolean);
+              const formatted = parts.length > 0 ? parts.join(', ') : (data.display_name?.split(',').slice(0, 4).join(', ') || '');
+
+              if (formatted) {
+                setStreetAddress(formatted);
+                if (township) {
+                  const match = MOCK_TOWNSHIPS.find(
+                    (t) => t.name.toLowerCase() === township.toLowerCase() || formatted.toLowerCase().includes(t.name.toLowerCase())
+                  );
+                  if (match) setSelectedTownship(match);
+                }
+              } else {
+                setStreetAddress(`GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
               }
+            } else if (data && data.display_name) {
+              setStreetAddress(data.display_name.split(',').slice(0, 4).join(', '));
+            } else {
+              setStreetAddress(`GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
             }
+          } else {
+            setStreetAddress(`GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
           }
         } catch {
-          // coordinates are safely saved
+          setStreetAddress(`GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
         }
       },
       (err) => {
@@ -94,7 +114,7 @@ export default function CheckoutPage() {
         } else if (err.code === 3) {
           setGpsErrorMsg('GPS request timed out. Please click again.');
         } else {
-          setGpsErrorMsg('Could not detect location. Please search your area or enter street address.');
+          setGpsErrorMsg('Could not detect location. Please enter delivery address manually.');
         }
       },
       {
@@ -105,44 +125,10 @@ export default function CheckoutPage() {
     );
   };
 
-  const handleMapSearch = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!mapSearch.trim()) return;
-
-    setIsSearchingMap(true);
-    setGpsErrorMsg('');
-    try {
-      const query = encodeURIComponent(`${mapSearch.trim()}, Yangon, Myanmar`);
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`, {
-        headers: {
-          'Accept-Language': 'en,my',
-        },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.length > 0) {
-          const lat = parseFloat(data[0].lat);
-          const lng = parseFloat(data[0].lon);
-          setPinCoords({ lat, lng });
-          setGpsStatus('success');
-          if (!streetAddress.trim()) {
-            setStreetAddress(data[0].display_name.split(',').slice(0, 3).join(', '));
-          }
-        } else {
-          setGpsErrorMsg(`No location found in Yangon for "${mapSearch}".`);
-        }
-      }
-    } catch {
-      setGpsErrorMsg('Search service unavailable. Please enter address manually.');
-    } finally {
-      setIsSearchingMap(false);
-    }
-  };
-
   const handlePlaceOrder = (e: React.FormEvent) => {
     e.preventDefault();
     const activeEl = typeof document !== 'undefined' ? (document.activeElement as HTMLElement) : null;
-    if (activeEl?.getAttribute('data-no-submit') === 'true' || activeEl?.getAttribute('name') === 'map-search') {
+    if (activeEl?.getAttribute('data-no-submit') === 'true') {
       return;
     }
     setNameTouched(true);
@@ -165,8 +151,10 @@ export default function CheckoutPage() {
       customerName,
       phone: phoneNumber,
       township: selectedTownship?.name || 'Yangon',
-      deliveryAddress: streetAddress ? `${streetAddress}, Yangon` : 'Yangon',
-      coordinates: pinCoords,
+      deliveryAddress: streetAddress.trim().toLowerCase().includes('yangon')
+        ? streetAddress.trim()
+        : `${streetAddress.trim()}, Yangon`,
+      coordinates: pinCoords || { lat: 16.8302, lng: 96.1301 },
       landmarkNote,
       items: cart,
       subtotal: cartSubtotal,
@@ -241,7 +229,7 @@ export default function CheckoutPage() {
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
             const target = e.target as HTMLElement;
-            if (target?.getAttribute('data-no-submit') === 'true' || target?.getAttribute('name') === 'map-search') {
+            if (target?.getAttribute('data-no-submit') === 'true') {
               e.preventDefault();
               e.stopPropagation();
             }
@@ -320,9 +308,24 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-[12px] font-bold text-[#38262e] mb-1.5">
-                    Street & apartment details *
-                  </label>
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <label className="block text-[12px] font-bold text-[#38262e]">
+                      Delivery address *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleUseCurrentLocation}
+                      disabled={isLocating}
+                      className="inline-flex items-center gap-1.5 text-[11px] sm:text-[12px] font-semibold text-[#b73d67] hover:text-[#8e294d] bg-[#fceef2] hover:bg-[#fadce6] px-2.5 py-1 rounded-full transition-all cursor-pointer shadow-2xs disabled:opacity-60 shrink-0"
+                      title="Auto-fill address using device GPS"
+                    >
+                      <svg className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      <span>{isLocating ? 'Detecting GPS…' : 'Use GPS location'}</span>
+                    </button>
+                  </div>
                   <input
                     type="text"
                     value={streetAddress}
@@ -338,7 +341,19 @@ export default function CheckoutPage() {
                   {addressTouched && !streetAddress.trim() && (
                     <p className="text-[#b73d67] text-[11px] font-medium mt-1 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] shrink-0 inline-block" />
-                      <span>Street & apartment details are required</span>
+                      <span>Delivery address is required</span>
+                    </p>
+                  )}
+                  {gpsErrorMsg && (
+                    <p className="text-[#b73d67] text-[11.5px] font-medium mt-1.5 flex items-center gap-1.5">
+                      <span className="shrink-0">⚠</span>
+                      <span>{gpsErrorMsg}</span>
+                    </p>
+                  )}
+                  {gpsStatus === 'success' && !gpsErrorMsg && pinCoords && (
+                    <p className="text-emerald-700 text-[11px] font-medium mt-1.5 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      <span>GPS location captured ({pinCoords.lat.toFixed(4)}, {pinCoords.lng.toFixed(4)}) · You can edit the address above</span>
                     </p>
                   )}
                 </div>
@@ -358,141 +373,10 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Step 2: Interactive Real GPS Map Locator */}
-            <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                <div>
-                  <h2 className="font-serif text-[24px] sm:text-[26px] font-medium text-[#38262e]">
-                    2. Pinpoint delivery location
-                  </h2>
-                  <p className="text-[12px] text-[#7a6870] mt-0.5">
-                    Real-time GPS delivery coordinates for accurate rider dispatch
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleUseCurrentLocation}
-                  disabled={isLocating}
-                  className={`px-3.5 py-2 rounded-lg text-[12px] font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer self-start sm:self-auto ${
-                    isLocating
-                      ? 'bg-[#fceef2] text-[#b73d67] border border-[#f5d9e3]'
-                      : gpsStatus === 'success'
-                      ? 'bg-[#fceef2] text-[#b73d67] border border-[#f5d9e3]'
-                      : 'bg-[#b73d67] hover:bg-[#a33259] text-white active:scale-95'
-                  }`}
-                >
-                  <svg className={`w-4 h-4 ${isLocating ? 'animate-spin' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                  <span>
-                    {isLocating
-                      ? 'Detecting GPS…'
-                      : gpsStatus === 'success'
-                      ? 'Located'
-                      : 'Locate my GPS'}
-                  </span>
-                </button>
-              </div>
-
-              {/* Map search input */}
-              <div className="mb-3 flex items-center gap-2">
-                <div className="flex-1 bg-[#f7f4f5] border border-[#eedfe5] focus-within:border-[#b73d67] focus-within:bg-white h-[42px] rounded-[9px] flex items-center px-3 gap-2.5 transition-all">
-                  <svg className="w-4 h-4 text-[#7a6870] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="M21 21l-4.35-4.35" />
-                  </svg>
-                  <input
-                    type="text"
-                    name="map-search"
-                    data-no-submit="true"
-                    value={mapSearch}
-                    onChange={(e) => setMapSearch(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleMapSearch();
-                      }
-                    }}
-                    placeholder="Search street, township or landmark …"
-                    className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full"
-                  />
-                  {mapSearch && (
-                    <button
-                      type="button"
-                      onClick={() => setMapSearch('')}
-                      className="text-[#7a6870] text-xs hover:text-[#38262e] cursor-pointer"
-                    >
-                      ✕
-                    </button>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleMapSearch()}
-                  disabled={isSearchingMap || !mapSearch.trim()}
-                  className="h-[42px] px-4 bg-[#38262e] hover:bg-[#503742] text-white text-[12px] font-bold rounded-[9px] transition-colors shrink-0 disabled:opacity-40 cursor-pointer"
-                >
-                  {isSearchingMap ? 'Searching…' : 'Search'}
-                </button>
-              </div>
-
-              {/* GPS error or guide alert */}
-              {gpsErrorMsg && (
-                <div className="mb-3 p-2.5 bg-[#fdf2f5] border border-[#f5d9e3] rounded-lg text-[12px] text-[#b73d67] flex items-start gap-2">
-                  <span className="shrink-0 mt-0.5">⚠</span>
-                  <span>{gpsErrorMsg}</span>
-                </div>
-              )}
-
-              {/* Real OpenStreetMap Container with Live Marker & Overlay */}
-              <div className="relative w-full h-[250px] sm:h-[300px] bg-[#f2ede9] rounded-xl overflow-hidden border border-[#eedfe5] shadow-inner">
-                <iframe
-                  key={`${pinCoords.lat.toFixed(4)}-${pinCoords.lng.toFixed(4)}`}
-                  title="Real Delivery Location Map"
-                  width="100%"
-                  height="100%"
-                  className="w-full h-full border-0 pointer-events-auto"
-                  loading="lazy"
-                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${(pinCoords.lng - 0.005).toFixed(5)}%2C${(pinCoords.lat - 0.0035).toFixed(5)}%2C${(pinCoords.lng + 0.005).toFixed(5)}%2C${(pinCoords.lat + 0.0035).toFixed(5)}&layer=mapnik&marker=${pinCoords.lat.toFixed(5)}%2C${pinCoords.lng.toFixed(5)}`}
-                />
-
-                {/* Bottom Overlay: Live GPS Coordinates & Google Maps Link (non-overlapping) */}
-                <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-sm border border-[#eedfe5] flex items-center justify-between gap-2 text-[11px]">
-                  <div className="flex items-center gap-2 truncate">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
-                    <span className="font-mono text-[#38262e] font-medium truncate">
-                      {pinCoords.lat.toFixed(5)}, {pinCoords.lng.toFixed(5)}
-                    </span>
-                    <span className="text-[#b73d67] font-bold text-[10px] tracking-wide uppercase shrink-0 bg-[#fceef2] px-1.5 py-0.5 rounded">
-                      Pinned
-                    </span>
-                  </div>
-
-                  <a
-                    href={`https://www.google.com/maps?q=${pinCoords.lat},${pinCoords.lng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-[#b73d67] text-[#38262e] text-[11px] font-bold px-2 py-1 rounded bg-[#faf7f8] hover:bg-[#fceef2] border border-[#eedfe5] flex items-center gap-1 transition-colors shrink-0 cursor-pointer"
-                    title="Open location in Google Maps"
-                  >
-                    <span>Google Maps</span>
-                    <svg className="w-3 h-3 text-[#b73d67]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
-                      <path d="M15 3h6v6" />
-                      <path d="M10 14L21 3" />
-                    </svg>
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Step 3: Payment Method Selector */}
+            {/* Step 2: Payment Method Selector */}
             <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
               <h2 className="font-serif text-[24px] sm:text-[26px] font-medium text-[#38262e] mb-2">
-                3. Payment method
+                2. Payment method
               </h2>
               <p className="text-[13px] text-[#7a6870] mb-4">
                 Choose your preferred payment method.
