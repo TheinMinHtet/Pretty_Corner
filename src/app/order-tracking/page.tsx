@@ -7,13 +7,30 @@ import { useStore } from '@/context/StoreContext';
 
 function OrderReceiptContent() {
   const searchParams = useSearchParams();
-  const { orders, isMounted, t, language } = useStore();
+  const { orders, isMounted, t, language, fetchOrderById } = useStore();
 
   const orderId = searchParams.get('orderId') || 'PC-261117-024';
   const cleanId = orderId.trim().toUpperCase();
   const order = orders.find((o) => o.id.trim().toUpperCase() === cleanId);
 
-  if (!isMounted) {
+  const [remoteLoading, setRemoteLoading] = React.useState(false);
+  const [remoteOrder, setRemoteOrder] = React.useState<typeof order | null>(null);
+
+  React.useEffect(() => {
+    if (!order && cleanId && fetchOrderById) {
+      setRemoteLoading(true);
+      fetchOrderById(cleanId)
+        .then((res) => {
+          if (res) setRemoteOrder(res);
+          setRemoteLoading(false);
+        })
+        .catch(() => setRemoteLoading(false));
+    }
+  }, [order, cleanId, fetchOrderById]);
+
+  const activeOrder = order || remoteOrder;
+
+  if (!isMounted || remoteLoading) {
     return (
       <div className="w-full max-w-xl mx-auto px-4 sm:px-6 py-16 flex items-center justify-center min-h-[50vh]">
         <div className="w-8 h-8 rounded-full border-2 border-[#b73d67] border-t-transparent animate-spin" />
@@ -21,7 +38,7 @@ function OrderReceiptContent() {
     );
   }
 
-  if (!order) {
+  if (!activeOrder) {
     return (
       <div className="w-full max-w-xl mx-auto px-4 sm:px-6 py-5 md:py-10 flex flex-col min-h-full pb-12">
         <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center">
@@ -56,7 +73,7 @@ function OrderReceiptContent() {
     );
   }
 
-  const isCOD = order.paymentMethod === 'Cash on Delivery';
+  const isCOD = activeOrder.paymentMethod === 'Cash on Delivery';
 
   return (
     <div className="w-full max-w-xl mx-auto px-4 sm:px-6 py-5 md:py-10 flex flex-col min-h-full pb-12">
@@ -84,7 +101,7 @@ function OrderReceiptContent() {
               {language === 'my' ? 'အမှာစာပြေစာနှင့် ကုန်ကျငွေ' : 'Order Receipt & Summary'}
             </h2>
             <p className="text-[13px] text-[#7a6870] mt-1 font-medium">
-              {t.orderRef}: <strong className="text-[#38262e] font-mono">{order.id}</strong> · {order.createdAt}
+              {t.orderRef}: <strong className="text-[#38262e] font-mono">{activeOrder.id}</strong> · {activeOrder.createdAt}
             </p>
           </div>
 
@@ -93,9 +110,9 @@ function OrderReceiptContent() {
             <div className="flex justify-between items-center text-[13px]">
               <span className="text-[#7a6870]">{t.paymentMethod}</span>
               <span className="font-bold text-[#38262e]">
-                {order.paymentMethod === 'Cash on Delivery'
+                {activeOrder.paymentMethod === 'Cash on Delivery'
                   ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည် (COD)' : 'Cash on Delivery')
-                  : (order.paymentMethod || 'Mobile Banking')}
+                  : (activeOrder.paymentMethod || 'Mobile Banking')}
               </span>
             </div>
             <div className="flex justify-between items-center text-[13px]">
@@ -119,7 +136,7 @@ function OrderReceiptContent() {
             </h3>
 
             <div className="space-y-2.5 text-[13px] text-[#38262e] divide-y divide-[#eedfe5]/60">
-              {order.items.map((item, idx) => (
+              {activeOrder.items.map((item, idx) => (
                 <div key={idx} className="flex justify-between items-center pt-2 first:pt-0">
                   <div className="flex items-center">
                     <span className="font-medium text-[#38262e]">{item.name}</span>
@@ -137,27 +154,27 @@ function OrderReceiptContent() {
             <div className="my-3.5 border-t border-[#eedfe5]" />
 
             <div className="space-y-1.5 text-[14px]">
-              {order.discount && order.discount > 0 ? (
+              {activeOrder.discount && activeOrder.discount > 0 ? (
                 <>
                   <div className="flex justify-between font-normal text-[13px] text-[#7a6870]">
                     <span>{t.subTotal}</span>
-                    <span>{order.subtotal.toLocaleString()} MMK</span>
+                    <span>{activeOrder.subtotal.toLocaleString()} MMK</span>
                   </div>
                   <div className="flex justify-between font-normal text-[13px] text-[#7a6870]">
                     <span>{t.discount}</span>
-                    <span className="text-[#b73d67]">-{order.discount.toLocaleString()} MMK</span>
+                    <span className="text-[#b73d67]">-{activeOrder.discount.toLocaleString()} MMK</span>
                   </div>
                 </>
               ) : null}
-              {order.deliveryFee > 0 && (
+              {activeOrder.deliveryFee && activeOrder.deliveryFee > 0 ? (
                 <div className="flex justify-between font-normal text-[13px] text-[#7a6870]">
                   <span>{t.delivery}</span>
-                  <span>{order.deliveryFee.toLocaleString()} MMK</span>
+                  <span>{activeOrder.deliveryFee.toLocaleString()} MMK</span>
                 </div>
-              )}
+              ) : null}
               <div className="flex justify-between pt-1 text-[16px] font-bold text-[#38262e]">
                 <span>{isCOD ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ပေးချေရမည့်ငွေ' : 'Total to Pay on Delivery') : t.total}</span>
-                <span className="text-[#b73d67]">{order.total.toLocaleString()} MMK</span>
+                <span className="text-[#b73d67]">{activeOrder.total.toLocaleString()} MMK</span>
               </div>
             </div>
           </div>
@@ -168,11 +185,11 @@ function OrderReceiptContent() {
               {t.deliveryDetails}
             </h4>
             <div className="space-y-1">
-              <p><strong className="text-[#38262e]">{t.recipient}:</strong> {order.customerName}</p>
-              <p><strong className="text-[#38262e]">{t.phone.replace(' *', '')}:</strong> {order.phone}</p>
-              <p><strong className="text-[#38262e]">{t.address}:</strong> {order.deliveryAddress}</p>
-              {order.landmarkNote && (
-                <p><strong className="text-[#38262e]">{t.note}:</strong> {order.landmarkNote}</p>
+              <p><strong className="text-[#38262e]">{t.recipient}:</strong> {activeOrder.customerName}</p>
+              <p><strong className="text-[#38262e]">{t.phone.replace(' *', '')}:</strong> {activeOrder.phone}</p>
+              <p><strong className="text-[#38262e]">{t.address}:</strong> {activeOrder.deliveryAddress}</p>
+              {activeOrder.landmarkNote && (
+                <p><strong className="text-[#38262e]">{t.note}:</strong> {activeOrder.landmarkNote}</p>
               )}
             </div>
           </div>

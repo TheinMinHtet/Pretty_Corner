@@ -2,8 +2,15 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Product, CartItem, Order, TownshipOption } from '@/lib/types';
-import { MOCK_PRODUCTS, INITIAL_ORDERS, MOCK_TOWNSHIPS } from '@/lib/mockData';
+import { MOCK_TOWNSHIPS } from '@/lib/mockData';
 import { translations, Language, TranslationSchema } from '@/lib/translations';
+import { supabase } from '@/lib/supabase';
+import {
+  createStorefrontOrderApi,
+  fetchStorefrontOrders,
+  fetchStorefrontProducts,
+  updateStorefrontOrderPaymentApi,
+} from '@/lib/api';
 
 interface StoreContextType {
   isMounted: boolean;
@@ -11,6 +18,8 @@ interface StoreContextType {
   setLanguage: (lang: Language) => void;
   t: TranslationSchema;
   products: Product[];
+  productsLoading: boolean;
+  refreshProducts: () => Promise<void>;
   cart: CartItem[];
   orders: Order[];
   selectedTownship: TownshipOption;
@@ -31,6 +40,7 @@ interface StoreContextType {
   decrementProduct: (productId: string, sizeName?: string) => void;
   createOrder: (orderData: Omit<Order, 'id' | 'createdAt'>) => Order;
   getOrder: (id: string, phone?: string) => Order | undefined;
+  fetchOrderById: (id: string) => Promise<Order | undefined>;
   updatePaymentStatus: (orderId: string, status: Order['paymentStatus']) => void;
 }
 
@@ -60,12 +70,80 @@ const INITIAL_CART: CartItem[] = [
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
   const [language, setLanguageState] = useState<Language>('en');
-  const [products] = useState<Product[]>(MOCK_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productsLoading, setProductsLoading] = useState(true);
   const [cart, setCart] = useState<CartItem[]>(INITIAL_CART);
-  const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [selectedTownship, setSelectedTownship] = useState<TownshipOption>(MOCK_TOWNSHIPS[0]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [discount, setDiscount] = useState<number>(0);
+
+  const t = translations[language];
+
+  const loadProducts = useCallback(async () => {
+    setProductsLoading(true);
+    try {
+      const apiProducts = await fetchStorefrontProducts();
+      if (apiProducts && apiProducts.length > 0) {
+        setProducts(apiProducts);
+        setProductsLoading(false);
+        return;
+      }
+
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('products')
+          .select(`
+            id,
+            slug,
+            name,
+            badge,
+            price,
+            stock_quantity,
+            description,
+            benefits,
+            usage,
+            main_image,
+            gallery,
+            is_active,
+            categories (
+              slug,
+              name
+            )
+          `)
+          .eq('is_active', true)
+          .order('created_at', { ascending: true });
+
+        if (!error && data && data.length > 0) {
+          const mapped: Product[] = data.map((row: any) => ({
+            id: row.slug || row.id,
+            slug: row.slug,
+            name: row.name,
+            category: row.categories?.slug || 'skincare',
+            subcategory: row.categories?.name || 'Skincare',
+            badge: row.badge || undefined,
+            price: row.price,
+            stockQuantity: row.stock_quantity,
+            image: row.main_image,
+            gallery: Array.isArray(row.gallery) && row.gallery.length > 0 ? row.gallery : [row.main_image],
+            description: row.description || '',
+            benefits: Array.isArray(row.benefits) ? row.benefits : [],
+            usage: row.usage || '',
+            inStock: (row.stock_quantity ?? 0) > 0,
+          }));
+          setProducts(mapped);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to load products:', err);
+    } finally {
+      setProductsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadProducts();
+  }, [loadProducts]);
 
   // Persist cart and language or load from localStorage if client-side
   useEffect(() => {
@@ -79,7 +157,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (savedCart) {
         setCart(JSON.parse(savedCart));
       }
-      // Ensure orders are not stored on local device
       localStorage.removeItem('pretty_corner_orders');
     } catch {
       // fallback to initial
@@ -101,7 +178,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addToCart = (productId: string, sizeName?: string, quantity: number = 1) => {
-    const product = products.find((p) => p.id === productId);
+    const product = products.find((p) => p.id === productId || p.slug === productId);
     if (!product) return;
 
     const chosenSize = sizeName
@@ -166,11 +243,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const getProductQuantity = (productId: string, sizeName?: string): number => {
     if (!isMounted) return 0;
     if (sizeName) {
-      const item = cart.find((i) => i.productId === productId && i.size === sizeName);
+      const item = cart.find((i) => (i.productId === productId || i.productId === productId.toLowerCase()) && i.size === sizeName);
       return item ? item.quantity : 0;
     }
     return cart
-      .filter((i) => i.productId === productId)
+      .filter((i) => i.productId === productId || i.productId === productId.toLowerCase())
       .reduce((sum, i) => sum + i.quantity, 0);
   };
 
@@ -179,7 +256,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const decrementProduct = (productId: string, sizeName?: string) => {
-    const product = products.find((p) => p.id === productId);
+    const product = products.find((p) => p.id === productId || p.slug === productId);
     if (!product) return;
     const chosenSize = sizeName || product.sizes?.[0]?.name || '';
     const itemId = chosenSize ? `${product.id}-${chosenSize}` : product.id;
@@ -206,7 +283,66 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       createdAt: formattedDate,
     };
 
-    setOrders((prev) => [newOrder, ...prev.filter((o) => o.id.toUpperCase() !== orderId.toUpperCase())]);
+    setOrders((prev) => [
+      newOrder,
+      ...prev.filter((o) => o.id.toUpperCase() !== orderId.toUpperCase()),
+    ]);
+
+    void (async () => {
+      try {
+        const savedApiOrder = await createStorefrontOrderApi(orderData);
+        if (savedApiOrder) {
+          setOrders((prev) => [
+            savedApiOrder,
+            ...prev.filter(
+              (o) =>
+                o.id.toUpperCase() !== orderId.toUpperCase() &&
+                o.id.toUpperCase() !== savedApiOrder.id.toUpperCase()
+            ),
+          ]);
+          return;
+        }
+      } catch {}
+
+      if (supabase) {
+        try {
+          await supabase.from('orders').insert({
+            id: orderId,
+            customer_name: orderData.customerName,
+            phone: orderData.phone,
+            delivery_address: orderData.deliveryAddress,
+            landmark_note: orderData.landmarkNote || null,
+            total_amount: orderData.total,
+            payment_method: orderData.paymentMethod,
+            payment_status: orderData.paymentStatus,
+            fulfillment_status: orderData.fulfillmentStatus,
+            payment_slip_url: null,
+          });
+
+          if (orderData.items && orderData.items.length > 0) {
+            const itemsToInsert = orderData.items.map((it) => {
+              const matchedProd = products.find(
+                (p) => p.slug === it.productId || p.id === it.productId || p.name === it.name
+              );
+              return {
+                order_id: orderId,
+                product_id: matchedProd?.id && matchedProd.id.length === 36 ? matchedProd.id : null,
+                product_name: it.name,
+                unit_price: it.price,
+                quantity: it.quantity,
+                item_total: it.price * it.quantity,
+                product_image: it.image || null,
+              };
+            });
+
+            await supabase.from('order_items').insert(itemsToInsert);
+          }
+        } catch (err) {
+          console.warn('Failed to insert order into Supabase:', err);
+        }
+      }
+    })();
+
     return newOrder;
   };
 
@@ -224,6 +360,55 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return found;
   };
 
+  const fetchOrderById = async (id: string): Promise<Order | undefined> => {
+    const cleanId = id.trim().toUpperCase();
+    const local = orders.find((o) => o.id.trim().toUpperCase() === cleanId);
+    if (local) return local;
+
+    try {
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*, order_items(*)')
+          .ilike('id', cleanId)
+          .single();
+
+        if (!error && data) {
+          const dateObj = new Date(data.created_at);
+          const day = dateObj.getDate().toString().padStart(2, '0');
+          const formattedDate = `${day} Nov ${dateObj.getFullYear()} · ${dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+
+          const mappedOrder: Order = {
+            id: data.id,
+            customerName: data.customer_name,
+            phone: data.phone,
+            deliveryAddress: data.delivery_address,
+            landmarkNote: data.landmark_note || undefined,
+            total: data.total_amount,
+            subtotal: data.total_amount,
+            paymentMethod: data.payment_method,
+            paymentStatus: data.payment_status as any,
+            fulfillmentStatus: data.fulfillment_status as any,
+            createdAt: formattedDate,
+            items: (data.order_items || []).map((it: any) => ({
+              id: it.id,
+              productId: it.product_id || it.product_name,
+              name: it.product_name,
+              price: it.unit_price,
+              quantity: it.quantity,
+              image: it.product_image || '/assets/dew-drop-serum.png',
+            })),
+          };
+
+          setOrders((prev) => [mappedOrder, ...prev.filter((o) => o.id.toUpperCase() !== cleanId)]);
+          return mappedOrder;
+        }
+      }
+    } catch {}
+
+    return undefined;
+  };
+
   const updatePaymentStatus = (orderId: string, status: Order['paymentStatus']) => {
     const cleanId = orderId.trim().toUpperCase();
     setOrders((prev) =>
@@ -238,12 +423,24 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         return o;
       })
     );
+
+    if (supabase) {
+      supabase
+        .from('orders')
+        .update({
+          payment_status: status,
+          fulfillment_status: status === 'paid' ? 'confirmed' : undefined,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', cleanId)
+        .then(() => {});
+    }
+
     if (status === 'paid') {
       clearCart();
     }
+    void updateStorefrontOrderPaymentApi(orderId, status);
   };
-
-  const t = translations[language];
 
   return (
     <StoreContext.Provider
@@ -253,6 +450,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setLanguage,
         t,
         products,
+        productsLoading,
+        refreshProducts: loadProducts,
         cart,
         orders,
         selectedTownship,
@@ -273,6 +472,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         decrementProduct,
         createOrder,
         getOrder,
+        fetchOrderById,
         updatePaymentStatus,
       }}
     >

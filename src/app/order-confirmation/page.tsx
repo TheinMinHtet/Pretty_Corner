@@ -132,7 +132,8 @@ function OrderConfirmationContent() {
     y += 30;
     ctx.textAlign = 'left';
     ctx.fillStyle = '#7a6870';
-    if ((order.discount && order.discount > 0) || order.deliveryFee > 0) {
+    const deliveryFee = order.deliveryFee || 0;
+    if ((order.discount && order.discount > 0) || deliveryFee > 0) {
       ctx.fillText(t.subTotal, 60, y);
       ctx.textAlign = 'right';
       ctx.fillText(`${(order.subtotal || order.total).toLocaleString()} MMK`, canvas.width - 60, y);
@@ -145,12 +146,12 @@ function OrderConfirmationContent() {
         ctx.fillText(`-${order.discount.toLocaleString()} MMK`, canvas.width - 60, y);
       }
 
-      if (order.deliveryFee > 0) {
+      if (deliveryFee > 0) {
         y += 26;
         ctx.textAlign = 'left';
         ctx.fillText(t.delivery, 60, y);
         ctx.textAlign = 'right';
-        ctx.fillText(`${order.deliveryFee.toLocaleString()} MMK`, canvas.width - 60, y);
+        ctx.fillText(`${deliveryFee.toLocaleString()} MMK`, canvas.width - 60, y);
       }
     }
 
@@ -306,7 +307,7 @@ function OrderConfirmationContent() {
             </div>
           ) : null}
 
-          {order.deliveryFee > 0 && (
+          {order.deliveryFee && order.deliveryFee > 0 ? (
             <div className="flex justify-between items-center text-[13px]">
               <span className="text-[#7a6870]">
                 {t.delivery}
@@ -315,7 +316,7 @@ function OrderConfirmationContent() {
                 {order.deliveryFee.toLocaleString()} MMK
               </span>
             </div>
-          )}
+          ) : null}
         </div>
 
         <div className="my-3 border-t border-[#eedfe5]" />
