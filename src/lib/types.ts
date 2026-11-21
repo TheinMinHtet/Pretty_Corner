@@ -49,9 +49,9 @@ export interface Order {
   id: string; // e.g. PC-261117-024
   customerName: string;
   phone: string;
-  township: string;
+  township?: string;
   deliveryAddress: string;
-  coordinates: {
+  coordinates?: {
     lat: number;
     lng: number;
   };
@@ -59,7 +59,7 @@ export interface Order {
   items: CartItem[];
   subtotal: number;
   discount?: number;
-  deliveryFee: number;
+  deliveryFee?: number;
   total: number;
   paymentMethod: 'Mobile Banking' | 'Cash on Delivery' | 'MyanMyanPay' | 'KBZPay' | 'WavePay' | string;
   paymentStatus: 'paid' | 'pending' | 'failed' | 'expired';

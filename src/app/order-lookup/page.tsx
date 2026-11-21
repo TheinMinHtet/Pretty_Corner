@@ -7,12 +7,13 @@ import { useStore } from '@/context/StoreContext';
 
 export default function OrderLookupPage() {
   const router = useRouter();
-  const { getOrder } = useStore();
+  const { getOrder, fetchOrderById } = useStore();
 
   const [orderRef, setOrderRef] = useState('');
+  const [loading, setLoading] = useState(false);
   const [lookupError, setLookupError] = useState(false);
 
-  const handleLookup = (e: React.FormEvent) => {
+  const handleLookup = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanRef = orderRef.trim();
     if (!cleanRef) {
@@ -20,7 +21,13 @@ export default function OrderLookupPage() {
       return;
     }
 
-    const order = getOrder(cleanRef);
+    setLoading(true);
+    let order = getOrder(cleanRef);
+    if (!order && fetchOrderById) {
+      order = await fetchOrderById(cleanRef);
+    }
+    setLoading(false);
+
     if (!order) {
       setLookupError(true);
       return;
@@ -78,9 +85,14 @@ export default function OrderLookupPage() {
 
             <button
               type="submit"
-              className="w-full h-[48px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-xs cursor-pointer"
+              disabled={loading}
+              className="w-full h-[48px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-xs cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              View Order Receipt
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                'View Order Receipt'
+              )}
             </button>
           </form>
 
