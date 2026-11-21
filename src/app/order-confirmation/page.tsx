@@ -116,7 +116,7 @@ function OrderConfirmationContent() {
     order.items.forEach((item) => {
       y += 34;
       ctx.textAlign = 'left';
-      ctx.fillText(`${item.quantity}x  ${item.name} (${item.size})`, 60, y);
+      ctx.fillText(`${item.name}  x${item.quantity}`, 60, y);
       ctx.textAlign = 'right';
       ctx.fillText(`${(item.price * item.quantity).toLocaleString()} MMK`, canvas.width - 60, y);
     });
@@ -266,8 +266,11 @@ function OrderConfirmationContent() {
         <div className="space-y-3">
           {order.items.map((item, idx) => (
             <div key={idx} className="flex justify-between items-center text-[13px]">
-              <span className="text-[#7a6870]">
-                {item.quantity} × {item.name} · {item.size}
+              <span className="text-[#38262e] font-medium flex items-center">
+                <span>{item.name}</span>
+                <span className="inline-flex items-center font-bold text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-1.5 py-0.5 rounded text-[11px] ml-2 shrink-0">
+                  x{item.quantity}
+                </span>
               </span>
               <span className="font-bold text-[#38262e]">
                 {(item.price * item.quantity).toLocaleString()} MMK

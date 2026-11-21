@@ -135,12 +135,11 @@ export default function ShoppingBagPage() {
                         <div className="relative w-10 h-10 rounded-lg bg-white border border-[#eedfe5] overflow-hidden shrink-0">
                           <Image src={item.image} alt={item.name} fill className="object-cover" />
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-medium text-[#38262e] truncate">{item.name}</p>
-                          <p className="text-[11px] text-[#7a6870]">
-                            Qty: <strong className="text-[#38262e] font-semibold">{item.quantity}</strong>
-                            {item.size ? ` · ${item.size}` : ''}
-                          </p>
+                        <div className="min-w-0 flex items-center">
+                          <span className="font-medium text-[#38262e] truncate">{item.name}</span>
+                          <span className="inline-flex items-center font-bold text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-1.5 py-0.5 rounded text-[11px] ml-2 shrink-0">
+                            x{item.quantity}
+                          </span>
                         </div>
                       </div>
                       <span className="font-bold text-[#38262e] shrink-0 whitespace-nowrap">

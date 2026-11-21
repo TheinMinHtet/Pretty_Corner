@@ -429,9 +429,11 @@ export default function CheckoutPage() {
                       <div className="relative w-9 h-9 rounded bg-[#f9f5f7] overflow-hidden shrink-0">
                         <Image src={item.image} alt={item.name} fill className="object-cover" />
                       </div>
-                      <div className="truncate">
-                        <p className="font-medium text-[#38262e] truncate">{item.name}</p>
-                        <p className="text-[11px] text-[#7a6870]">Qty: {item.quantity} · {item.size}</p>
+                      <div className="truncate flex items-center">
+                        <span className="font-medium text-[#38262e] truncate">{item.name}</span>
+                        <span className="inline-flex items-center font-bold text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-1.5 py-0.5 rounded text-[11px] ml-2 shrink-0">
+                          x{item.quantity}
+                        </span>
                       </div>
                     </div>
                     <span className="font-bold text-[#38262e] shrink-0">

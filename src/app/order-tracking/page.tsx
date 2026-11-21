@@ -117,11 +117,11 @@ function OrderReceiptContent() {
             <div className="space-y-2.5 text-[13px] text-[#38262e] divide-y divide-[#eedfe5]/60">
               {order.items.map((item, idx) => (
                 <div key={idx} className="flex justify-between items-center pt-2 first:pt-0">
-                  <div>
-                    <p className="font-medium text-[#38262e]">{item.name}</p>
-                    <p className="text-[11px] text-[#7a6870]">
-                      Qty: {item.quantity} {item.size ? `· ${item.size}` : ''}
-                    </p>
+                  <div className="flex items-center">
+                    <span className="font-medium text-[#38262e]">{item.name}</span>
+                    <span className="inline-flex items-center font-bold text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-1.5 py-0.5 rounded text-[11px] ml-2 shrink-0">
+                      x{item.quantity}
+                    </span>
                   </div>
                   <span className="font-bold text-[#38262e]">
                     {(item.price * item.quantity).toLocaleString()} MMK
