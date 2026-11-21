@@ -14,7 +14,7 @@ export default function ProductCardStepper({
   sizeName,
   className,
 }: ProductCardStepperProps) {
-  const { getProductQuantity, incrementProduct, decrementProduct, isMounted } = useStore();
+  const { getProductQuantity, incrementProduct, decrementProduct, isMounted, t } = useStore();
 
   const quantity = isMounted ? getProductQuantity(productId, sizeName) : 0;
 
@@ -32,7 +32,7 @@ export default function ProductCardStepper({
         }
         aria-label="Add product to bag"
       >
-        <span>+ Add</span>
+        <span>{t.addBtn}</span>
       </button>
     );
   }

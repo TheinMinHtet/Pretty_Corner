@@ -7,7 +7,6 @@ import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 
-const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false });
 const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper'), {
   ssr: false,
   loading: () => (
@@ -20,7 +19,7 @@ const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper
 function ShopContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { products, cartCount, addToCart, isMounted } = useStore();
+  const { products, isMounted, t, language } = useStore();
 
   const initialCat = searchParams.get('category') || 'all';
   const initialQuery = searchParams.get('q') || '';
@@ -47,7 +46,7 @@ function ShopContent() {
     };
   }, [showSortDropdown]);
 
-  // Sync state when URL query params change (e.g. from Home page Others popup)
+  // Sync state when URL query params change
   useEffect(() => {
     const cat = searchParams.get('category');
     setActiveCategory(cat || 'all');
@@ -67,59 +66,57 @@ function ShopContent() {
   const categoriesList = useMemo(() => [
     {
       id: 'all',
-      label: 'All Products',
-      description: 'Explore full catalog across beauty, tech & variety',
+      label: t.catAll,
+      description: language === 'my' ? 'အလှအပ၊ အီလက်ထရောနစ်နှင့် လူနေမှုအသုံးအဆောင် ပစ္စည်းအားလုံး' : 'Explore full catalog across beauty, tech & variety',
       count: products.length,
-      aliases: ['all', 'everything', 'catalog', 'products', 'store'],
+      aliases: ['all', 'everything', 'catalog', 'products', 'store', 'အားလုံး'],
     },
     {
       id: 'electrical',
-      label: 'Electrical & Gadgets',
-      description: 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
+      label: t.catElectrical,
+      description: language === 'my' ? 'အလှအပသုံး ပစ္စည်းများ၊ LED မှန်နှင့် စမတ်အသုံးအဆောင်များ' : 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
       count: products.filter((p) => p.category === 'electrical').length,
       aliases: ['electrical', 'electronics', 'gadget', 'gadgets', 'tech', 'device', 'devices', 'mirror', 'humidifier', 'sonic'],
     },
     {
       id: 'skincare',
-      label: 'Skincare',
-      description: 'Gentle barrier serums, moisturizers & UV daily defense',
+      label: t.catSkincare,
+      description: language === 'my' ? 'အသားအရေကြည်လင် အစိုဓာတ်ထိန်း ဆီရမ်၊ ခရင်မ်နှင့် နေလောင်ကာ' : 'Gentle barrier serums, moisturizers & UV daily defense',
       count: products.filter((p) => p.category === 'skincare').length,
       aliases: ['skincare', 'skin', 'serum', 'cream', 'moisturizer', 'barrier', 'sunscreen', 'uv', 'cleanser'],
     },
     {
       id: 'makeup',
-      label: 'Makeup',
-      description: 'Breathable cheek tints, lip glazes & complexion picks',
+      label: t.catMakeup,
+      description: language === 'my' ? 'ပါးနီ၊ နှုတ်ခမ်းနီနှင့် နေ့စဉ်လိမ်း မိတ်ကပ်ပစ္စည်းများ' : 'Breathable cheek tints, lip glazes & complexion picks',
       count: products.filter((p) => p.category === 'makeup').length,
       aliases: ['makeup', 'cosmetics', 'tint', 'lip', 'blush', 'cheek', 'glaze', 'complexion'],
     },
     {
       id: 'lifestyle',
-      label: 'Lifestyle & Variety',
-      description: 'Silk hair accessories, vacuum tumblers & daily finds',
+      label: t.catLifestyle,
+      description: language === 'my' ? 'ပိုးသားဆံပင်စည်းကြိုး၊ ရေဗူးနှင့် နေ့စဉ်လူနေမှုအသုံးအဆောင်များ' : 'Silk hair accessories, vacuum tumblers & daily finds',
       count: products.filter((p) => p.category === 'lifestyle').length,
       aliases: ['lifestyle', 'variety', 'tumbler', 'hair', 'scrunchie', 'accessories', 'everyday'],
     },
     {
       id: 'lenses',
-      label: 'Contact Lenses',
-      description: 'Hydrated daily and monthly comfort beauty lenses',
+      label: t.catLenses,
+      description: language === 'my' ? 'မျက်စိသက်တောင့်သက်သာရှိစေမည့် နေ့စဉ်နှင့် လစဉ်သုံး မျက်ကပ်မှန်များ' : 'Hydrated daily and monthly comfort beauty lenses',
       count: products.filter((p) => p.category === 'lenses').length,
       aliases: ['lenses', 'lens', 'contact lens', 'contact lenses', 'eyes', 'eye'],
     },
     {
       id: 'more',
-      label: 'Accessories & More',
-      description: 'Pure silk ties, beauty tools & thoughtful additions',
+      label: t.catMore,
+      description: language === 'my' ? 'ပိုးသားအသုံးအဆောင်နှင့် အလှပြင်ကိရိယာများ' : 'Pure silk ties, beauty tools & thoughtful additions',
       count: products.filter((p) => p.category === 'more').length,
       aliases: ['more', 'accessories', 'tools', 'silk', 'additions'],
     },
-  ], [products]);
+  ], [products, t, language]);
 
-  // Limit visible pill bar to 5 categories (including All Products); others go into '+ Others'
   const visibleCategories = useMemo(() => {
     const top5 = categoriesList.slice(0, 5);
-    // If an "other" category is active, display it so the active state is always visible
     if (activeCategory !== 'all' && !top5.some((c) => c.id === activeCategory)) {
       const activeObj = categoriesList.find((c) => c.id === activeCategory);
       if (activeObj) {
@@ -132,48 +129,46 @@ function ShopContent() {
   const getCategoryTitle = () => {
     switch (activeCategory) {
       case 'electrical':
-        return 'Electrical & Smart Gadgets';
+        return language === 'my' ? 'အီလက်ထရောနစ်နှင့် စမတ်ဂက်ဂျက်များ' : 'Electrical & Smart Gadgets';
       case 'skincare':
-        return 'Skincare Essentials';
+        return language === 'my' ? 'အသားအရေထိန်းသိမ်း ပစ္စည်းများ' : 'Skincare Essentials';
       case 'makeup':
-        return 'Everyday Makeup';
+        return language === 'my' ? 'နေ့စဉ်သုံး မိတ်ကပ်ပစ္စည်းများ' : 'Everyday Makeup';
       case 'lifestyle':
-        return 'Lifestyle & Variety';
+        return language === 'my' ? 'လူနေမှုအသုံးအဆောင် ပစ္စည်းများ' : 'Lifestyle & Variety';
       case 'lenses':
-        return 'Contact Lenses & Eye Care';
+        return language === 'my' ? 'မျက်ကပ်မှန်နှင့် မျက်စိအားဖြည့်ပစ္စည်းများ' : 'Contact Lenses & Eye Care';
       case 'more':
-        return 'Accessories & More';
+        return language === 'my' ? 'အခြား အလှပြင်အသုံးအဆောင်များ' : 'Accessories & More';
       default:
-        return 'The Variety Corner';
+        return language === 'my' ? 'ကုန်ပစ္စည်းများ အားလုံး' : 'The Variety Corner';
     }
   };
 
   const getCategorySubtitle = () => {
     switch (activeCategory) {
       case 'electrical':
-        return 'Sonic beauty devices, touch LED mirrors, humidifiers & smart lifestyle tech.';
+        return language === 'my' ? 'အလှအပသုံး စက်ပစ္စည်းများ၊ LED မှန်နှင့် စမတ်အသုံးအဆောင်များ' : 'Sonic beauty devices, touch LED mirrors, humidifiers & smart lifestyle tech.';
       case 'skincare':
-        return 'Gentle serums, barrier moisturizers, and UV daily defense formulas.';
+        return language === 'my' ? 'အသားအရေစိုပြေစေမည့် ဆီရမ်၊ မွိုက်စချာရိုက်ဆာနှင့် နေလောင်ကာများ' : 'Gentle serums, barrier moisturizers, and UV daily defense formulas.';
       case 'makeup':
-        return 'Breathable cheek tints, cushion lip glazes, and daily complexion picks.';
+        return language === 'my' ? 'ပေါ့ပါးလန်းဆန်းသော ပါးနီ၊ နှုတ်ခမ်းနီနှင့် မိတ်ကပ်ပစ္စည်းများ' : 'Breathable cheek tints, cushion lip glazes, and daily complexion picks.';
       case 'lifestyle':
-        return 'Silk hair ties, vacuum tumblers, and thoughtful everyday accessories.';
+        return language === 'my' ? 'ပိုးသားဆံပင်စည်းကြိုး၊ ရေဗူးနှင့် နေ့စဉ်လူနေမှုအသုံးအဆောင်များ' : 'Silk hair ties, vacuum tumblers, and thoughtful everyday accessories.';
       case 'lenses':
-        return 'Moisture-rich daily and monthly contact lenses for natural beauty.';
+        return language === 'my' ? 'မျက်စိစိုပြေစေသော နေ့စဉ်နှင့် လစဉ်သုံး မျက်ကပ်မှန်များ' : 'Moisture-rich daily and monthly contact lenses for natural beauty.';
       case 'more':
-        return 'Pure mulberry silk scrunchies, cosmetic tools & everyday add-ons.';
+        return language === 'my' ? 'ပိုးသားအသုံးအဆောင်နှင့် အလှပြင်ကိရိယာများ' : 'Pure mulberry silk scrunchies, cosmetic tools & everyday add-ons.';
       default:
-        return 'From genuine skincare & makeup to smart electrical gadgets and variety essentials.';
+        return language === 'my' ? 'အရည်အသွေးမြင့် အလှကုန်၊ မိတ်ကပ်၊ အီလက်ထရောနစ်နှင့် နေ့စဉ်သုံးပစ္စည်းများကို စုံလင်စွာ ရွေးချယ်နိုင်ပါသည်။' : 'From genuine skincare & makeup to smart electrical gadgets and variety essentials.';
     }
   };
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
-      // Category filter
       if (activeCategory !== 'all' && p.category !== activeCategory) {
         return false;
       }
-      // Search term (searches by product name, tagline, description, category ID, category label, or category aliases)
       if (searchFilter.trim()) {
         const q = searchFilter.toLowerCase().trim();
         const categoryObj = categoriesList.find((c) => c.id === p.category);
@@ -190,11 +185,9 @@ function ShopContent() {
           matchesCategory;
         if (!matchesQuery) return false;
       }
-      // In stock
       if (inStockOnly && !p.inStock) {
         return false;
       }
-      // Max price
       if (p.price > maxPrice) {
         return false;
       }
@@ -203,24 +196,30 @@ function ShopContent() {
       if (sortBy === 'price-asc') return a.price - b.price;
       if (sortBy === 'price-desc') return b.price - a.price;
       if (sortBy === 'newest') return b.id.localeCompare(a.id);
-      return 0; // featured default
+      return 0;
     });
-  }, [products, activeCategory, searchFilter, inStockOnly, maxPrice, sortBy]);
+  }, [products, activeCategory, searchFilter, inStockOnly, maxPrice, sortBy, categoriesList]);
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full">
-      {/* Catalog Header & Breadcrumb - Consistent across mobile and desktop */}
+      {/* Catalog Header & Breadcrumb */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-4">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-[12px] text-[#7a6870] mb-2 sm:mb-3">
-          <Link href="/" className="hover:text-[#38262e]">Home</Link>
+          <Link href="/" className="hover:text-[#38262e]">{t.navHome}</Link>
           <span>/</span>
-          <span className="text-[#38262e] font-medium capitalize">{activeCategory}</span>
+          <span className="text-[#38262e] font-medium capitalize">
+            {categoriesList.find((c) => c.id === activeCategory)?.label || activeCategory}
+          </span>
         </div>
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
           <div>
-            <h1 className="font-serif text-[28px] sm:text-[36px] lg:text-[42px] font-medium text-[#38262e] leading-tight">
+            <h1 className={`font-serif font-medium text-[#38262e] leading-tight ${
+              language === 'my'
+                ? 'text-[23px] sm:text-[28px] lg:text-[33px]'
+                : 'text-[28px] sm:text-[36px] lg:text-[42px]'
+            }`}>
               {getCategoryTitle()}
             </h1>
             <p className="font-sans text-[13px] sm:text-[14px] text-[#7a6870] mt-1 sm:mt-1.5 max-w-xl">
@@ -228,7 +227,7 @@ function ShopContent() {
             </p>
           </div>
 
-          {/* Search Bar - Consistent on mobile and desktop */}
+          {/* Search Bar */}
           <div className="w-full md:w-[320px] lg:w-[380px] shrink-0 mt-2 md:mt-0">
             <div className="bg-[#f7f4f5] border border-[#eedfe5] focus-within:border-[#b73d67] focus-within:bg-white h-[44px] rounded-full flex items-center px-4 gap-2.5 transition-all shadow-2xs">
               <svg className="w-4 h-4 text-[#7a6870] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -239,7 +238,7 @@ function ShopContent() {
                 type="text"
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
-                placeholder="Search products, electricals, gadgets…"
+                placeholder={t.searchPlaceholder}
                 className="bg-transparent text-[13px] text-[#38262e] placeholder-[#7a6870] outline-none w-full font-normal"
               />
               {searchFilter && (
@@ -254,7 +253,7 @@ function ShopContent() {
             </div>
             <div className="hidden md:block text-right mt-1.5">
               <span className="text-[12px] text-[#7a6870]">
-                Showing <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'product' : 'products'}
+                {t.showing} <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? t.productCountSingular : t.productsCount}
               </span>
             </div>
           </div>
@@ -286,8 +285,8 @@ function ShopContent() {
             }`}
           >
             <span>
-              <span className="hidden sm:inline">+ More Categories</span>
-              <span className="sm:hidden">+ More</span>
+              <span className="hidden sm:inline">{t.moreCategories}</span>
+              <span className="sm:hidden">{language === 'my' ? '+ အခြား' : '+ More'}</span>
             </span>
             {categoriesList.length > 5 && (
               <span className="text-[11px] opacity-75">
@@ -298,14 +297,14 @@ function ShopContent() {
         </div>
       </div>
 
-      {/* 3. Catalog Section - Responsive Container */}
+      {/* 3. Catalog Section */}
       <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-3 pb-12">
-        {/* Controls Toolbar: Active Filters & Count on Left, Filter & Sort on Right */}
+        {/* Controls Toolbar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#eedfe5]">
           {/* Left: Product Counter & Active Filter Badges */}
           <div className="flex items-center gap-2.5 flex-wrap">
             <span className="text-[13px] text-[#7a6870]">
-              Showing <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? 'product' : 'products'}
+              {t.showing} <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? t.productCountSingular : t.productsCount}
             </span>
 
             {activeCategory !== 'all' && (
@@ -345,7 +344,7 @@ function ShopContent() {
                   : 'bg-[#fdfbfa] hover:bg-[#fcf7f9] border-[#eedfe5] text-[#38262e] hover:border-[#b73d67]'
               }`}
             >
-              <span>Filters</span>
+              <span>{t.filters}</span>
               {(maxPrice < 60000 || !inStockOnly || activeCategory !== 'all') && (
                 <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />
               )}
@@ -361,20 +360,20 @@ function ShopContent() {
                 }`}
               >
                 <span>
-                  {sortBy === 'featured' && 'Sort: Featured'}
-                  {sortBy === 'newest' && 'Sort: Newest'}
-                  {sortBy === 'price-asc' && 'Price: Low to High'}
-                  {sortBy === 'price-desc' && 'Price: High to Low'}
+                  {sortBy === 'featured' && t.sortFeatured}
+                  {sortBy === 'newest' && t.sortNewest}
+                  {sortBy === 'price-asc' && t.sortPriceAsc}
+                  {sortBy === 'price-desc' && t.sortPriceDesc}
                 </span>
               </button>
 
               {showSortDropdown && (
                 <div className="absolute right-0 top-[calc(100%+6px)] z-30 min-w-[190px] bg-white/95 backdrop-blur-md rounded-2xl border border-[#eedfe5] shadow-[0_12px_32px_rgba(56,38,46,0.12)] py-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                   {[
-                    { value: 'featured', label: 'Sort: Featured' },
-                    { value: 'newest', label: 'Sort: Newest' },
-                    { value: 'price-asc', label: 'Price: Low to High' },
-                    { value: 'price-desc', label: 'Price: High to Low' },
+                    { value: 'featured', label: t.sortFeatured },
+                    { value: 'newest', label: t.sortNewest },
+                    { value: 'price-asc', label: t.sortPriceAsc },
+                    { value: 'price-desc', label: t.sortPriceDesc },
                   ].map((option) => (
                     <button
                       key={option.value}
@@ -401,7 +400,7 @@ function ShopContent() {
           </div>
         </div>
 
-        {/* Responsive Product Grid: 2 cols on mobile, 3 cols on tablet, 4 cols on desktop */}
+        {/* Responsive Product Grid */}
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5 lg:gap-6 mt-6">
             {filteredProducts.map((product) => {
@@ -448,8 +447,8 @@ function ShopContent() {
           </div>
         ) : (
           <div className="py-16 text-center">
-            <p className="font-serif text-[24px] text-[#38262e]">No products match your filters</p>
-            <p className="text-[14px] text-[#7a6870] mt-1.5">Try adjusting your price range or search keyword.</p>
+            <p className="font-serif text-[24px] text-[#38262e]">{t.noProductsMatch}</p>
+            <p className="text-[14px] text-[#7a6870] mt-1.5">{t.noProductsAdjust}</p>
             <button
               onClick={() => {
                 setActiveCategory('all');
@@ -459,13 +458,13 @@ function ShopContent() {
               }}
               className="mt-5 px-6 py-2.5 bg-[#b73d67] text-white rounded-[10px] text-[13px] font-bold hover:bg-[#a33259] transition-colors"
             >
-              Reset all filters
+              {t.resetFilters}
             </button>
           </div>
         )}
       </section>
 
-      {/* 4. Filter Modal (35:632) - Responsive: Slide-up on mobile, Centered Dialog on desktop */}
+      {/* 4. Filter Modal */}
       {showFilterModal && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
           {/* Backdrop */}
@@ -478,7 +477,7 @@ function ShopContent() {
           <div className="relative w-full md:max-w-md bg-white rounded-t-[20px] md:rounded-2xl p-6 max-h-[90vh] overflow-y-auto shadow-2xl z-10 animate-in fade-in slide-in-from-bottom-6 md:zoom-in-95">
             <div className="flex items-center justify-between pb-3 border-b border-[#eedfe5]">
               <h2 className="font-serif text-[24px] font-medium text-[#38262e]">
-                Filter & sort
+                {t.filterAndSort}
               </h2>
               <button
                 onClick={() => setShowFilterModal(false)}
@@ -491,7 +490,9 @@ function ShopContent() {
             <div className="py-4 space-y-5">
               {/* Categories */}
               <div>
-                <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">Category</p>
+                <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">
+                  {language === 'my' ? 'အမျိုးအစား' : 'Category'}
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {categoriesList.map((cat) => (
                     <button
@@ -512,7 +513,7 @@ function ShopContent() {
               {/* Price range */}
               <div>
                 <div className="flex justify-between items-center text-[13px] font-bold text-[#38262e] mb-2">
-                  <span>Price range</span>
+                  <span>{t.priceRange}</span>
                   <span className="text-[#b73d67]">0 — {maxPrice.toLocaleString()} MMK</span>
                 </div>
                 <input
@@ -528,7 +529,7 @@ function ShopContent() {
 
               {/* Availability */}
               <div>
-                <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">Availability</p>
+                <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">{t.availability}</p>
                 <label className="flex items-center gap-2.5 text-[13px] text-[#38262e] cursor-pointer">
                   <input
                     type="checkbox"
@@ -536,7 +537,7 @@ function ShopContent() {
                     onChange={(e) => setInStockOnly(e.target.checked)}
                     className="accent-[#b73d67]"
                   />
-                  In stock items only
+                  {t.onlyInStock}
                 </label>
               </div>
 
@@ -546,7 +547,7 @@ function ShopContent() {
                   onClick={() => setShowFilterModal(false)}
                   className="w-full h-[48px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] transition-colors cursor-pointer"
                 >
-                  Show matching products
+                  {t.showMatchingProducts}
                 </button>
 
                 <button
@@ -559,7 +560,7 @@ function ShopContent() {
                   }}
                   className="w-full h-[44px] bg-[#fceef2] text-[#b73d67] rounded-[10px] font-bold text-[14px] hover:bg-[#f6e1e8] transition-colors cursor-pointer"
                 >
-                  Clear all filters
+                  {t.clearAll}
                 </button>
               </div>
             </div>
@@ -570,21 +571,19 @@ function ShopContent() {
       {/* Category Popup Modal ("+ Others") */}
       {showCategoryModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          {/* Backdrop */}
           <div
             className="fixed inset-0 bg-[#38262e]/45 backdrop-blur-xs transition-opacity"
             onClick={() => setShowCategoryModal(false)}
           />
 
-          {/* Dialog - Centered on screen */}
           <div className="relative w-full max-w-lg bg-white rounded-2xl p-5 sm:p-6 max-h-[80vh] overflow-y-auto shadow-2xl z-10 border border-[#eedfe5] animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-3 border-b border-[#eedfe5]">
               <div>
                 <h3 className="font-serif text-[22px] font-medium text-[#38262e]">
-                  All Categories
+                  {t.allCategories}
                 </h3>
                 <p className="text-[12px] text-[#7a6870] mt-0.5">
-                  Select a category to view
+                  {t.selectCategoryToView}
                 </p>
               </div>
               <button
@@ -618,7 +617,7 @@ function ShopContent() {
                         </span>
                         {isSelected && (
                           <span className="text-[10px] bg-[#b73d67] text-white font-bold px-1.5 py-0.5 rounded-full">
-                            Active
+                            {t.active}
                           </span>
                         )}
                       </div>
@@ -627,7 +626,7 @@ function ShopContent() {
                       </p>
                     </div>
                     <span className="text-[12px] font-semibold text-[#7a6870] bg-[#faf7f8] px-2.5 py-1 rounded-full border border-[#eedfe5] shrink-0">
-                      {cat.count} items
+                      {cat.count} {language === 'my' ? 'ခု' : 'items'}
                     </span>
                   </button>
                 );

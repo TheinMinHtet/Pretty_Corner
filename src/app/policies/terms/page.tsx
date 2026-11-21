@@ -3,17 +3,19 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useStore } from '@/context/StoreContext';
 
 export default function TermsPage() {
   const router = useRouter();
+  const { t, language } = useStore();
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-10 flex flex-col min-h-full pb-12">
-      {/* Breadcrumb - Consistent across mobile and desktop */}
+      {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870] mb-4 sm:mb-6">
-        <Link href="/" className="hover:text-[#38262e]">Home</Link>
+        <Link href="/" className="hover:text-[#38262e]">{t.navHome}</Link>
         <span>/</span>
-        <span className="text-[#38262e] font-medium">Terms and Conditions</span>
+        <span className="text-[#38262e] font-medium">{t.termsAndConditions}</span>
       </div>
 
       <div className="flex flex-col gap-5">
@@ -24,37 +26,51 @@ export default function TermsPage() {
           <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
-          <span>Back</span>
+          <span>{t.back}</span>
         </button>
 
         <div>
           <h1 className="font-serif text-[32px] sm:text-[40px] font-medium text-[#38262e] leading-tight">
-            Terms and Conditions
+            {t.termsAndConditions}
           </h1>
           <p className="text-[14px] sm:text-[15px] text-[#7a6870] mt-1.5">
-            Standard customer agreement for orders placed at Pretty Corner.
+            {language === 'my'
+              ? 'Pretty Corner တွင် အမှာစာတင်သွင်းမှုဆိုင်ရာ သဘောတူညီချက် စည်းကမ်းချက်များ'
+              : 'Standard customer agreement for orders placed at Pretty Corner.'}
           </p>
         </div>
 
         <div className="space-y-4 text-[14px] text-[#514149] leading-relaxed">
           <div className="bg-[#faf7f8] p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
-            <h3 className="font-serif text-[20px] font-medium text-[#38262e]">Order Acceptance</h3>
+            <h3 className="font-serif text-[20px] font-medium text-[#38262e]">
+              {language === 'my' ? '၁။ အမှာစာ လက်ခံခြင်း' : 'Order Acceptance'}
+            </h3>
             <p className="mt-2 text-[#7a6870]">
-              All orders placed on Pretty Corner represent an offer to purchase products. Orders are confirmed once payment verification is successfully logged in our system.
+              {language === 'my'
+                ? 'Pretty Corner တွင် တင်သွင်းသော အမှာစာအားလုံးသည် စနစ်တွင် အတည်ပြုမှတ်တမ်းတင်ပြီးနောက် ပို့ဆောင်မှုလုပ်ငန်းစဉ် စတင်မည်ဖြစ်ပါသည်။'
+                : 'All orders placed on Pretty Corner represent an offer to purchase products. Orders are confirmed once payment verification is successfully logged in our system.'}
             </p>
           </div>
 
           <div className="bg-[#faf7f8] p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
-            <h3 className="font-serif text-[20px] font-medium text-[#38262e]">Pricing & Availability</h3>
+            <h3 className="font-serif text-[20px] font-medium text-[#38262e]">
+              {language === 'my' ? '၂။ စျေးနှုန်းနှင့် ပစ္စည်းအသင့်ရှိမှု' : 'Pricing & Availability'}
+            </h3>
             <p className="mt-2 text-[#7a6870]">
-              All product prices are quoted in Myanmar Kyat (MMK). While we make every effort to ensure stock availability, in the rare event of inventory stock-outs, our team will promptly contact you for substitution or refund.
+              {language === 'my'
+                ? 'ကုန်ပစ္စည်းစျေးနှုန်းအားလုံးကို မြန်မာကျပ်ငွေ (MMK) ဖြင့် ဖော်ပြထားပါသည်။ ပစ္စည်းလက်ကျန် အပြောင်းအလဲရှိပါက ကျွန်ုပ်တို့အဖွဲ့မှ သင့်ထံ အမြန်ဆုံး ဆက်သွယ်အသိပေးပါမည်။'
+                : 'All product prices are quoted in Myanmar Kyat (MMK). While we make every effort to ensure stock availability, in the rare event of inventory stock-outs, our team will promptly contact you for substitution or refund.'}
             </p>
           </div>
 
           <div className="bg-[#faf7f8] p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
-            <h3 className="font-serif text-[20px] font-medium text-[#38262e]">Customer Obligations</h3>
+            <h3 className="font-serif text-[20px] font-medium text-[#38262e]">
+              {language === 'my' ? '၃။ ဝယ်ယူသူဆိုင်ရာ လိုက်နာရန်များ' : 'Customer Obligations'}
+            </h3>
             <p className="mt-2 text-[#7a6870]">
-              Customers agree to provide accurate recipient contact numbers and clear delivery landmark instructions to facilitate timely courier dispatch in Yangon.
+              {language === 'my'
+                ? 'အိမ်အရောက် ပို့ဆောင်မှု ချောမွေ့မြန်ဆန်စေရန်အတွက် မှန်ကန်သော ဖုန်းနံပါတ်နှင့် တိကျသော လိပ်စာအမှတ်အသားတို့ကို ဖြည့်စွက်ပေးရန် မေတ္တာရပ်ခံအပ်ပါသည်။'
+                : 'Customers agree to provide accurate recipient contact numbers and clear delivery landmark instructions to facilitate timely courier dispatch in Yangon.'}
             </p>
           </div>
         </div>
@@ -64,7 +80,7 @@ export default function TermsPage() {
             href="/shop"
             className="inline-flex items-center justify-center h-[50px] px-8 bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] transition-all shadow-xs"
           >
-            Continue shopping
+            {t.continueShopping}
           </Link>
         </div>
       </div>

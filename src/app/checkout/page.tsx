@@ -11,7 +11,7 @@ import { validatePhoneNumber } from '@/lib/validation';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, cartSubtotal, discount, cartTotal, selectedTownship, setSelectedTownship, createOrder, clearCart, isMounted } = useStore();
+  const { cart, cartSubtotal, discount, cartTotal, selectedTownship, setSelectedTownship, createOrder, clearCart, isMounted, t, language } = useStore();
 
   const [customerName, setCustomerName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -36,7 +36,7 @@ export default function CheckoutPage() {
   const handleUseCurrentLocation = () => {
     if (typeof window === 'undefined' || !navigator.geolocation) {
       setGpsStatus('error');
-      setGpsErrorMsg('GPS location is not supported by your browser.');
+      setGpsErrorMsg(language === 'my' ? 'သင့်ဘရောင်ဇာတွင် GPS အသုံးမပြုနိုင်ပါ' : 'GPS location is not supported by your browser.');
       return;
     }
 
@@ -108,13 +108,13 @@ export default function CheckoutPage() {
         setIsLocating(false);
         setGpsStatus('error');
         if (err.code === 1) {
-          setGpsErrorMsg('Location permission was denied. Please allow location permissions in your browser.');
+          setGpsErrorMsg(language === 'my' ? 'တည်နေရာအသုံးပြုခွင့် မရရှိပါ။ ဘရောင်ဇာ Setting တွင် တည်နေရာဖွင့်ပေးပါရန်။' : 'Location permission was denied. Please allow location permissions in your browser.');
         } else if (err.code === 2) {
-          setGpsErrorMsg('GPS position unavailable. Please ensure GPS/Location is turned on.');
+          setGpsErrorMsg(language === 'my' ? 'GPS တည်နေရာရှာမတွေ့ပါ။ စက်တွင် GPS ဖွင့်ထားခြင်းရှိမရှိ စစ်ဆေးပေးပါ။' : 'GPS position unavailable. Please ensure GPS/Location is turned on.');
         } else if (err.code === 3) {
-          setGpsErrorMsg('GPS request timed out. Please click again.');
+          setGpsErrorMsg(language === 'my' ? 'အချိန်ကြာမြင့်သွားပါသည်။ ထပ်မံနှိပ်ပေးပါ။' : 'GPS request timed out. Please click again.');
         } else {
-          setGpsErrorMsg('Could not detect location. Please enter delivery address manually.');
+          setGpsErrorMsg(language === 'my' ? 'တည်နေရာမတွေ့ရှိပါ။ လိပ်စာကို ကိုယ်တိုင်ရိုက်ထည့်ပေးပါရန်။' : 'Could not detect location. Please enter delivery address manually.');
         }
       },
       {
@@ -136,12 +136,12 @@ export default function CheckoutPage() {
     setAddressTouched(true);
 
     if (!customerName.trim() || !phoneNumber.trim() || !streetAddress.trim()) {
-      setFormAlert('Please fill in your name, phone number, and delivery address.');
+      setFormAlert(language === 'my' ? 'ကျေးဇူးပြု၍ အမည်၊ ဖုန်းနံပါတ်နှင့် ပို့ဆောင်ရမည့်လိပ်စာတို့ကို ပြည့်စုံစွာ ဖြည့်စွက်ပေးပါ။' : 'Please fill in your name, phone number, and delivery address.');
       return;
     }
     const phoneCheck = validatePhoneNumber(phoneNumber);
     if (!phoneCheck.isValid) {
-      setPhoneError(phoneCheck.error || 'Please enter a valid phone number.');
+      setPhoneError(phoneCheck.error || (language === 'my' ? 'မှန်ကန်သော ဖုန်းနံပါတ် ထည့်သွင်းပေးပါရန်' : 'Please enter a valid phone number.'));
       return;
     }
 
@@ -184,15 +184,15 @@ export default function CheckoutPage() {
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full pb-12">
-      {/* Breadcrumb & Heading - Unified across mobile and desktop */}
+      {/* Breadcrumb & Heading */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-4">
         <div className="flex items-center justify-between gap-3 mb-2 sm:mb-3">
           <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870]">
-            <Link href="/" className="hover:text-[#38262e]">Home</Link>
+            <Link href="/" className="hover:text-[#38262e]">{t.navHome}</Link>
             <span>/</span>
-            <Link href="/bag" className="hover:text-[#38262e]">Beauty Bag</Link>
+            <Link href="/bag" className="hover:text-[#38262e]">{t.bagTitle}</Link>
             <span>/</span>
-            <span className="text-[#38262e] font-medium">Checkout</span>
+            <span className="text-[#38262e] font-medium">{t.checkoutTitle}</span>
           </div>
 
           <button
@@ -203,28 +203,32 @@ export default function CheckoutPage() {
             <svg className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            <span>Back</span>
+            <span>{t.back}</span>
           </button>
         </div>
 
         <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-center">
           <div className="md:col-span-7 lg:col-span-8">
-            <h1 className="font-serif text-[30px] sm:text-[38px] font-medium text-[#38262e]">
-              Checkout
+            <h1 className={`font-serif font-medium text-[#38262e] ${
+              language === 'my'
+                ? 'text-[24px] sm:text-[30px]'
+                : 'text-[30px] sm:text-[38px]'
+            }`}>
+              {t.checkoutTitle}
             </h1>
             <p className="font-sans text-[13px] sm:text-[15px] text-[#7a6870] mt-1">
-              Fast, direct delivery across all townships.
+              {t.checkoutSubtitle}
             </p>
           </div>
 
-          {/* Unified Step Bar - Centered evenly over the Review & Pay column */}
+          {/* Unified Step Bar */}
           <div className="md:col-span-5 lg:col-span-4 flex justify-center items-center mt-3 md:mt-0">
             <OrderingStepBar currentStep={1} isCOD={paymentMethod === 'Cash on Delivery'} />
           </div>
         </div>
       </div>
 
-      {/* Main Form Area - 2-Column Responsive Layout */}
+      {/* Main Form Area */}
       <form
         onSubmit={handlePlaceOrder}
         onKeyDown={(e) => {
@@ -245,20 +249,20 @@ export default function CheckoutPage() {
             {/* Step 1: Contact Details */}
             <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
               <h2 className="font-serif text-[24px] sm:text-[26px] font-medium text-[#38262e] mb-4">
-                1. Contact & delivery details
+                {t.contactAndDelivery}
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] font-bold text-[#38262e] mb-1.5">
-                    Full name *
+                    {t.fullName}
                   </label>
                   <input
                     type="text"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     onBlur={() => setNameTouched(true)}
-                    placeholder="e.g. Daw Su Su / Ma Thida"
+                    placeholder={t.fullNamePlaceholder}
                     className={`w-full h-[46px] px-3.5 bg-white border rounded-[9px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none transition-colors ${
                       nameTouched && !customerName.trim()
                         ? 'border-[#b73d67] bg-[#fdf2f5]/20'
@@ -268,14 +272,14 @@ export default function CheckoutPage() {
                   {nameTouched && !customerName.trim() && (
                     <p className="text-[#b73d67] text-[11px] font-medium mt-1 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] shrink-0 inline-block" />
-                      <span>Full name is required</span>
+                      <span>{t.fullNameRequired}</span>
                     </p>
                   )}
                 </div>
 
                 <div>
                   <label className="block text-[12px] font-bold text-[#38262e] mb-1.5">
-                    Phone number *
+                    {t.phone}
                   </label>
                   <input
                     type="tel"
@@ -293,7 +297,7 @@ export default function CheckoutPage() {
                       const check = validatePhoneNumber(phoneNumber);
                       setPhoneError(check.isValid ? '' : (check.error || ''));
                     }}
-                    placeholder="e.g. 09 765 432 100"
+                    placeholder={t.phonePlaceholder}
                     className={`w-full h-[46px] px-3.5 bg-white border rounded-[9px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none transition-colors ${
                       phoneError
                         ? 'border-red-400 focus:border-red-500 bg-red-50/10'
@@ -311,7 +315,7 @@ export default function CheckoutPage() {
                 <div className="sm:col-span-2">
                   <div className="flex items-center justify-between gap-2 mb-1.5">
                     <label className="block text-[12px] font-bold text-[#38262e]">
-                      Delivery address *
+                      {t.deliveryAddress}
                     </label>
                     <button
                       type="button"
@@ -324,7 +328,7 @@ export default function CheckoutPage() {
                         <circle cx="12" cy="12" r="10" />
                         <circle cx="12" cy="12" r="3" />
                       </svg>
-                      <span>{isLocating ? 'Detecting GPS…' : 'Use GPS location'}</span>
+                      <span>{isLocating ? t.locating : t.locateMe}</span>
                     </button>
                   </div>
                   <input
@@ -332,7 +336,7 @@ export default function CheckoutPage() {
                     value={streetAddress}
                     onChange={(e) => setStreetAddress(e.target.value)}
                     onBlur={() => setAddressTouched(true)}
-                    placeholder="e.g. No. 24, Insein Road, Building A, 3rd floor"
+                    placeholder={t.streetAddressPlaceholder}
                     className={`w-full h-[46px] px-3.5 bg-white border rounded-[9px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none transition-colors ${
                       addressTouched && !streetAddress.trim()
                         ? 'border-[#b73d67] bg-[#fdf2f5]/20'
@@ -342,7 +346,7 @@ export default function CheckoutPage() {
                   {addressTouched && !streetAddress.trim() && (
                     <p className="text-[#b73d67] text-[11px] font-medium mt-1 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] shrink-0 inline-block" />
-                      <span>Delivery address is required</span>
+                      <span>{t.deliveryAddressRequired}</span>
                     </p>
                   )}
                   {gpsErrorMsg && (
@@ -354,20 +358,20 @@ export default function CheckoutPage() {
                   {gpsStatus === 'success' && !gpsErrorMsg && pinCoords && (
                     <p className="text-emerald-700 text-[11px] font-medium mt-1.5 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                      <span>GPS location captured ({pinCoords.lat.toFixed(4)}, {pinCoords.lng.toFixed(4)}) · You can edit the address above</span>
+                      <span>{language === 'my' ? `တည်နေရာ ရယူပြီးပါပြီ (${pinCoords.lat.toFixed(4)}, ${pinCoords.lng.toFixed(4)})` : `GPS location captured (${pinCoords.lat.toFixed(4)}, ${pinCoords.lng.toFixed(4)}) · You can edit the address above`}</span>
                     </p>
                   )}
                 </div>
 
                 <div className="sm:col-span-2">
                   <label className="block text-[12px] font-bold text-[#38262e] mb-1.5">
-                    Delivery landmark note (optional)
+                    {t.landmarkNote}
                   </label>
                   <input
                     type="text"
                     value={landmarkNote}
                     onChange={(e) => setLandmarkNote(e.target.value)}
-                    placeholder="e.g. Near Hledan Centre · Please call on arrival"
+                    placeholder={t.landmarkPlaceholder}
                     className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67]"
                   />
                 </div>
@@ -377,10 +381,10 @@ export default function CheckoutPage() {
             {/* Step 2: Payment Method Selector */}
             <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
               <h2 className="font-serif text-[24px] sm:text-[26px] font-medium text-[#38262e] mb-2">
-                2. Payment method
+                {t.paymentMethod}
               </h2>
               <p className="text-[13px] text-[#7a6870] mb-4">
-                Choose your preferred payment method.
+                {t.choosePaymentMethod}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -394,7 +398,7 @@ export default function CheckoutPage() {
                   }`}
                 >
                   <span className={`text-[15px] font-bold ${paymentMethod === 'Mobile Banking' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
-                    {paymentMethod === 'Mobile Banking' ? '●' : '○'} Mobile Banking
+                    {paymentMethod === 'Mobile Banking' ? '●' : '○'} {t.mobileBanking}
                   </span>
                 </div>
 
@@ -408,18 +412,18 @@ export default function CheckoutPage() {
                   }`}
                 >
                   <span className={`text-[15px] font-bold ${paymentMethod === 'Cash on Delivery' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
-                    {paymentMethod === 'Cash on Delivery' ? '●' : '○'} Cash on Delivery
+                    {paymentMethod === 'Cash on Delivery' ? '●' : '○'} {t.cod}
                   </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Sticky Order Summary & Submit (col-span-12 on mobile, col-span-5 or 4 on desktop) */}
+          {/* Right Column: Sticky Order Summary & Submit */}
           <div className="md:col-span-5 lg:col-span-4 mt-6 md:mt-0">
             <div className="sticky top-28 bg-[#fcf9fa] p-6 lg:p-7 rounded-2xl border border-[#eedfe5]">
               <h2 className="font-serif text-[24px] sm:text-[26px] font-medium text-[#38262e] mb-4">
-                Review & pay
+                {t.reviewAndPay}
               </h2>
 
               {/* Items Miniature List */}
@@ -447,20 +451,20 @@ export default function CheckoutPage() {
               {/* Sub Total, Discount, and Total */}
               <div className="border-t border-[#eedfe5] pt-3.5 space-y-2 text-[14px]">
                 <div className="flex justify-between items-center text-[#7a6870]">
-                  <span>Sub Total</span>
+                  <span>{t.subTotal}</span>
                   <span className="font-semibold text-[#38262e]">{cartSubtotal.toLocaleString()} MMK</span>
                 </div>
                 <div className="flex justify-between items-center text-[#7a6870]">
-                  <span>Discount</span>
+                  <span>{t.discount}</span>
                   <span className="font-semibold text-[#38262e]">{discount.toLocaleString()} MMK</span>
                 </div>
                 <div className="border-t border-[#eedfe5] pt-2.5 flex justify-between items-center text-[18px] font-bold text-[#38262e]">
-                  <span>Total</span>
+                  <span>{t.total}</span>
                   <span className="text-[#b73d67]">{grandTotal.toLocaleString()} MMK</span>
                 </div>
               </div>
 
-              {/* Notification around confirm button (visible on mobile without scrolling up) */}
+              {/* Notification around confirm button */}
               {formAlert && (
                 <div className="mt-3.5 p-3 rounded-xl bg-[#fdf2f5] border border-[#f3ccd8] text-[#842a4b] text-[12px] flex items-center justify-between gap-2 shadow-xs animate-in fade-in duration-200">
                   <div className="flex items-center gap-2">
@@ -482,17 +486,17 @@ export default function CheckoutPage() {
                 type="submit"
                 className={`w-full ${formAlert ? 'mt-3' : 'mt-5'} h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer whitespace-nowrap`}
               >
-                {paymentMethod === 'Cash on Delivery' ? 'Confirm Order' : 'Proceed to Payment'}
+                {paymentMethod === 'Cash on Delivery' ? t.confirmOrder : t.proceedToPayment}
               </button>
 
               <p className="text-[11px] text-center text-[#7a6870] mt-3 leading-normal">
-                By placing an order, you agree to our{' '}
+                {t.agreeTermsNotice}{' '}
                 <Link href="/policies/terms" className="underline hover:text-[#38262e]">
-                  Terms
+                  {t.terms}
                 </Link>{' '}
-                and{' '}
+                {t.and}{' '}
                 <Link href="/policies/privacy" className="underline hover:text-[#38262e]">
-                  Privacy Policy
+                  {t.privacyPolicy}
                 </Link>.
               </p>
             </div>

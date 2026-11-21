@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
@@ -9,7 +9,7 @@ import OrderingStepBar from '@/components/OrderingStepBar';
 function PaymentPendingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { orders, updatePaymentStatus } = useStore();
+  const { orders, updatePaymentStatus, t, language } = useStore();
 
   const orderId = searchParams.get('orderId') || 'PC-261117-024';
   const order = orders.find((o) => o.id === orderId) || orders[0];
@@ -48,48 +48,52 @@ function PaymentPendingContent() {
           </svg>
         </div>
 
-        <h2 className="font-serif text-[34px] font-medium leading-tight text-[#38262e]">
-          One last little step.
+        <h2 className={`font-serif font-medium leading-tight text-[#38262e] ${
+          language === 'my'
+            ? 'text-[25px] sm:text-[29px]'
+            : 'text-[34px]'
+        }`}>
+          {t.oneLastStep}
         </h2>
 
         <p className="font-sans text-[14px] text-[#7a6870] mt-2 leading-relaxed">
-          Complete your payment securely<br />with {order.paymentMethod || 'MyanMyanPay'}.
+          {t.completePaymentSecurely}<br />{order.paymentMethod || 'KBZPay, WavePay'}.
         </p>
 
-        {/* Provider Payment Card (2:365) */}
+        {/* Provider Payment Card */}
         <div className="w-full bg-[#fcf9fa] border border-[#eedfe5] rounded-[12px] p-5 mt-5 flex flex-col items-center">
           <span className="font-sans text-[21px] font-bold text-[#38262e]">
-            {order.paymentMethod || 'MyanMyanPay'}
+            {order.paymentMethod || 'Mobile Banking'}
           </span>
           <span className="text-[10px] font-bold tracking-[1.5px] text-[#7a6870] uppercase mt-3">
-            TOTAL TO PAY
+            {t.totalToPay}
           </span>
           <span className="font-sans text-[30px] font-bold text-[#b73d67] mt-1">
             {order.total.toLocaleString()} MMK
           </span>
           <span className="text-[12px] text-[#7a6870] mt-1.5 font-medium">
-            Order {order.id}
+            {t.orderRef}: {order.id}
           </span>
         </div>
 
-        {/* Open Secure Payment Page CTA (2:370) */}
+        {/* Open Secure Payment Page CTA */}
         <button
           onClick={handleSimulatePaymentGateway}
           className="w-full h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] mt-4 hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-xs cursor-pointer"
         >
-          Open secure payment page ↗
+          {t.openPaymentPage}
         </button>
 
         {/* Help & Recovery */}
         <div className="w-full pt-5 border-t border-[#eedfe5]/70 flex flex-col items-center text-center mt-6">
           <p className="text-[12px] text-[#7a6870] leading-relaxed">
-            Need help or page didn’t open? Contact us with order reference <span className="font-mono font-bold text-[#38262e]">{order.id}</span>.
+            {t.needHelpPayment} <span className="font-mono font-bold text-[#38262e]">{order.id}</span>.
           </p>
           <Link
             href="/contact"
             className="text-[12px] font-bold text-[#b73d67] hover:underline mt-1.5 inline-block"
           >
-            Need help? Contact Pretty Corner
+            {t.questionsContact}
           </Link>
         </div>
       </section>
@@ -105,25 +109,25 @@ function PaymentPendingContent() {
               </svg>
             </div>
             <h4 className="font-serif text-[22px] font-medium text-[#38262e]">
-              MyanMyanPay Gateway
+              {language === 'my' ? 'မိုဘိုင်းဘဏ် ငွေချေစနစ်' : 'Mobile Banking Payment'}
             </h4>
             <p className="text-[12px] text-[#7a6870] mt-1">
-              Simulating secured checkout for {order.id}
+              Order {order.id}
             </p>
             <div className="my-4 bg-[#f9f5f7] p-3 rounded-[10px] text-left text-[12px] space-y-1">
               <div className="flex justify-between">
-                <span className="text-[#7a6870]">Merchant:</span>
+                <span className="text-[#7a6870]">{language === 'my' ? 'ဆိုင်အမည်' : 'Merchant'}:</span>
                 <span className="font-bold text-[#38262e]">Pretty Corner</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#7a6870]">Amount:</span>
+                <span className="text-[#7a6870]">{language === 'my' ? 'ပေးချေရမည့်ပမာဏ' : 'Amount'}:</span>
                 <span className="font-bold text-[#b73d67]">{order.total.toLocaleString()} MMK</span>
               </div>
             </div>
 
             {mockPaymentSuccess ? (
               <div className="text-[13px] font-bold text-[#3b775d] py-3">
-                ✓ Payment Authorized Successfully!
+                {t.paymentAuthorized}
               </div>
             ) : (
               <div className="flex flex-col gap-2">
@@ -131,13 +135,13 @@ function PaymentPendingContent() {
                   onClick={handleConfirmGatewayPayment}
                   className="w-full h-[46px] bg-[#3b775d] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#2f614a]"
                 >
-                  Confirm & Pay {order.total.toLocaleString()} MMK
+                  {t.confirmAndPay} ({order.total.toLocaleString()} MMK)
                 </button>
                 <button
                   onClick={() => setShowPaymentModal(false)}
                   className="w-full h-[40px] text-[#7a6870] text-[13px] hover:text-[#38262e]"
                 >
-                  Cancel
+                  {t.cancel}
                 </button>
               </div>
             )}

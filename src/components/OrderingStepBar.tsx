@@ -1,24 +1,27 @@
 'use client';
 
 import React from 'react';
+import { useStore } from '@/context/StoreContext';
 
 interface OrderingStepBarProps {
   currentStep: 1 | 2 | 3;
   isCOD?: boolean;
 }
 
-const THREE_STEPS = [
-  { step: 1, label: 'Delivery' },
-  { step: 2, label: 'Payment' },
-  { step: 3, label: 'Confirmation' },
-];
-
-const TWO_STEPS = [
-  { step: 1, label: 'Delivery' },
-  { step: 2, label: 'Confirmation' },
-];
-
 export default function OrderingStepBar({ currentStep, isCOD = false }: OrderingStepBarProps) {
+  const { t } = useStore();
+
+  const THREE_STEPS = [
+    { step: 1, label: t.stepDelivery },
+    { step: 2, label: t.stepPayment },
+    { step: 3, label: t.stepConfirmation },
+  ];
+
+  const TWO_STEPS = [
+    { step: 1, label: t.stepDelivery },
+    { step: 2, label: t.stepConfirmation },
+  ];
+
   const steps = isCOD ? TWO_STEPS : THREE_STEPS;
   const activeStep = isCOD && currentStep >= 2 ? 2 : currentStep;
 

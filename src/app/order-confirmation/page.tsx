@@ -9,7 +9,7 @@ import OrderingStepBar from '@/components/OrderingStepBar';
 function OrderConfirmationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { orders, clearCart } = useStore();
+  const { orders, clearCart, t, language } = useStore();
 
   const orderId = searchParams.get('orderId') || 'PC-261117-024';
   const order = orders.find((o) => o.id === orderId) || orders[0];
@@ -56,12 +56,11 @@ function OrderConfirmationContent() {
     // Tagline
     ctx.fillStyle = '#7a6870';
     ctx.font = 'bold 13px sans-serif';
-    ctx.letterSpacing = '2px';
-    ctx.fillText('BEAUTY, GADGETS & VARIETY EDIT', canvas.width / 2, 90);
+    ctx.fillText(t.brandSlogan.toUpperCase(), canvas.width / 2, 90);
 
     ctx.fillStyle = '#b73d67';
     ctx.font = '14px sans-serif';
-    ctx.fillText('Official Purchase Receipt', canvas.width / 2, 115);
+    ctx.fillText(t.officialReceipt, canvas.width / 2, 115);
 
     // Order Info block
     ctx.textAlign = 'left';
@@ -69,11 +68,11 @@ function OrderConfirmationContent() {
     ctx.font = 'bold 16px sans-serif';
     let y = 180;
 
-    ctx.fillText(`Order Reference: ${order.id}`, 60, y);
+    ctx.fillText(`${t.orderRef}: ${order.id}`, 60, y);
     ctx.fillStyle = '#7a6870';
     ctx.font = '14px sans-serif';
     ctx.fillText(`Date: ${formattedDate}`, 60, y + 26);
-    ctx.fillText(`Payment: ${order.paymentMethod || 'MyanMyanPay'} (Verified / Paid)`, 60, y + 50);
+    ctx.fillText(`Payment: ${order.paymentMethod || 'Mobile Banking'} (${t.paymentVerified})`, 60, y + 50);
 
     // Divider
     y += 85;
@@ -88,7 +87,7 @@ function OrderConfirmationContent() {
     y += 30;
     ctx.fillStyle = '#38262e';
     ctx.font = 'bold 15px sans-serif';
-    ctx.fillText('Delivering To:', 60, y);
+    ctx.fillText(`${t.deliveringTo}:`, 60, y);
     ctx.fillStyle = '#7a6870';
     ctx.font = '14px sans-serif';
     ctx.fillText(`${order.customerName} · ${order.phone}`, 60, y + 24);
@@ -106,9 +105,9 @@ function OrderConfirmationContent() {
     y += 35;
     ctx.fillStyle = '#38262e';
     ctx.font = 'bold 15px sans-serif';
-    ctx.fillText('Item Description', 60, y);
+    ctx.fillText(t.itemsOrdered, 60, y);
     ctx.textAlign = 'right';
-    ctx.fillText('Amount (MMK)', canvas.width - 60, y);
+    ctx.fillText('MMK', canvas.width - 60, y);
 
     // Items list
     ctx.font = '14px sans-serif';
@@ -133,26 +132,25 @@ function OrderConfirmationContent() {
     y += 30;
     ctx.textAlign = 'left';
     ctx.fillStyle = '#7a6870';
-    const deliveryFee = order.deliveryFee || 0;
-    if ((order.discount && order.discount > 0) || deliveryFee > 0) {
-      ctx.fillText('Sub Total', 60, y);
+    if ((order.discount && order.discount > 0) || order.deliveryFee > 0) {
+      ctx.fillText(t.subTotal, 60, y);
       ctx.textAlign = 'right';
       ctx.fillText(`${(order.subtotal || order.total).toLocaleString()} MMK`, canvas.width - 60, y);
 
       if (order.discount && order.discount > 0) {
         y += 26;
         ctx.textAlign = 'left';
-        ctx.fillText('Discount', 60, y);
+        ctx.fillText(t.discount, 60, y);
         ctx.textAlign = 'right';
         ctx.fillText(`-${order.discount.toLocaleString()} MMK`, canvas.width - 60, y);
       }
 
-      if (deliveryFee > 0) {
+      if (order.deliveryFee > 0) {
         y += 26;
         ctx.textAlign = 'left';
-        ctx.fillText('Delivery', 60, y);
+        ctx.fillText(t.delivery, 60, y);
         ctx.textAlign = 'right';
-        ctx.fillText(`${deliveryFee.toLocaleString()} MMK`, canvas.width - 60, y);
+        ctx.fillText(`${order.deliveryFee.toLocaleString()} MMK`, canvas.width - 60, y);
       }
     }
 
@@ -169,7 +167,7 @@ function OrderConfirmationContent() {
     ctx.textAlign = 'left';
     ctx.font = 'bold 18px sans-serif';
     ctx.fillStyle = '#38262e';
-    ctx.fillText(order.paymentMethod === 'Cash on Delivery' ? 'Total to Pay on Delivery' : 'Grand Total Paid', 60, y);
+    ctx.fillText(order.paymentMethod === 'Cash on Delivery' ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ပေးချေရမည့်ငွေ' : 'Total to Pay on Delivery') : t.total, 60, y);
     ctx.textAlign = 'right';
     ctx.fillStyle = '#b73d67';
     ctx.fillText(`${order.total.toLocaleString()} MMK`, canvas.width - 60, y);
@@ -179,8 +177,8 @@ function OrderConfirmationContent() {
     ctx.textAlign = 'center';
     ctx.font = '12px sans-serif';
     ctx.fillStyle = '#7a6870';
-    ctx.fillText('Thank you for choosing Pretty Corner!', canvas.width / 2, y);
-    ctx.fillText('Doorstep delivery in Yangon & nationwide shipping · Yangon, Myanmar', canvas.width / 2, y + 20);
+    ctx.fillText(language === 'my' ? 'Pretty Corner ကို ရွေးချယ်အားပေးသည့်အတွက် အထူးကျေးဇူးတင်ရှိပါသည်!' : 'Thank you for choosing Pretty Corner!', canvas.width / 2, y);
+    ctx.fillText(`${t.doorstepDelivery} · ${t.yangonMyanmar}`, canvas.width / 2, y + 20);
 
     // Export to JPEG
     const jpegUrl = canvas.toDataURL('image/jpeg', 0.95);
@@ -212,21 +210,29 @@ function OrderConfirmationContent() {
           </svg>
         </div>
 
-        <h2 className="font-serif text-[33px] font-medium leading-tight text-[#38262e]">
-          A little joy is on its way.
+        <h2 className={`font-serif font-medium leading-tight text-[#38262e] ${
+          language === 'my'
+            ? 'text-[24px] sm:text-[28px]'
+            : 'text-[33px]'
+        }`}>
+          {t.orderConfirmedJoy}
         </h2>
 
-        <p className="font-sans text-[14px] text-[#7a6870] mt-2 leading-relaxed max-w-[320px]">
+        <p className="font-sans text-[14px] text-[#7a6870] mt-2 leading-relaxed max-w-[340px]">
           {order.paymentMethod === 'Cash on Delivery'
-            ? `Thank you, ${order.customerName}. Your order is confirmed! Please have cash ready when our courier arrives.`
-            : `Thank you, ${order.customerName}. Your payment is verified and we’ve received your order.`}
+            ? (language === 'my'
+                ? `ကျေးဇူးတင်ပါသည် ${order.customerName}။ သင့်အမှာစာ အတည်ပြုပြီးပါပြီ။ ပစ္စည်းရောက်ရှိချိန်တွင် ငွေအဆင်သင့် ထားရှိပေးပါခင်ဗျာ။`
+                : `Thank you, ${order.customerName}. Your order is confirmed! Please have cash ready when our courier arrives.`)
+            : (language === 'my'
+                ? `ကျေးဇူးတင်ပါသည် ${order.customerName}။ ငွေပေးချေမှု အတည်ပြုပြီးဖြစ်၍ အမှာစာကို လက်ခံရရှိထားပါပြီ။`
+                : `Thank you, ${order.customerName}. Your payment is verified and we’ve received your order.`)}
         </p>
 
-        {/* Order reference card (2:390) */}
+        {/* Order reference card */}
         <div className="w-full bg-[#fcf9fa] border border-[#eedfe5] rounded-[10px] p-4 mt-6 flex items-center justify-between text-left">
           <div>
             <span className="block text-[10px] font-bold tracking-[1.2px] text-[#7a6870] uppercase">
-              YOUR ORDER REFERENCE
+              {t.yourOrderRef}
             </span>
             <span className="block text-[19px] font-bold text-[#38262e] mt-0.5">
               {order.id}
@@ -235,11 +241,11 @@ function OrderConfirmationContent() {
 
           <button
             onClick={handleCopy}
-            className="p-2 text-[#7a6870] hover:text-[#b73d67] transition-colors relative"
+            className="p-2 text-[#7a6870] hover:text-[#b73d67] transition-colors relative cursor-pointer"
             title="Copy order reference"
           >
             {copied ? (
-              <span className="text-[11px] font-bold text-[#3b775d]">Copied!</span>
+              <span className="text-[11px] font-bold text-[#3b775d]">{t.copied}</span>
             ) : (
               <svg className="w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
@@ -250,28 +256,28 @@ function OrderConfirmationContent() {
         </div>
       </section>
 
-      {/* 3. Order Details (2:35) */}
+      {/* 3. Order Details */}
       <section className="px-5 pt-6 flex flex-col">
         <div className="flex justify-between items-center text-[13px] py-1">
-          <span className="text-[#7a6870]">Payment</span>
+          <span className="text-[#7a6870]">{t.paymentMethod}</span>
           <span className="font-bold text-[#38262e]">
             {order.paymentMethod === 'Cash on Delivery'
-              ? 'Cash on Delivery · Pay on arrival'
-              : `Paid · ${order.paymentMethod || 'Mobile Banking'}`}
+              ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည် (COD)' : 'Cash on Delivery · Pay on arrival')
+              : (language === 'my' ? `ငွေပေးချေပြီး · ${order.paymentMethod || 'မိုဘိုင်းဘဏ်'}` : `Paid · ${order.paymentMethod || 'Mobile Banking'}`)}
           </span>
         </div>
 
         <div className="flex justify-between items-center text-[13px] py-1">
-          <span className="text-[#7a6870]">Order status</span>
+          <span className="text-[#7a6870]">{t.orderStatus}</span>
           <span className="font-bold text-[#38262e]">
-            Pending review
+            {t.pendingReview}
           </span>
         </div>
 
         <div className="my-3 border-t border-[#eedfe5]" />
 
         <h3 className="font-serif text-[24px] font-medium text-[#38262e] mb-3">
-          Your beauty picks
+          {t.yourBeautyPicks}
         </h3>
 
         <div className="space-y-3">
@@ -292,7 +298,7 @@ function OrderConfirmationContent() {
           {order.discount && order.discount > 0 ? (
             <div className="flex justify-between items-center text-[13px]">
               <span className="text-[#7a6870]">
-                Discount
+                {t.discount}
               </span>
               <span className="font-bold text-[#b73d67]">
                 -{order.discount.toLocaleString()} MMK
@@ -300,23 +306,25 @@ function OrderConfirmationContent() {
             </div>
           ) : null}
 
-          {order.deliveryFee && order.deliveryFee > 0 ? (
+          {order.deliveryFee > 0 && (
             <div className="flex justify-between items-center text-[13px]">
               <span className="text-[#7a6870]">
-                Delivery
+                {t.delivery}
               </span>
               <span className="font-bold text-[#38262e]">
                 {order.deliveryFee.toLocaleString()} MMK
               </span>
             </div>
-          ) : null}
+          )}
         </div>
 
         <div className="my-3 border-t border-[#eedfe5]" />
 
         <div className="flex justify-between items-center text-[17px] py-1">
           <span className="text-[#7a6870]">
-            {order.paymentMethod === 'Cash on Delivery' ? 'Total to pay' : 'Total paid'}
+            {order.paymentMethod === 'Cash on Delivery'
+              ? (language === 'my' ? 'ပေးချေရမည့် စုစုပေါင်း' : 'Total to pay')
+              : (language === 'my' ? 'ပေးချေပြီး စုစုပေါင်း' : 'Total paid')}
           </span>
           <span className="font-bold text-[#38262e]">
             {order.total.toLocaleString()} MMK
@@ -325,7 +333,7 @@ function OrderConfirmationContent() {
 
         <div className="mt-4 pt-2">
           <p className="text-[13px] font-bold text-[#38262e]">
-            Delivering to {order.customerName}
+            {t.deliveringTo} {order.customerName}
           </p>
           <p className="text-[12px] text-[#7a6870] mt-0.5">
             {order.deliveryAddress}
@@ -343,22 +351,22 @@ function OrderConfirmationContent() {
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
-            <span>{downloaded ? 'Receipt Downloaded! ✓' : 'Download Receipt (JPEG)'}</span>
+            <span>{downloaded ? t.receiptDownloaded : t.downloadReceipt}</span>
           </button>
         </div>
       </section>
 
-      {/* 4. Help & Action Buttons (2:36) */}
+      {/* 4. Help & Action Buttons */}
       <section className="px-5 pt-8 flex flex-col gap-3 print:hidden">
         <Link
           href={`/order-tracking?orderId=${order.id}`}
           className="w-full h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-xs"
         >
-          View Order Receipt
+          {t.viewOrderReceipt}
         </Link>
 
         <p className="text-[11px] text-center text-[#7a6870]">
-          Save your Order ID! You can check your receipt anytime using only your ID — no login needed.
+          {t.saveOrderIdHint}
         </p>
 
         <div className="text-center pt-2">
@@ -366,7 +374,7 @@ function OrderConfirmationContent() {
             href="/shop"
             className="text-[13px] font-bold text-[#b73d67] hover:underline"
           >
-            Back to shopping
+            {t.backToShopping}
           </Link>
         </div>
 
@@ -375,7 +383,7 @@ function OrderConfirmationContent() {
             href="/contact"
             className="text-[12px] text-[#7a6870] hover:text-[#38262e] hover:underline"
           >
-            Questions? We’re happy to help.
+            {t.questionsHelp}
           </Link>
         </div>
       </section>

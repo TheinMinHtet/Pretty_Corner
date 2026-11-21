@@ -12,7 +12,7 @@ const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false }
 
 export default function ProductDetailView({ product }: { product: Product }) {
   const router = useRouter();
-  const { addToCart, cartCount, isMounted } = useStore();
+  const { addToCart, cartCount, isMounted, t } = useStore();
 
   const [selectedGalleryIdx, setSelectedGalleryIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -31,7 +31,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
       {/* Breadcrumb & Back Button */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870]">
-          <Link href="/" className="hover:text-[#38262e]">Home</Link>
+          <Link href="/" className="hover:text-[#38262e]">{t.navHome}</Link>
           <span>/</span>
           <Link href={`/shop?category=${product.category}`} className="hover:text-[#38262e] capitalize">
             {product.category}
@@ -48,7 +48,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
           <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
-          <span>Back</span>
+          <span>{t.back}</span>
         </button>
       </div>
 
@@ -128,18 +128,9 @@ export default function ProductDetailView({ product }: { product: Product }) {
               <span className="text-[22px] sm:text-[26px] font-bold text-[#b73d67]">
                 {unitPrice.toLocaleString()} MMK
               </span>
-              {product.inStock ? (
-                <span className="text-[12px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium">
-                  In stock
-                  {typeof product.stockQuantity === 'number'
-                    ? ` · ${product.stockQuantity} left`
-                    : ''}
-                </span>
-              ) : (
-                <span className="text-[12px] text-rose-700 bg-rose-50 px-2 py-0.5 rounded font-medium">
-                  Out of stock
-                </span>
-              )}
+              <span className="text-[12px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium">
+                In stock
+              </span>
             </div>
 
             {/* Short Description */}
@@ -170,12 +161,9 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {/* Big Add to Bag Button */}
                 <button
                   onClick={handleAddToCart}
-                  disabled={!product.inStock}
-                  className="flex-1 h-[52px] bg-[#b73d67]/80 hover:bg-[#b73d67] disabled:bg-[#d8c1ca] disabled:cursor-not-allowed text-white rounded-[10px] font-bold text-[15px] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer"
+                  className="flex-1 h-[52px] bg-[#b73d67]/80 hover:bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer"
                 >
-                  {product.inStock
-                    ? `Add to bag · ${totalPrice.toLocaleString()} MMK`
-                    : 'Out of stock'}
+                  {t.addToBag} · {totalPrice.toLocaleString()} MMK
                 </button>
               </div>
             </div>
@@ -189,7 +177,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                     onClick={() => setOpenWhyLove(!openWhyLove)}
                     className="w-full flex items-center justify-between text-left cursor-pointer"
                   >
-                    <span className="text-[15px] font-bold text-[#38262e]">Why we love it</span>
+                    <span className="text-[15px] font-bold text-[#38262e]">{t.whyWeLoveIt}</span>
                     <span className="text-[20px] text-[#38262e] font-normal leading-none">
                       {openWhyLove ? '−' : '+'}
                     </span>
@@ -216,7 +204,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                     onClick={() => setOpenHowToUse(!openHowToUse)}
                     className="w-full flex items-center justify-between text-left cursor-pointer"
                   >
-                    <span className="text-[15px] font-bold text-[#38262e]">How to use</span>
+                    <span className="text-[15px] font-bold text-[#38262e]">{t.howToUse}</span>
                     <span className="text-[20px] text-[#38262e] font-normal leading-none">
                       {openHowToUse ? '−' : '+'}
                     </span>

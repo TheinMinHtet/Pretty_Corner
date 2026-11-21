@@ -7,7 +7,7 @@ import { useStore } from '@/context/StoreContext';
 
 export default function FloatingCartBar() {
   const pathname = usePathname();
-  const { cartCount, cartSubtotal, isMounted } = useStore();
+  const { cartCount, cartSubtotal, isMounted, t } = useStore();
 
   // Hide the bar on cart/checkout pages where purchase flow is present
   const isExcludedPage =
@@ -60,7 +60,7 @@ export default function FloatingCartBar() {
 
           <div className="flex flex-col">
             <span className="text-[11px] font-bold uppercase tracking-wider text-[#7a6870]">
-              {cartCount} {cartCount === 1 ? 'item' : 'items'} in bag
+              {cartCount} {cartCount === 1 ? t.itemCountSingular : t.itemsCount}
             </span>
             <span className="text-[15px] sm:text-[17px] font-bold text-[#38262e] tracking-tight leading-none mt-0.5">
               {cartSubtotal.toLocaleString()} MMK
@@ -73,7 +73,7 @@ export default function FloatingCartBar() {
           href="/bag"
           className="relative h-[42px] px-5 sm:px-6 bg-[#b73d67]/85 hover:bg-[#b73d67] active:scale-95 text-white text-[13px] sm:text-[14px] font-bold rounded-xl flex items-center justify-center transition-all shadow-md shrink-0 cursor-pointer border border-white/30 backdrop-blur-sm"
         >
-          <span>View Cart</span>
+          <span>{t.viewBag}</span>
         </Link>
       </div>
     </div>

@@ -4,11 +4,14 @@ import React from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
+import { useStore } from '@/context/StoreContext';
+import LanguageToggle from '@/components/LanguageToggle';
 
 const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false });
 
 export default function Header() {
   const pathname = usePathname();
+  const { t } = useStore();
 
   const isHome = pathname === '/';
   const isShop = pathname.startsWith('/shop') || pathname.startsWith('/product');
@@ -18,26 +21,26 @@ export default function Header() {
   return (
     <header className="w-full sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-[#eedfe5] transition-all">
       {/* Main Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[64px] md:h-[74px] flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[64px] md:h-[74px] flex items-center justify-between gap-3 sm:gap-4">
         {/* Brand Logo */}
         <Link href="/" className="flex flex-col group shrink-0">
           <span className="font-serif text-[24px] sm:text-[28px] md:text-[30px] lg:text-[34px] font-medium leading-none text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
-            Pretty Corner
+            {t.brandName}
           </span>
           <span className="font-sans text-[8px] sm:text-[9px] font-bold tracking-[1.5px] sm:tracking-[2px] text-[#7a6870] uppercase mt-0.5 sm:mt-1">
-            Beauty, Gadgets & Variety Edit
+            {t.brandSlogan}
           </span>
         </Link>
 
         {/* Center Nav Links (md and above) */}
-        <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-[14px]">
+        <nav className="hidden md:flex items-center gap-5 lg:gap-8 text-[14px]">
           <Link
             href="/"
             className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
               isHome ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
             }`}
           >
-            Home
+            {t.navHome}
             {isHome && (
               <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
             )}
@@ -49,7 +52,7 @@ export default function Header() {
               isShop ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
             }`}
           >
-            All Products
+            {t.navShop}
             {isShop && (
               <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
             )}
@@ -61,7 +64,7 @@ export default function Header() {
               isTrack ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
             }`}
           >
-            Order Receipt
+            {t.navReceipt}
             {isTrack && (
               <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
             )}
@@ -73,15 +76,18 @@ export default function Header() {
               isContact ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
             }`}
           >
-            Contact
+            {t.navContact}
             {isContact && (
               <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#b73d67] rounded-full" />
             )}
           </Link>
         </nav>
 
-        {/* Right Action Icons */}
-        <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 shrink-0">
+        {/* Right Action Icons: Language Toggle + Bag */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Aesthetic Language Switcher */}
+          <LanguageToggle />
+
           {/* Bag Button */}
           <Link
             href="/bag"
@@ -96,7 +102,7 @@ export default function Header() {
               <CartBadge className="absolute -top-1.5 -right-2 bg-[#b73d67] text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center" />
             </div>
             <span className="font-bold text-[12px] sm:text-[13px] text-[#38262e]">
-              Bag
+              {t.navBag}
             </span>
           </Link>
         </div>

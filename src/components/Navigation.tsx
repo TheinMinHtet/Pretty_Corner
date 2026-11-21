@@ -4,11 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
+import { useStore } from '@/context/StoreContext';
 
 const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false });
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { t } = useStore();
 
   const isHome = pathname === '/';
   const isShop = pathname.startsWith('/shop') || pathname.startsWith('/product');
@@ -30,8 +32,8 @@ export default function Navigation() {
             <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" />
             <path d="M9 21V12h6v9" />
           </svg>
-          <span className={`text-[10.5px] mt-0.5 tracking-tight ${isHome ? 'font-bold' : 'font-medium'}`}>
-            Home
+          <span className={`text-[10px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isHome ? 'font-bold' : 'font-medium'}`}>
+            {t.navHome}
           </span>
         </Link>
 
@@ -48,8 +50,8 @@ export default function Navigation() {
             <rect x="14" y="14" width="7" height="7" rx="1.5" />
             <rect x="3" y="14" width="7" height="7" rx="1.5" />
           </svg>
-          <span className={`text-[10.5px] mt-0.5 tracking-tight ${isShop ? 'font-bold' : 'font-medium'}`}>
-            Shop
+          <span className={`text-[10px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isShop ? 'font-bold' : 'font-medium'}`}>
+            {t.navShop}
           </span>
         </Link>
 
@@ -69,17 +71,17 @@ export default function Navigation() {
             <CartBadge />
           </div>
           <span
-            className={`text-[10.5px] mt-0.5 tracking-tight ${isBag ? 'font-bold' : 'font-medium'}`}
+            className={`text-[10px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isBag ? 'font-bold' : 'font-medium'}`}
           >
-            Bag
+            {t.navBag}
           </span>
         </Link>
 
         {/* Order Receipt Tab */}
         <Link
           href="/order-lookup"
-          aria-label="Order Receipt"
-          title="Order Receipt"
+          aria-label={t.navReceipt}
+          title={t.navReceipt}
           className={`flex flex-col items-center justify-center flex-1 max-w-[68px] py-1 transition-colors ${
             isReceipt ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
@@ -90,8 +92,8 @@ export default function Navigation() {
             <path d="M8 11h8" />
             <path d="M8 15h5" />
           </svg>
-          <span className={`text-[10.5px] mt-0.5 tracking-tight ${isReceipt ? 'font-bold' : 'font-medium'}`}>
-            Receipt
+          <span className={`text-[10px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isReceipt ? 'font-bold' : 'font-medium'}`}>
+            {t.navReceipt}
           </span>
         </Link>
 
@@ -105,8 +107,8 @@ export default function Navigation() {
           <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
           </svg>
-          <span className={`text-[10.5px] mt-0.5 tracking-tight ${isContact ? 'font-bold' : 'font-medium'}`}>
-            Contact
+          <span className={`text-[10px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isContact ? 'font-bold' : 'font-medium'}`}>
+            {t.navContact}
           </span>
         </Link>
       </div>

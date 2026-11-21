@@ -2,20 +2,15 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Product, CartItem, Order, TownshipOption } from '@/lib/types';
-import { MOCK_TOWNSHIPS } from '@/lib/mockData';
-import { supabase } from '@/lib/supabase';
-import {
-  createStorefrontOrderApi,
-  fetchStorefrontOrders,
-  fetchStorefrontProducts,
-  updateStorefrontOrderPaymentApi,
-} from '@/lib/api';
+import { MOCK_PRODUCTS, INITIAL_ORDERS, MOCK_TOWNSHIPS } from '@/lib/mockData';
+import { translations, Language, TranslationSchema } from '@/lib/translations';
 
 interface StoreContextType {
   isMounted: boolean;
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: TranslationSchema;
   products: Product[];
-  productsLoading: boolean;
-  refreshProducts: () => Promise<void>;
   cart: CartItem[];
   orders: Order[];
   selectedTownship: TownshipOption;
@@ -36,138 +31,77 @@ interface StoreContextType {
   decrementProduct: (productId: string, sizeName?: string) => void;
   createOrder: (orderData: Omit<Order, 'id' | 'createdAt'>) => Order;
   getOrder: (id: string, phone?: string) => Order | undefined;
-  fetchOrderById: (id: string) => Promise<Order | undefined>;
   updatePaymentStatus: (orderId: string, status: Order['paymentStatus']) => void;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
+const INITIAL_CART: CartItem[] = [
+  {
+    id: 'dew-drop-serum-30ml',
+    productId: 'dew-drop-serum',
+    name: 'Dew Drop Serum',
+    size: '30 ml',
+    price: 28000,
+    quantity: 1,
+    image: '/assets/dew-drop-serum.png',
+  },
+  {
+    id: 'cloud-soft-cream-50g',
+    productId: 'cloud-soft-cream',
+    name: 'Cloud Soft Cream',
+    size: '50 g',
+    price: 32000,
+    quantity: 1,
+    image: '/assets/cloud-soft-cream.png',
+  },
+];
+
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [isMounted, setIsMounted] = useState(false);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [productsLoading, setProductsLoading] = useState(true);
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [language, setLanguageState] = useState<Language>('en');
+  const [products] = useState<Product[]>(MOCK_PRODUCTS);
+  const [cart, setCart] = useState<CartItem[]>(INITIAL_CART);
+  const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
   const [selectedTownship, setSelectedTownship] = useState<TownshipOption>(MOCK_TOWNSHIPS[0]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [discount, setDiscount] = useState<number>(0);
 
-  // Fetch live products from Supabase with fallback to MOCK_PRODUCTS
-  useEffect(() => {
-    async function loadLiveProducts() {
-      try {
-        const { data, error } = await supabase
-          .from('products')
-          .select(`
-            id,
-            slug,
-            name,
-            badge,
-            price,
-            stock_quantity,
-            description,
-            benefits,
-            usage,
-            main_image,
-            gallery,
-            is_active,
-            categories (
-              slug,
-              name
-            )
-          `)
-          .eq('is_active', true)
-          .order('created_at', { ascending: true });
-
-        if (error || !data || data.length === 0) {
-          return;
-        }
-
-        const mapped: Product[] = data.map((row: any) => {
-          const categorySlug = row.categories?.slug || 'skincare';
-          const categoryName = row.categories?.name || 'Skincare';
-          const galleryList = Array.isArray(row.gallery) && row.gallery.length > 0
-            ? row.gallery
-            : [row.main_image];
-
-          return {
-            id: row.slug || row.id,
-            slug: row.slug,
-            name: row.name,
-            category: categorySlug,
-            subcategory: categoryName,
-            badge: row.badge || undefined,
-            price: row.price,
-            stockQuantity: row.stock_quantity,
-            image: row.main_image,
-            gallery: galleryList,
-            description: row.description || '',
-            benefits: Array.isArray(row.benefits) ? row.benefits : [],
-            usage: row.usage || '',
-            inStock: (row.stock_quantity ?? 0) > 0,
-          };
-        });
-
-        if (mapped.length > 0) {
-          setProducts(mapped);
-        }
-      } catch (err) {
-        console.warn('Failed to fetch products from Supabase, using mock fallback:', err);
-      }
-    }
-
-    loadLiveProducts();
-  }, []);
-
-  const refreshProducts = useCallback(async () => {
-    try {
-      const list = await fetchStorefrontProducts();
-      if (list !== null) {
-        setProducts(list);
-      }
-    } catch (error) {
-      console.warn('Failed to fetch products from shared API:', error);
-    } finally {
-      setProductsLoading(false);
-    }
-  }, []);
-
-  const refreshOrders = useCallback(async () => {
-    try {
-      const list = await fetchStorefrontOrders();
-      if (list !== null) {
-        setOrders(list);
-      }
-    } catch (error) {
-      console.warn('Failed to fetch orders from shared API:', error);
-    }
-  }, []);
-
+  // Persist cart and language or load from localStorage if client-side
   useEffect(() => {
     setIsMounted(true);
     try {
+      const savedLang = localStorage.getItem('pretty_corner_lang') as Language;
+      if (savedLang === 'en' || savedLang === 'my') {
+        setLanguageState(savedLang);
+      }
       const savedCart = localStorage.getItem('pretty_corner_cart');
       if (savedCart) {
         setCart(JSON.parse(savedCart));
       }
+      // Ensure orders are not stored on local device
       localStorage.removeItem('pretty_corner_orders');
     } catch {
-      // fallback to empty cart
+      // fallback to initial
     }
+  }, []);
 
-    void refreshProducts();
-    void refreshOrders();
-  }, [refreshProducts, refreshOrders]);
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    try {
+      localStorage.setItem('pretty_corner_lang', lang);
+    } catch {}
+  };
 
   const saveCartToStorage = (updatedCart: CartItem[]) => {
     setCart(updatedCart);
     try {
       localStorage.setItem('pretty_corner_cart', JSON.stringify(updatedCart));
-    } catch { }
+    } catch {}
   };
 
   const addToCart = (productId: string, sizeName?: string, quantity: number = 1) => {
-    const product = products.find((p) => p.id === productId || p.slug === productId);
+    const product = products.find((p) => p.id === productId);
     if (!product) return;
 
     const chosenSize = sizeName
@@ -224,7 +158,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (prev.length === 0) return prev;
       try {
         localStorage.setItem('pretty_corner_cart', JSON.stringify([]));
-      } catch { }
+      } catch {}
       return [];
     });
   }, []);
@@ -232,11 +166,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const getProductQuantity = (productId: string, sizeName?: string): number => {
     if (!isMounted) return 0;
     if (sizeName) {
-      const item = cart.find((i) => (i.productId === productId || i.productId === productId.toLowerCase()) && i.size === sizeName);
+      const item = cart.find((i) => i.productId === productId && i.size === sizeName);
       return item ? item.quantity : 0;
     }
     return cart
-      .filter((i) => i.productId === productId || i.productId === productId.toLowerCase())
+      .filter((i) => i.productId === productId)
       .reduce((sum, i) => sum + i.quantity, 0);
   };
 
@@ -245,7 +179,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const decrementProduct = (productId: string, sizeName?: string) => {
-    const product = products.find((p) => p.id === productId || p.slug === productId);
+    const product = products.find((p) => p.id === productId);
     if (!product) return;
     const chosenSize = sizeName || product.sizes?.[0]?.name || '';
     const itemId = chosenSize ? `${product.id}-${chosenSize}` : product.id;
@@ -272,43 +206,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       createdAt: formattedDate,
     };
 
-    setOrders((prev) => [
-      newOrder,
-      ...prev.filter((o) => o.id.toUpperCase() !== orderId.toUpperCase()),
-    ]);
-
-    void createStorefrontOrderApi(orderData).then((savedOrder) => {
-      if (savedOrder) {
-        setOrders((prev) => [
-          savedOrder,
-          ...prev.filter(
-            (o) =>
-              o.id.toUpperCase() !== orderId.toUpperCase() &&
-              o.id.toUpperCase() !== savedOrder.id.toUpperCase()
-          ),
-        ]);
-      } else if (supabase) {
-        (async () => {
-          try {
-            await supabase.from('orders').insert({
-              id: orderId,
-              customer_name: orderData.customerName,
-              phone: orderData.phone,
-              delivery_address: orderData.deliveryAddress,
-              landmark_note: orderData.landmarkNote || null,
-              total_amount: orderData.total,
-              payment_method: orderData.paymentMethod,
-              payment_status: orderData.paymentStatus,
-              fulfillment_status: orderData.fulfillmentStatus,
-              payment_slip_url: null,
-            });
-          } catch (err) {
-            console.warn('Failed to insert order into Supabase:', err);
-          }
-        })();
-      }
-    });
-
+    setOrders((prev) => [newOrder, ...prev.filter((o) => o.id.toUpperCase() !== orderId.toUpperCase())]);
     return newOrder;
   };
 
@@ -326,53 +224,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return found;
   };
 
-  const fetchOrderById = async (id: string): Promise<Order | undefined> => {
-    const cleanId = id.trim().toUpperCase();
-    const local = orders.find((o) => o.id.trim().toUpperCase() === cleanId);
-    if (local) return local;
-
-    try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*, order_items(*)')
-        .ilike('id', cleanId)
-        .single();
-
-      if (error || !data) return undefined;
-
-      const dateObj = new Date(data.created_at);
-      const day = dateObj.getDate().toString().padStart(2, '0');
-      const formattedDate = `${day} Nov ${dateObj.getFullYear()} · ${dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-
-      const mappedOrder: Order = {
-        id: data.id,
-        customerName: data.customer_name,
-        phone: data.phone,
-        deliveryAddress: data.delivery_address,
-        landmarkNote: data.landmark_note || undefined,
-        total: data.total_amount,
-        subtotal: data.total_amount,
-        paymentMethod: data.payment_method,
-        paymentStatus: data.payment_status as any,
-        fulfillmentStatus: data.fulfillment_status as any,
-        createdAt: formattedDate,
-        items: (data.order_items || []).map((it: any) => ({
-          id: it.id,
-          productId: it.product_id || it.product_name,
-          name: it.product_name,
-          price: it.unit_price,
-          quantity: it.quantity,
-          image: it.product_image || '/assets/dew-drop-serum.png',
-        })),
-      };
-
-      setOrders((prev) => [mappedOrder, ...prev.filter((o) => o.id.toUpperCase() !== cleanId)]);
-      return mappedOrder;
-    } catch {
-      return undefined;
-    }
-  };
-
   const updatePaymentStatus = (orderId: string, status: Order['paymentStatus']) => {
     const cleanId = orderId.trim().toUpperCase();
     setOrders((prev) =>
@@ -387,33 +238,21 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         return o;
       })
     );
-
-    // Sync status update to Supabase
-    if (supabase) {
-      supabase
-        .from('orders')
-        .update({
-          payment_status: status,
-          fulfillment_status: status === 'paid' ? 'confirmed' : undefined,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', cleanId)
-        .then(() => { });
-    }
-
     if (status === 'paid') {
       clearCart();
     }
-    void updateStorefrontOrderPaymentApi(orderId, status);
   };
+
+  const t = translations[language];
 
   return (
     <StoreContext.Provider
       value={{
         isMounted,
+        language,
+        setLanguage,
+        t,
         products,
-        productsLoading,
-        refreshProducts,
         cart,
         orders,
         selectedTownship,
@@ -434,7 +273,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         decrementProduct,
         createOrder,
         getOrder,
-        fetchOrderById,
         updatePaymentStatus,
       }}
     >

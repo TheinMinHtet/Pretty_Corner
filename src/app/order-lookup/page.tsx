@@ -7,13 +7,12 @@ import { useStore } from '@/context/StoreContext';
 
 export default function OrderLookupPage() {
   const router = useRouter();
-  const { getOrder, fetchOrderById } = useStore();
+  const { getOrder, t, language } = useStore();
 
   const [orderRef, setOrderRef] = useState('');
-  const [loading, setLoading] = useState(false);
   const [lookupError, setLookupError] = useState(false);
 
-  const handleLookup = async (e: React.FormEvent) => {
+  const handleLookup = (e: React.FormEvent) => {
     e.preventDefault();
     const cleanRef = orderRef.trim();
     if (!cleanRef) {
@@ -21,13 +20,7 @@ export default function OrderLookupPage() {
       return;
     }
 
-    setLoading(true);
-    let order = getOrder(cleanRef);
-    if (!order && fetchOrderById) {
-      order = await fetchOrderById(cleanRef);
-    }
-    setLoading(false);
-
+    const order = getOrder(cleanRef);
     if (!order) {
       setLookupError(true);
       return;
@@ -41,23 +34,27 @@ export default function OrderLookupPage() {
       <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-6 sm:p-8 flex flex-col">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870] mb-4">
-          <Link href="/" className="hover:text-[#38262e]">Home</Link>
+          <Link href="/" className="hover:text-[#38262e]">{t.navHome}</Link>
           <span>/</span>
-          <span className="text-[#38262e] font-medium">Find Receipt</span>
+          <span className="text-[#38262e] font-medium">{t.navReceipt}</span>
         </div>
 
         {/* Page Details */}
         <div className="flex flex-col gap-5">
           <Link href="/shop" className="text-[12px] font-bold text-[#b73d67] hover:underline">
-            ← Back to shop
+            {t.backToShop}
           </Link>
 
           <div>
-            <h2 className="font-serif text-[30px] font-medium text-[#38262e]">
-              Find your order receipt.
+            <h2 className={`font-serif font-medium text-[#38262e] ${
+              language === 'my'
+                ? 'text-[24px] sm:text-[27px]'
+                : 'text-[30px]'
+            }`}>
+              {t.findReceipt}
             </h2>
             <p className="text-[13px] text-[#7a6870] mt-1">
-              Enter your Order ID to view your receipt anytime. No login or password required.
+              {t.findReceiptSubtitle}
             </p>
           </div>
 
@@ -65,7 +62,7 @@ export default function OrderLookupPage() {
           <form onSubmit={handleLookup} className="flex flex-col gap-4">
             <div>
               <label className="block text-[12px] font-bold text-[#38262e] mb-1.5">
-                Order ID / Reference *
+                {t.orderIdLabel}
               </label>
               <input
                 type="text"
@@ -75,24 +72,19 @@ export default function OrderLookupPage() {
                   setOrderRef(e.target.value);
                   setLookupError(false);
                 }}
-                placeholder="e.g. PC-261117-024"
+                placeholder={t.orderIdPlaceholder}
                 className="w-full h-[48px] px-3.5 bg-white border border-[#eedfe5] rounded-[10px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67] font-mono uppercase"
               />
               <p className="text-[12px] text-[#7a6870] mt-1.5">
-                Simply enter the Order ID provided when you placed your order.
+                {t.saveOrderIdHint}
               </p>
             </div>
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full h-[48px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-xs cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full h-[48px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-xs cursor-pointer"
             >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                'View Order Receipt'
-              )}
+              {t.searchOrder}
             </button>
           </form>
 
@@ -100,10 +92,10 @@ export default function OrderLookupPage() {
           {lookupError && (
             <div className="bg-[#fceef2] border border-[#eedfe5] rounded-[10px] p-4 flex flex-col gap-1.5">
               <p className="text-[14px] font-bold text-[#38262e]">
-                We couldn’t find an order with that reference.
+                {t.orderNotFoundTitle}
               </p>
               <p className="text-[13px] text-[#7a6870] leading-relaxed">
-                Please double-check your Order ID (e.g. PC-261117-024) and try again.
+                {t.orderNotFoundDesc}
               </p>
             </div>
           )}
@@ -113,7 +105,7 @@ export default function OrderLookupPage() {
             href="/contact"
             className="w-full h-[46px] bg-[#fceef2] text-[#b73d67] rounded-[10px] font-bold text-[14px] flex items-center justify-center hover:bg-[#f6e1e8] transition-colors"
           >
-            Questions? Contact Pretty Corner
+            {t.questionsContact}
           </Link>
         </div>
       </div>

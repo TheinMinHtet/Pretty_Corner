@@ -19,7 +19,7 @@ const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper
 
 export default function HomePage() {
   const router = useRouter();
-  const { products, cartCount, setSearchQuery, addToCart, isMounted } = useStore();
+  const { products, cartCount, setSearchQuery, addToCart, isMounted, t, language } = useStore();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchInput, setSearchInput] = useState('');
   const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
@@ -27,47 +27,47 @@ export default function HomePage() {
   const categoriesList = useMemo(() => [
     {
       id: 'all',
-      label: 'All Products',
+      label: t.catAll,
       description: 'Explore our complete variety of products',
       count: products.length,
     },
     {
       id: 'electrical',
-      label: 'Electrical & Gadgets',
+      label: t.catElectrical,
       description: 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
       count: products.filter((p) => p.category === 'electrical').length,
     },
     {
       id: 'skincare',
-      label: 'Skincare',
+      label: t.catSkincare,
       description: 'Gentle barrier serums, moisturizers & UV daily defense',
       count: products.filter((p) => p.category === 'skincare').length,
     },
     {
       id: 'makeup',
-      label: 'Makeup',
+      label: t.catMakeup,
       description: 'Breathable cheek tints, lip glazes & complexion picks',
       count: products.filter((p) => p.category === 'makeup').length,
     },
     {
       id: 'lifestyle',
-      label: 'Lifestyle & Others',
+      label: t.catLifestyle,
       description: 'Silk hair accessories, vacuum tumblers & daily finds',
       count: products.filter((p) => p.category === 'lifestyle').length,
     },
     {
       id: 'lenses',
-      label: 'Contact Lenses',
+      label: t.catLenses,
       description: 'Hydrated daily and monthly comfort beauty lenses',
       count: products.filter((p) => p.category === 'lenses').length,
     },
     {
       id: 'more',
-      label: 'Accessories & More',
+      label: t.catMore,
       description: 'Pure silk ties, beauty tools & thoughtful additions',
       count: products.filter((p) => p.category === 'more').length,
     },
-  ], [products]);
+  ], [products, t]);
 
   // Matching products for the selected category
   const matchingProducts = useMemo(() => {
@@ -109,13 +109,17 @@ export default function HomePage() {
           <div className="absolute inset-0 p-6 sm:p-10 md:p-12 lg:p-16 flex flex-col justify-between">
             <div className="max-w-lg">
               <span className="inline-block font-sans text-[11px] sm:text-[12px] font-bold tracking-[2px] text-[#b73d67] uppercase">
-                Your little corner of beauty and inspiration.
+                {t.heroBadge}
               </span>
-              <h2 className="font-serif text-[41px] sm:text-[50px] md:text-[58px] lg:text-[64px] font-medium leading-[1.05] text-[#38262e] mt-2">
-                Beauty, gadgets &<br />daily essentials.
+              <h2 className={`font-serif font-medium leading-[1.1] text-[#38262e] mt-2 ${
+                language === 'my'
+                  ? 'text-[28px] sm:text-[36px] md:text-[42px] lg:text-[48px]'
+                  : 'text-[41px] sm:text-[50px] md:text-[58px] lg:text-[64px]'
+              }`}>
+                {t.heroTitleLine1}<br />{t.heroTitleLine2}
               </h2>
               <p className="font-sans text-[15px] sm:text-[16.5px] font-medium text-[#2e1d25] leading-relaxed mt-3 max-w-md">
-                A little corner of beauty, style, and inspiration. Discover your pretty side with Pretty Corner.
+                {t.heroDescription}
               </p>
             </div>
 
@@ -124,7 +128,7 @@ export default function HomePage() {
                 href="/shop"
                 className="inline-flex items-center justify-center bg-[#b73d67] text-white text-[14px] sm:text-[15px] font-bold h-[48px] sm:h-[52px] px-7 sm:px-8 rounded-[12px] shadow-sm hover:bg-[#a33259] active:scale-[0.98] transition-all"
               >
-                Explore all products
+                {t.heroCta}
               </Link>
             </div>
           </div>
@@ -135,13 +139,13 @@ export default function HomePage() {
       <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-8 pb-3">
         <div className="flex items-center justify-between gap-3">
           <h3 className="font-serif text-[22px] sm:text-[28px] font-medium text-[#38262e]">
-            Explore by category
+            {t.exploreByCategory}
           </h3>
           <button
             onClick={() => setShowCategoryModal(true)}
             className="text-[13px] font-bold text-[#b73d67] hover:underline cursor-pointer shrink-0"
           >
-            All Categories
+            {t.viewAll}
           </button>
         </div>
 

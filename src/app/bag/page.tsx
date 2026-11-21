@@ -8,7 +8,7 @@ import { useStore } from '@/context/StoreContext';
 
 export default function ShoppingBagPage() {
   const router = useRouter();
-  const { cart, updateCartQuantity, removeFromCart, cartCount, cartSubtotal, discount, cartTotal, selectedTownship, isMounted } = useStore();
+  const { cart, updateCartQuantity, removeFromCart, cartCount, cartSubtotal, discount, cartTotal, selectedTownship, isMounted, t, language } = useStore();
 
   if (!isMounted) {
     return (
@@ -24,9 +24,9 @@ export default function ShoppingBagPage() {
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-4">
         <div className="flex items-center justify-between gap-3 mb-2 sm:mb-3">
           <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870]">
-            <Link href="/" className="hover:text-[#38262e]">Home</Link>
+            <Link href="/" className="hover:text-[#38262e]">{t.navHome}</Link>
             <span>/</span>
-            <span className="text-[#38262e] font-medium">Beauty Bag</span>
+            <span className="text-[#38262e] font-medium">{t.bagTitle}</span>
           </div>
 
           <button
@@ -37,12 +37,16 @@ export default function ShoppingBagPage() {
             <svg className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            <span>Back</span>
+            <span>{t.back}</span>
           </button>
         </div>
 
-        <h1 className="font-serif text-[30px] sm:text-[38px] font-medium text-[#38262e]">
-          Your beauty bag
+        <h1 className={`font-serif font-medium text-[#38262e] ${
+          language === 'my'
+            ? 'text-[24px] sm:text-[30px]'
+            : 'text-[30px] sm:text-[38px]'
+        }`}>
+          {t.bagTitle}
         </h1>
         <p className="font-sans text-[13px] sm:text-[15px] text-[#7a6870] mt-1">
           {cart.length > 0
@@ -120,10 +124,10 @@ export default function ShoppingBagPage() {
               <div className="sticky top-28 bg-[#fcf9fa] p-5 sm:p-6 lg:p-7 rounded-2xl border border-[#eedfe5]">
                 <div className="flex items-center justify-between mb-3 pb-2.5 border-b border-[#eedfe5]">
                   <h2 className="font-serif text-[22px] sm:text-[26px] font-medium text-[#38262e]">
-                    Order summary
+                    {t.orderSummary}
                   </h2>
                   <span className="text-[12px] font-medium text-[#7a6870]">
-                    {cartCount} {cartCount === 1 ? 'item' : 'items'}
+                    {cartCount} {cartCount === 1 ? t.itemCountSingular : t.itemsCount}
                   </span>
                 </div>
 
@@ -152,15 +156,15 @@ export default function ShoppingBagPage() {
                 {/* Sub Total, Discount, and Total */}
                 <div className="border-t border-[#eedfe5] pt-3.5 space-y-2 text-[14px]">
                   <div className="flex justify-between items-center text-[#7a6870]">
-                    <span>Sub Total</span>
+                    <span>{t.subTotal}</span>
                     <span className="font-semibold text-[#38262e]">{cartSubtotal.toLocaleString()} MMK</span>
                   </div>
                   <div className="flex justify-between items-center text-[#7a6870]">
-                    <span>Discount</span>
+                    <span>{t.discount}</span>
                     <span className="font-semibold text-[#38262e]">{discount.toLocaleString()} MMK</span>
                   </div>
                   <div className="border-t border-[#eedfe5] pt-2.5 flex justify-between items-center text-[18px] font-bold text-[#38262e]">
-                    <span>Total</span>
+                    <span>{t.total}</span>
                     <span className="text-[#b73d67]">{cartTotal.toLocaleString()} MMK</span>
                   </div>
                 </div>
@@ -169,12 +173,12 @@ export default function ShoppingBagPage() {
                   href="/checkout"
                   className="w-full mt-5 h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-sm cursor-pointer"
                 >
-                  Checkout · {cartTotal.toLocaleString()} MMK
+                  {t.checkoutWithTotal} {cartTotal.toLocaleString()} MMK
                 </Link>
 
                 <div className="text-center mt-3.5">
                   <Link href="/shop" className="text-[13px] font-bold text-[#b73d67] hover:underline">
-                    Continue shopping
+                    {t.continueShopping}
                   </Link>
                 </div>
               </div>
@@ -189,15 +193,15 @@ export default function ShoppingBagPage() {
                 <path d="M16 10a4 4 0 01-8 0" />
               </svg>
             </div>
-            <h2 className="font-serif text-[28px] text-[#38262e]">No beauty picks yet.</h2>
+            <h2 className="font-serif text-[28px] text-[#38262e]">{t.bagEmptyTitle}</h2>
             <p className="text-[14px] text-[#7a6870] mt-2">
-              Discover your next glow favorite from our curated skincare collection.
+              {t.bagEmptySubtitle}
             </p>
             <Link
               href="/shop"
               className="mt-6 inline-flex items-center justify-center px-8 h-[48px] bg-[#b73d67] text-white rounded-[10px] text-[14px] font-bold hover:bg-[#a33259] transition-all cursor-pointer"
             >
-              Start shopping
+              {t.startShopping}
             </Link>
           </div>
         )}
