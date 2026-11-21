@@ -11,7 +11,7 @@ import { validatePhoneNumber } from '@/lib/validation';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, cartSubtotal, cartTotal, selectedTownship, setSelectedTownship, createOrder, clearCart, isMounted } = useStore();
+  const { cart, cartSubtotal, discount, cartTotal, selectedTownship, setSelectedTownship, createOrder, clearCart, isMounted } = useStore();
 
   const [customerName, setCustomerName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -31,7 +31,7 @@ export default function CheckoutPage() {
   const [formAlert, setFormAlert] = useState<string | null>(null);
 
   const deliveryFee = 0;
-  const grandTotal = cartSubtotal;
+  const grandTotal = cartTotal;
 
   const handleUseCurrentLocation = () => {
     if (typeof window === 'undefined' || !navigator.geolocation) {
@@ -158,6 +158,7 @@ export default function CheckoutPage() {
       landmarkNote,
       items: cart,
       subtotal: cartSubtotal,
+      discount,
       deliveryFee,
       total: grandTotal,
       paymentMethod,
@@ -443,9 +444,20 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              <div className="border-t border-[#eedfe5] pt-4 flex justify-between items-center text-[18px] font-bold text-[#38262e]">
-                <span>Total</span>
-                <span className="text-[#b73d67]">{grandTotal.toLocaleString()} MMK</span>
+              {/* Sub Total, Discount, and Total */}
+              <div className="border-t border-[#eedfe5] pt-3.5 space-y-2 text-[14px]">
+                <div className="flex justify-between items-center text-[#7a6870]">
+                  <span>Sub Total</span>
+                  <span className="font-semibold text-[#38262e]">{cartSubtotal.toLocaleString()} MMK</span>
+                </div>
+                <div className="flex justify-between items-center text-[#7a6870]">
+                  <span>Discount</span>
+                  <span className="font-semibold text-[#38262e]">{discount.toLocaleString()} MMK</span>
+                </div>
+                <div className="border-t border-[#eedfe5] pt-2.5 flex justify-between items-center text-[18px] font-bold text-[#38262e]">
+                  <span>Total</span>
+                  <span className="text-[#b73d67]">{grandTotal.toLocaleString()} MMK</span>
+                </div>
               </div>
 
               {/* Notification around confirm button (visible on mobile without scrolling up) */}

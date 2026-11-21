@@ -58,6 +58,7 @@ export interface Order {
   landmarkNote?: string;
   items: CartItem[];
   subtotal: number;
+  discount?: number;
   deliveryFee: number;
   total: number;
   paymentMethod: 'Mobile Banking' | 'Cash on Delivery' | 'MyanMyanPay' | 'KBZPay' | 'WavePay' | string;

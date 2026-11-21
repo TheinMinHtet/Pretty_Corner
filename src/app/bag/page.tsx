@@ -8,7 +8,7 @@ import { useStore } from '@/context/StoreContext';
 
 export default function ShoppingBagPage() {
   const router = useRouter();
-  const { cart, updateCartQuantity, removeFromCart, cartCount, cartSubtotal, cartTotal, selectedTownship, isMounted } = useStore();
+  const { cart, updateCartQuantity, removeFromCart, cartCount, cartSubtotal, discount, cartTotal, selectedTownship, isMounted } = useStore();
 
   if (!isMounted) {
     return (
@@ -149,17 +149,27 @@ export default function ShoppingBagPage() {
                   ))}
                 </div>
 
-                {/* Total */}
-                <div className="border-t border-[#eedfe5] pt-4 flex justify-between items-center text-[18px] font-bold text-[#38262e]">
-                  <span>Total</span>
-                  <span className="text-[#b73d67]">{cartSubtotal.toLocaleString()} MMK</span>
+                {/* Sub Total, Discount, and Total */}
+                <div className="border-t border-[#eedfe5] pt-3.5 space-y-2 text-[14px]">
+                  <div className="flex justify-between items-center text-[#7a6870]">
+                    <span>Sub Total</span>
+                    <span className="font-semibold text-[#38262e]">{cartSubtotal.toLocaleString()} MMK</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[#7a6870]">
+                    <span>Discount</span>
+                    <span className="font-semibold text-[#38262e]">{discount.toLocaleString()} MMK</span>
+                  </div>
+                  <div className="border-t border-[#eedfe5] pt-2.5 flex justify-between items-center text-[18px] font-bold text-[#38262e]">
+                    <span>Total</span>
+                    <span className="text-[#b73d67]">{cartTotal.toLocaleString()} MMK</span>
+                  </div>
                 </div>
 
                 <Link
                   href="/checkout"
                   className="w-full mt-5 h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-sm cursor-pointer"
                 >
-                  Checkout · {cartSubtotal.toLocaleString()} MMK
+                  Checkout · {cartTotal.toLocaleString()} MMK
                 </Link>
 
                 <div className="text-center mt-3.5">

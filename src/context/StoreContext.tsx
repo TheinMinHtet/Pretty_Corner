@@ -19,6 +19,8 @@ interface StoreContextType {
   clearCart: () => void;
   cartCount: number;
   cartSubtotal: number;
+  discount: number;
+  setDiscount: (discount: number) => void;
   cartTotal: number;
   getProductQuantity: (productId: string, sizeName?: string) => number;
   incrementProduct: (productId: string, sizeName?: string) => void;
@@ -58,6 +60,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
   const [selectedTownship, setSelectedTownship] = useState<TownshipOption>(MOCK_TOWNSHIPS[0]);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [discount, setDiscount] = useState<number>(0);
 
   // Persist cart or load from localStorage if client-side
   useEffect(() => {
@@ -169,7 +172,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const cartCount = isMounted ? cart.reduce((sum, item) => sum + item.quantity, 0) : 0;
   const cartSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const cartTotal = cartSubtotal;
+  const cartTotal = Math.max(0, cartSubtotal - discount);
 
   const createOrder = (orderData: Omit<Order, 'id' | 'createdAt'>): Order => {
     const date = new Date();
@@ -241,6 +244,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         clearCart,
         cartCount,
         cartSubtotal,
+        discount,
+        setDiscount,
         cartTotal,
         getProductQuantity,
         incrementProduct,

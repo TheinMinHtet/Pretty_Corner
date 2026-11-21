@@ -133,6 +133,18 @@ function OrderReceiptContent() {
             <div className="my-3.5 border-t border-[#eedfe5]" />
 
             <div className="space-y-1.5 text-[14px]">
+              {order.discount && order.discount > 0 ? (
+                <>
+                  <div className="flex justify-between font-normal text-[13px] text-[#7a6870]">
+                    <span>Sub Total</span>
+                    <span>{order.subtotal.toLocaleString()} MMK</span>
+                  </div>
+                  <div className="flex justify-between font-normal text-[13px] text-[#7a6870]">
+                    <span>Discount</span>
+                    <span className="text-[#b73d67]">-{order.discount.toLocaleString()} MMK</span>
+                  </div>
+                </>
+              ) : null}
               {order.deliveryFee > 0 && (
                 <div className="flex justify-between font-normal text-[13px] text-[#7a6870]">
                   <span>Delivery</span>
