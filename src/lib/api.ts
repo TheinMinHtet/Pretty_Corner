@@ -48,20 +48,24 @@ const SingleProductResponseSchema = z.object({
   product: StorefrontProductSchema,
 });
 
-export async function fetchStorefrontProducts(): Promise<Product[]> {
-  const baseUrl = getApiBaseUrl();
-  const res = await fetch(`${baseUrl}/api/products?audience=storefront`, {
-    cache: 'no-store',
-  });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch products (${res.status})`);
+export async function fetchStorefrontProducts(): Promise<Product[] | null> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const res = await fetch(`${baseUrl}/api/products?audience=storefront`, {
+      cache: 'no-store',
+    });
+    if (!res.ok) {
+      return null;
+    }
+    const json = await res.json();
+    const parsed = ProductsResponseSchema.safeParse(json);
+    if (!parsed.success) {
+      return null;
+    }
+    return parsed.data.products;
+  } catch {
+    return null;
   }
-  const json = await res.json();
-  const parsed = ProductsResponseSchema.safeParse(json);
-  if (!parsed.success) {
-    throw new Error('Invalid products response from shared API');
-  }
-  return parsed.data.products;
 }
 
 export async function fetchStorefrontProduct(id: string): Promise<Product | null> {
@@ -84,16 +88,20 @@ export async function fetchStorefrontProduct(id: string): Promise<Product | null
   return parsed.data.product;
 }
 
-export async function fetchStorefrontOrders(): Promise<Order[]> {
-  const baseUrl = getApiBaseUrl();
-  const res = await fetch(`${baseUrl}/api/orders?audience=storefront`, {
-    cache: 'no-store',
-  });
-  if (!res.ok) {
-    throw new Error(`Failed to fetch orders (${res.status})`);
+export async function fetchStorefrontOrders(): Promise<Order[] | null> {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const res = await fetch(`${baseUrl}/api/orders?audience=storefront`, {
+      cache: 'no-store',
+    });
+    if (!res.ok) {
+      return null;
+    }
+    const json = (await res.json()) as { orders?: Order[] };
+    return Array.isArray(json.orders) ? json.orders : [];
+  } catch {
+    return null;
   }
-  const json = (await res.json()) as { orders?: Order[] };
-  return Array.isArray(json.orders) ? json.orders : [];
 }
 
 export async function createStorefrontOrderApi(

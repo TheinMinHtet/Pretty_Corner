@@ -122,9 +122,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const refreshProducts = useCallback(async () => {
     try {
       const list = await fetchStorefrontProducts();
-      setProducts(list);
+      if (list !== null) {
+        setProducts(list);
+      }
     } catch (error) {
-      console.error('Failed to fetch products from shared API:', error);
+      console.warn('Failed to fetch products from shared API:', error);
     } finally {
       setProductsLoading(false);
     }
@@ -133,9 +135,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const refreshOrders = useCallback(async () => {
     try {
       const list = await fetchStorefrontOrders();
-      setOrders(list);
+      if (list !== null) {
+        setOrders(list);
+      }
     } catch (error) {
-      console.error('Failed to fetch orders from shared API:', error);
+      console.warn('Failed to fetch orders from shared API:', error);
     }
   }, []);
 
