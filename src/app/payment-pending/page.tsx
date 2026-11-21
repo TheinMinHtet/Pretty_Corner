@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
@@ -9,10 +9,28 @@ import OrderingStepBar from '@/components/OrderingStepBar';
 function PaymentPendingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { orders, updatePaymentStatus, t, language } = useStore();
+  const { orders, updatePaymentStatus, fetchOrderById, isMounted, t, language } = useStore();
 
   const orderId = searchParams.get('orderId') || 'PC-261117-024';
-  const order = orders.find((o) => o.id === orderId) || orders[0];
+  const cleanId = orderId.trim().toUpperCase();
+  const localOrder = orders.find((o) => o.id.trim().toUpperCase() === cleanId) || orders[0];
+
+  const [remoteOrder, setRemoteOrder] = useState<typeof localOrder | null>(null);
+  const [remoteLoading, setRemoteLoading] = useState(false);
+
+  useEffect(() => {
+    if (!localOrder && cleanId && fetchOrderById) {
+      setRemoteLoading(true);
+      fetchOrderById(cleanId)
+        .then((res) => {
+          if (res) setRemoteOrder(res);
+          setRemoteLoading(false);
+        })
+        .catch(() => setRemoteLoading(false));
+    }
+  }, [localOrder, cleanId, fetchOrderById]);
+
+  const activeOrder = localOrder || remoteOrder;
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [mockPaymentSuccess, setMockPaymentSuccess] = useState(false);
@@ -25,10 +43,23 @@ function PaymentPendingContent() {
     setMockPaymentSuccess(true);
     setTimeout(() => {
       setShowPaymentModal(false);
-      updatePaymentStatus(order.id, 'paid');
-      router.push(`/order-confirmation?orderId=${order.id}`);
+      const targetId = activeOrder?.id || cleanId;
+      updatePaymentStatus(targetId, 'paid');
+      router.push(`/order-confirmation?orderId=${targetId}`);
     }, 1000);
   };
+
+  if (!isMounted || remoteLoading) {
+    return (
+      <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-16 flex items-center justify-center min-h-[50vh]">
+        <div className="w-8 h-8 rounded-full border-2 border-[#b73d67] border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  const currentId = activeOrder?.id || cleanId;
+  const paymentMethod = activeOrder?.paymentMethod || 'Mobile Banking';
+  const totalAmount = activeOrder?.total ?? 0;
 
   return (
     <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-5 md:py-8 flex flex-col min-h-full pb-12">
@@ -57,22 +88,22 @@ function PaymentPendingContent() {
         </h2>
 
         <p className="font-sans text-[14px] text-[#7a6870] mt-2 leading-relaxed">
-          {t.completePaymentSecurely}<br />{order.paymentMethod || 'KBZPay, WavePay'}.
+          {t.completePaymentSecurely}<br />{paymentMethod || 'KBZPay, WavePay'}.
         </p>
 
         {/* Provider Payment Card */}
         <div className="w-full bg-[#fcf9fa] border border-[#eedfe5] rounded-[12px] p-5 mt-5 flex flex-col items-center">
           <span className="font-sans text-[21px] font-bold text-[#38262e]">
-            {order.paymentMethod || 'Mobile Banking'}
+            {paymentMethod || 'Mobile Banking'}
           </span>
           <span className="text-[10px] font-bold tracking-[1.5px] text-[#7a6870] uppercase mt-3">
             {t.totalToPay}
           </span>
           <span className="font-sans text-[30px] font-bold text-[#b73d67] mt-1">
-            {order.total.toLocaleString()} MMK
+            {totalAmount.toLocaleString()} MMK
           </span>
           <span className="text-[12px] text-[#7a6870] mt-1.5 font-medium">
-            {t.orderRef}: {order.id}
+            {t.orderRef}: {currentId}
           </span>
         </div>
 
@@ -87,7 +118,7 @@ function PaymentPendingContent() {
         {/* Help & Recovery */}
         <div className="w-full pt-5 border-t border-[#eedfe5]/70 flex flex-col items-center text-center mt-6">
           <p className="text-[12px] text-[#7a6870] leading-relaxed">
-            {t.needHelpPayment} <span className="font-mono font-bold text-[#38262e]">{order.id}</span>.
+            {t.needHelpPayment} <span className="font-mono font-bold text-[#38262e]">{currentId}</span>.
           </p>
           <Link
             href="/contact"
@@ -108,43 +139,46 @@ function PaymentPendingContent() {
                 <line x1="2" y1="10" x2="22" y2="10" />
               </svg>
             </div>
-            <h4 className="font-serif text-[22px] font-medium text-[#38262e]">
-              {language === 'my' ? 'မိုဘိုင်းဘဏ် ငွေချေစနစ်' : 'Mobile Banking Payment'}
-            </h4>
-            <p className="text-[12px] text-[#7a6870] mt-1">
-              Order {order.id}
+            <h3 className="font-serif text-[22px] font-bold text-[#38262e] mb-1">
+              {paymentMethod || 'Mobile Banking'}
+            </h3>
+            <p className="text-[13px] text-[#7a6870] mb-4">
+              {language === 'my'
+                ? 'ငွေပေးချေမှုပုံစံတူစနစ် ဖြစ်ပါသည်။ စမ်းသပ်ရန် အောက်ပါခလုတ်ကို နှိပ်ပါ။'
+                : 'Demo Payment Gateway. Click below to simulate completing the transfer.'}
             </p>
-            <div className="my-4 bg-[#f9f5f7] p-3 rounded-[10px] text-left text-[12px] space-y-1">
-              <div className="flex justify-between">
-                <span className="text-[#7a6870]">{language === 'my' ? 'ဆိုင်အမည်' : 'Merchant'}:</span>
-                <span className="font-bold text-[#38262e]">Pretty Corner</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#7a6870]">{language === 'my' ? 'ပေးချေရမည့်ပမာဏ' : 'Amount'}:</span>
-                <span className="font-bold text-[#b73d67]">{order.total.toLocaleString()} MMK</span>
-              </div>
+            <div className="bg-[#faf7f8] rounded-xl p-3 mb-5 border border-[#eedfe5]">
+              <span className="text-[11px] text-[#7a6870] block">
+                {language === 'my' ? 'လွှဲပြောင်းရမည့်ငွေ' : 'Amount to transfer'}
+              </span>
+              <span className="font-bold text-[20px] text-[#b73d67]">
+                {totalAmount.toLocaleString()} MMK
+              </span>
             </div>
 
             {mockPaymentSuccess ? (
-              <div className="text-[13px] font-bold text-[#3b775d] py-3">
+              <div className="h-[46px] bg-emerald-50 text-emerald-700 font-bold text-[14px] rounded-[10px] flex items-center justify-center gap-2">
+                <svg className="w-5 h-5 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
                 {t.paymentAuthorized}
               </div>
             ) : (
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={handleConfirmGatewayPayment}
-                  className="w-full h-[46px] bg-[#3b775d] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#2f614a]"
-                >
-                  {t.confirmAndPay} ({order.total.toLocaleString()} MMK)
-                </button>
-                <button
-                  onClick={() => setShowPaymentModal(false)}
-                  className="w-full h-[40px] text-[#7a6870] text-[13px] hover:text-[#38262e]"
-                >
-                  {t.cancel}
-                </button>
-              </div>
+              <button
+                onClick={handleConfirmGatewayPayment}
+                className="w-full h-[46px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] transition-all flex items-center justify-center shadow-xs cursor-pointer"
+              >
+                {language === 'my' ? 'ငွေပေးချေပြီးပြီ' : 'Simulate Successful Payment'}
+              </button>
             )}
+
+            <button
+              disabled={mockPaymentSuccess}
+              onClick={() => setShowPaymentModal(false)}
+              className="mt-3 text-[13px] text-[#7a6870] hover:text-[#38262e] font-medium disabled:opacity-50"
+            >
+              {language === 'my' ? 'မလုပ်တော့ပါ' : 'Cancel'}
+            </button>
           </div>
         </div>
       )}
@@ -155,7 +189,7 @@ function PaymentPendingContent() {
 
 export default function PaymentPendingPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-[#7a6870]">Loading payment...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-[#7a6870]">Loading payment status...</div>}>
       <PaymentPendingContent />
     </Suspense>
   );

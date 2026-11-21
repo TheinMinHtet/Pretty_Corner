@@ -69,23 +69,24 @@ export async function fetchStorefrontProducts(): Promise<Product[] | null> {
 }
 
 export async function fetchStorefrontProduct(id: string): Promise<Product | null> {
-  const baseUrl = getApiBaseUrl();
-  const res = await fetch(
-    `${baseUrl}/api/products/${encodeURIComponent(id)}?audience=storefront`,
-    { cache: 'no-store' }
-  );
-  if (res.status === 404) {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const res = await fetch(
+      `${baseUrl}/api/products/${encodeURIComponent(id)}?audience=storefront`,
+      { cache: 'no-store' }
+    );
+    if (res.status === 404 || !res.ok) {
+      return null;
+    }
+    const json = await res.json();
+    const parsed = SingleProductResponseSchema.safeParse(json);
+    if (!parsed.success) {
+      return null;
+    }
+    return parsed.data.product;
+  } catch {
     return null;
   }
-  if (!res.ok) {
-    throw new Error(`Failed to fetch product (${res.status})`);
-  }
-  const json = await res.json();
-  const parsed = SingleProductResponseSchema.safeParse(json);
-  if (!parsed.success) {
-    throw new Error('Invalid product response from shared API');
-  }
-  return parsed.data.product;
 }
 
 export async function fetchStorefrontOrders(): Promise<Order[] | null> {
@@ -107,41 +108,49 @@ export async function fetchStorefrontOrders(): Promise<Order[] | null> {
 export async function createStorefrontOrderApi(
   orderData: Omit<Order, 'id' | 'createdAt'>
 ): Promise<Order | null> {
-  const baseUrl = getApiBaseUrl();
-  const res = await fetch(`${baseUrl}/api/orders`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(orderData),
-  });
-  if (!res.ok) {
+  try {
+    const baseUrl = getApiBaseUrl();
+    const res = await fetch(`${baseUrl}/api/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(orderData),
+    });
+    if (!res.ok) {
+      return null;
+    }
+    const json = (await res.json()) as { order?: Order };
+    return json.order ?? null;
+  } catch {
     return null;
   }
-  const json = (await res.json()) as { order?: Order };
-  return json.order ?? null;
 }
 
 export async function updateStorefrontOrderPaymentApi(
   orderId: string,
   status: Order['paymentStatus']
 ): Promise<Order | null> {
-  const baseUrl = getApiBaseUrl();
-  const statusMap: Record<Order['paymentStatus'], string> = {
-    paid: 'Paid',
-    pending: 'Pending',
-    failed: 'Failed',
-    expired: 'Expired',
-  };
-  const res = await fetch(
-    `${baseUrl}/api/orders/${encodeURIComponent(orderId)}`,
-    {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paymentStatus: statusMap[status] }),
+  try {
+    const baseUrl = getApiBaseUrl();
+    const statusMap: Record<Order['paymentStatus'], string> = {
+      paid: 'Paid',
+      pending: 'Pending',
+      failed: 'Failed',
+      expired: 'Expired',
+    };
+    const res = await fetch(
+      `${baseUrl}/api/orders/${encodeURIComponent(orderId)}`,
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentStatus: statusMap[status] }),
+      }
+    );
+    if (!res.ok) {
+      return null;
     }
-  );
-  if (!res.ok) {
+    const json = (await res.json()) as { storefrontOrder?: Order };
+    return json.storefrontOrder ?? null;
+  } catch {
     return null;
   }
-  const json = (await res.json()) as { storefrontOrder?: Order };
-  return json.storefrontOrder ?? null;
 }

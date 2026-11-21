@@ -439,7 +439,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (status === 'paid') {
       clearCart();
     }
-    void updateStorefrontOrderPaymentApi(orderId, status);
+    void updateStorefrontOrderPaymentApi(orderId, status).catch(() => {});
   };
 
   return (
