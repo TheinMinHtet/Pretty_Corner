@@ -3,7 +3,12 @@ import { fetchStorefrontProduct } from '@/lib/api';
 import ProductDetailView from '@/components/ProductDetailView';
 import { notFound } from 'next/navigation';
 
-async function ProductDetailContent({ id }: { id: string }) {
+async function ProductDetailContent({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const product = await fetchStorefrontProduct(id);
 
   if (!product) {
@@ -13,13 +18,11 @@ async function ProductDetailContent({ id }: { id: string }) {
   return <ProductDetailView product={product} />;
 }
 
-export default async function ProductDetailPage({
+export default function ProductDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const resolvedParams = await params;
-
   return (
     <Suspense
       fallback={
@@ -28,7 +31,7 @@ export default async function ProductDetailPage({
         </div>
       }
     >
-      <ProductDetailContent id={resolvedParams.id} />
+      <ProductDetailContent params={params} />
     </Suspense>
   );
 }
