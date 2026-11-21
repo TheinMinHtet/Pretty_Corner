@@ -11,21 +11,22 @@ export interface Product {
   brand?: string;
   category: 'electrical' | 'skincare' | 'makeup' | 'lifestyle' | 'lenses' | 'more' | string;
   subcategory?: string;
-  badge?: 'BESTSELLER' | 'NEW' | 'DAILY ESSENTIAL' | 'TRAVEL SIZE' | 'TOP TECH' | 'POPULAR';
-  tagline: string;
-  subtitle: string;
+  badge?: 'BESTSELLER' | 'NEW' | 'DAILY ESSENTIAL' | 'TRAVEL SIZE' | 'TOP TECH' | 'POPULAR' | string;
+  tagline?: string;
+  subtitle?: string;
   price: number;
-  sizes: ProductSize[];
+  stockQuantity?: number;
+  sizes?: ProductSize[];
   image: string;
   gallery: string[];
   description: string;
   benefits: string[];
   usage: string;
-  ingredients: string;
+  ingredients?: string;
   specs?: string;
   inStock: boolean;
-  rating: number;
-  reviewsCount: number;
+  rating?: number;
+  reviewsCount?: number;
 }
 
 export interface CartItem {

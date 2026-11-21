@@ -86,10 +86,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (!product) return;
 
     const chosenSize = sizeName
-      ? product.sizes.find((s) => s.name === sizeName) || product.sizes[0]
-      : product.sizes[0];
+      ? product.sizes?.find((s) => s.name === sizeName) || product.sizes?.[0]
+      : product.sizes?.[0];
 
-    const itemId = `${product.id}-${chosenSize.name}`;
+    const sizeLabel = chosenSize?.name || '';
+    const itemPrice = chosenSize?.price || product.price;
+    const itemId = sizeLabel ? `${product.id}-${sizeLabel}` : product.id;
     const existingIndex = cart.findIndex((item) => item.id === itemId);
 
     let updatedCart: CartItem[];
@@ -103,8 +105,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           id: itemId,
           productId: product.id,
           name: product.name,
-          size: chosenSize.name,
-          price: chosenSize.price,
+          size: sizeLabel,
+          price: itemPrice,
           quantity,
           image: product.image,
         },
@@ -160,8 +162,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const decrementProduct = (productId: string, sizeName?: string) => {
     const product = products.find((p) => p.id === productId);
     if (!product) return;
-    const chosenSize = sizeName || product.sizes[0]?.name;
-    const itemId = `${product.id}-${chosenSize}`;
+    const chosenSize = sizeName || product.sizes?.[0]?.name || '';
+    const itemId = chosenSize ? `${product.id}-${chosenSize}` : product.id;
     updateCartQuantity(itemId, -1);
   };
 

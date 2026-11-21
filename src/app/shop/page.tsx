@@ -185,7 +185,7 @@ function ShopContent() {
           ));
         const matchesQuery =
           p.name.toLowerCase().includes(q) ||
-          p.tagline.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q) ||
           p.description.toLowerCase().includes(q) ||
           matchesCategory;
         if (!matchesQuery) return false;
@@ -428,7 +428,7 @@ function ShopContent() {
                   {/* Details */}
                   <div className="pt-3">
                     <p className="text-[10px] sm:text-[11px] font-medium tracking-wide text-[#7a6870] uppercase">
-                      {product.tagline}
+                      {product.category}
                     </p>
                     <Link href={`/product/${product.id}`}>
                       <h4 className="text-[15px] sm:text-[16px] font-normal text-[#38262e] hover:text-[#b73d67] transition-colors line-clamp-1 mt-0.5">

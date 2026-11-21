@@ -15,17 +15,15 @@ export default function ProductDetailView({ product }: { product: Product }) {
   const { addToCart, cartCount, isMounted } = useStore();
 
   const [selectedGalleryIdx, setSelectedGalleryIdx] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0]?.name || 'Standard');
   const [quantity, setQuantity] = useState(1);
   const [openWhyLove, setOpenWhyLove] = useState(true);
   const [openHowToUse, setOpenHowToUse] = useState(false);
 
-  const currentSizeObj = product.sizes.find((s) => s.name === selectedSize) || product.sizes[0];
-  const unitPrice = currentSizeObj?.price || product.price;
+  const unitPrice = product.price;
   const totalPrice = unitPrice * quantity;
 
   const handleAddToCart = () => {
-    addToCart(product.id, selectedSize, quantity);
+    addToCart(product.id, '', quantity);
   };
 
   return (
@@ -113,13 +111,15 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
           {/* Right Column: Product Information & Purchase (col-span-12 on mobile, col-span-6 on tablet, col-span-5 on desktop) */}
           <div className="md:col-span-6 lg:col-span-5 px-5 sm:px-0 pt-6 md:pt-0 flex flex-col">
-            {/* Tagline & Brand */}
-            <span className="text-[11px] font-bold tracking-[1.5px] text-[#7a6870] uppercase">
-              {product.brand || 'Pretty Essentials'} · {product.tagline}
-            </span>
+            {/* Badge (if exists) */}
+            {product.badge && (
+              <span className="text-[11px] font-bold tracking-[1px] text-[#b73d67] uppercase mb-1">
+                {product.badge}
+              </span>
+            )}
 
             {/* Product Name */}
-            <h1 className="font-serif text-[30px] sm:text-[36px] lg:text-[40px] font-medium leading-[1.1] text-[#38262e] mt-1.5">
+            <h1 className="font-serif text-[30px] sm:text-[36px] lg:text-[40px] font-medium leading-[1.1] text-[#38262e]">
               {product.name}
             </h1>
 
@@ -137,34 +137,6 @@ export default function ProductDetailView({ product }: { product: Product }) {
             <p className="text-[14px] sm:text-[15px] text-[#7a6870] leading-relaxed mt-3">
               {product.description}
             </p>
-
-            {/* Size Selector */}
-            <div className="mt-6 pt-5 border-t border-[#eedfe5]">
-              <div className="flex items-center justify-between mb-2.5">
-                <span className="text-[13px] font-bold text-[#38262e] uppercase tracking-wide">
-                  Select Size
-                </span>
-                <span className="text-[12px] text-[#7a6870]">
-                  Standard formulation
-                </span>
-              </div>
-
-              <div className="flex gap-2.5">
-                {product.sizes.map((s) => (
-                  <button
-                    key={s.name}
-                    onClick={() => setSelectedSize(s.name)}
-                    className={`h-[42px] px-5 rounded-[10px] text-[13px] font-medium transition-all cursor-pointer ${
-                      selectedSize === s.name
-                        ? 'bg-[#38262e] text-white shadow-sm'
-                        : 'bg-[#faf7f8] text-[#38262e] border border-[#eedfe5] hover:bg-[#fceef2]'
-                    }`}
-                  >
-                    {s.name}
-                  </button>
-                ))}
-              </div>
-            </div>
 
             {/* Purchase Controls (Quantity + Add to Bag) */}
             <div className="mt-6 pt-6 border-t border-[#eedfe5]">
@@ -199,67 +171,51 @@ export default function ProductDetailView({ product }: { product: Product }) {
             {/* Accordions: Why We Love It & How to Use */}
             <div className="mt-8 border-t border-[#eedfe5] divide-y divide-[#eedfe5]">
               {/* Accordion 1: Why we love it */}
-              <div className="py-4">
-                <button
-                  onClick={() => setOpenWhyLove(!openWhyLove)}
-                  className="w-full flex items-center justify-between text-left cursor-pointer"
-                >
-                  <span className="text-[15px] font-bold text-[#38262e]">Why we love it</span>
-                  <span className="text-[20px] text-[#38262e] font-normal leading-none">
-                    {openWhyLove ? '−' : '+'}
-                  </span>
-                </button>
-                {openWhyLove && (
-                  <div className="pt-2 text-[14px] text-[#7a6870] leading-relaxed space-y-2">
-                    <p>{product.description}</p>
-                    <div className="space-y-1 pt-1 text-[13px]">
-                      {product.benefits.map((b, i) => (
-                        <p key={i} className="text-[#514149]">✓ {b}</p>
-                      ))}
+              {(product.description || (product.benefits && product.benefits.length > 0)) && (
+                <div className="py-4">
+                  <button
+                    onClick={() => setOpenWhyLove(!openWhyLove)}
+                    className="w-full flex items-center justify-between text-left cursor-pointer"
+                  >
+                    <span className="text-[15px] font-bold text-[#38262e]">Why we love it</span>
+                    <span className="text-[20px] text-[#38262e] font-normal leading-none">
+                      {openWhyLove ? '−' : '+'}
+                    </span>
+                  </button>
+                  {openWhyLove && (
+                    <div className="pt-2 text-[14px] text-[#7a6870] leading-relaxed space-y-2">
+                      {product.description && <p>{product.description}</p>}
+                      {product.benefits && product.benefits.length > 0 && (
+                        <div className="space-y-1 pt-1 text-[13px]">
+                          {product.benefits.map((b, i) => (
+                            <p key={i} className="text-[#514149]">✓ {b}</p>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      <span className="bg-[#fceef2] text-[#b73d67] text-[11px] font-bold px-2.5 py-1 rounded">
-                        Suitable for all skin types
-                      </span>
-                      <span className="bg-[#fceef2] text-[#b73d67] text-[11px] font-bold px-2.5 py-1 rounded">
-                        Non-greasy finish
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
 
               {/* Accordion 2: How to use */}
-              <div className="py-4">
-                <button
-                  onClick={() => setOpenHowToUse(!openHowToUse)}
-                  className="w-full flex items-center justify-between text-left cursor-pointer"
-                >
-                  <span className="text-[15px] font-bold text-[#38262e]">
-                    {product.category === 'electrical' || product.category === 'lifestyle'
-                      ? 'How to use & specifications'
-                      : 'How to use & ingredients'}
-                  </span>
-                  <span className="text-[20px] text-[#38262e] font-normal leading-none">
-                    {openHowToUse ? '−' : '+'}
-                  </span>
-                </button>
-                {openHowToUse && (
-                  <div className="pt-2 text-[14px] text-[#7a6870] leading-relaxed space-y-2">
-                    <p>
-                      <strong className="text-[#38262e]">Directions / Usage:</strong> {product.usage}
-                    </p>
-                    <p>
-                      <strong className="text-[#38262e]">
-                        {product.category === 'electrical' || product.category === 'lifestyle'
-                          ? 'Specifications:'
-                          : 'Ingredients:'}
-                      </strong>{' '}
-                      {product.specs || product.ingredients}
-                    </p>
-                  </div>
-                )}
-              </div>
+              {product.usage && (
+                <div className="py-4">
+                  <button
+                    onClick={() => setOpenHowToUse(!openHowToUse)}
+                    className="w-full flex items-center justify-between text-left cursor-pointer"
+                  >
+                    <span className="text-[15px] font-bold text-[#38262e]">How to use</span>
+                    <span className="text-[20px] text-[#38262e] font-normal leading-none">
+                      {openHowToUse ? '−' : '+'}
+                    </span>
+                  </button>
+                  {openHowToUse && (
+                    <div className="pt-2 text-[14px] text-[#7a6870] leading-relaxed">
+                      <p>{product.usage}</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
