@@ -73,6 +73,9 @@ export type TranslationSchema = Record<
   | 'bagTitle'
   | 'bagEmptyTitle'
   | 'bagEmptySubtitle'
+  | 'bagSubtitleEmpty'
+  | 'bagSubtitleReady'
+  | 'standardPackaging'
   | 'startShopping'
   | 'orderSummary'
   | 'subTotal'
@@ -264,6 +267,9 @@ export const translations: Record<Language, TranslationSchema> = {
     bagTitle: 'Beauty Bag',
     bagEmptyTitle: 'No beauty picks yet.',
     bagEmptySubtitle: 'Discover your next favorite pick from our curated collection.',
+    bagSubtitleEmpty: 'Your beauty bag is currently empty.',
+    bagSubtitleReady: 'ready for doorstep delivery.',
+    standardPackaging: 'Standard packaging',
     startShopping: 'Start shopping',
     orderSummary: 'Order summary',
     subTotal: 'Sub Total',
@@ -462,6 +468,9 @@ export const translations: Record<Language, TranslationSchema> = {
     bagTitle: 'စျေးဝယ်အိတ်',
     bagEmptyTitle: 'စျေးဝယ်အိတ်ထဲတွင် ပစ္စည်းမရှိသေးပါ',
     bagEmptySubtitle: 'မိမိနှစ်သက်ရာ အလှအပနှင့် လူနေမှုအသုံးအဆောင်များကို လွတ်လပ်စွာ ရွေးချယ်လိုက်ပါ။',
+    bagSubtitleEmpty: 'သင့်စျေးဝယ်အိတ်ထဲတွင် ပစ္စည်းမရှိသေးပါ။',
+    bagSubtitleReady: 'အိမ်အရောက်ပို့ဆောင်ရန် အသင့်ရှိပါသည်။',
+    standardPackaging: 'ပုံမှန်ထုပ်ပိုးမှု',
     startShopping: 'စျေးစဝယ်မည်',
     orderSummary: 'အမှာစာ အကျဉ်းချုပ်',
     subTotal: 'စုစုပေါင်းကုန်ကျငွေ',

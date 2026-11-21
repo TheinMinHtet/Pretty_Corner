@@ -50,8 +50,10 @@ export default function ShoppingBagPage() {
         </h1>
         <p className="font-sans text-[13px] sm:text-[15px] text-[#7a6870] mt-1">
           {cart.length > 0
-            ? `${cart.length} lovely ${cart.length === 1 ? 'find' : 'finds'} ready for doorstep delivery.`
-            : 'Your beauty bag is currently empty.'}
+            ? language === 'my'
+              ? `အိမ်အရောက်ပို့ဆောင်ရန် ပစ္စည်း ${cart.length} မျိုး အသင့်ရှိပါသည်။`
+              : `${cart.length} lovely ${cart.length === 1 ? 'find' : 'finds'} ready for doorstep delivery.`
+            : t.bagSubtitleEmpty}
         </p>
       </div>
 
@@ -78,7 +80,7 @@ export default function ShoppingBagPage() {
                         {item.name}
                       </h3>
                       <p className="text-[12px] sm:text-[13px] text-[#7a6870] mt-0.5">
-                        {item.size} · Standard packaging
+                        {item.size ? `${item.size} · ` : ''}{t.standardPackaging}
                       </p>
                       <p className="text-[15px] sm:text-[16px] font-bold text-[#b73d67] mt-1.5">
                         {item.price.toLocaleString()} MMK
