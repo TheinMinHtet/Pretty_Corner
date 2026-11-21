@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Order, Product } from './types';
+import { supabase } from './supabase';
 
 export function getApiBaseUrl(): string {
   const raw =
@@ -49,44 +50,153 @@ const SingleProductResponseSchema = z.object({
 });
 
 export async function fetchStorefrontProducts(): Promise<Product[] | null> {
+  // 1. Try external API if configured and reachable
   try {
     const baseUrl = getApiBaseUrl();
     const res = await fetch(`${baseUrl}/api/products?audience=storefront`, {
       cache: 'no-store',
     });
-    if (!res.ok) {
-      return null;
+    if (res.ok) {
+      const json = await res.json();
+      const parsed = ProductsResponseSchema.safeParse(json);
+      if (parsed.success && parsed.data.products.length > 0) {
+        return parsed.data.products;
+      }
     }
-    const json = await res.json();
-    const parsed = ProductsResponseSchema.safeParse(json);
-    if (!parsed.success) {
-      return null;
+  } catch {}
+
+  // 2. Query Supabase catalog
+  try {
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          id,
+          slug,
+          name,
+          badge,
+          price,
+          stock_quantity,
+          description,
+          benefits,
+          usage,
+          main_image,
+          gallery,
+          is_active,
+          categories (
+            slug,
+            name
+          )
+        `)
+        .eq('is_active', true)
+        .order('created_at', { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        return data.map((row: any) => ({
+          id: row.slug || row.id,
+          slug: row.slug,
+          name: row.name,
+          category: row.categories?.slug || 'skincare',
+          subcategory: row.categories?.name || 'Skincare',
+          badge: row.badge || undefined,
+          price: row.price,
+          stockQuantity: row.stock_quantity,
+          image: row.main_image,
+          gallery: Array.isArray(row.gallery) && row.gallery.length > 0 ? row.gallery : [row.main_image],
+          description: row.description || '',
+          benefits: Array.isArray(row.benefits) ? row.benefits : [],
+          usage: row.usage || '',
+          inStock: (row.stock_quantity ?? 0) > 0,
+        }));
+      }
     }
-    return parsed.data.products;
-  } catch {
-    return null;
+  } catch (err) {
+    console.warn('Failed to query products from Supabase:', err);
   }
+
+  return null;
 }
 
 export async function fetchStorefrontProduct(id: string): Promise<Product | null> {
+  // 1. Try external API if reachable
   try {
     const baseUrl = getApiBaseUrl();
     const res = await fetch(
       `${baseUrl}/api/products/${encodeURIComponent(id)}?audience=storefront`,
       { cache: 'no-store' }
     );
-    if (res.status === 404 || !res.ok) {
-      return null;
+    if (res.ok) {
+      const json = await res.json();
+      const parsed = SingleProductResponseSchema.safeParse(json);
+      if (parsed.success) {
+        return parsed.data.product;
+      }
     }
-    const json = await res.json();
-    const parsed = SingleProductResponseSchema.safeParse(json);
-    if (!parsed.success) {
-      return null;
+  } catch {}
+
+  // 2. Query Supabase directly by slug or id!
+  try {
+    if (supabase) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+      let query = supabase
+        .from('products')
+        .select(`
+          id,
+          slug,
+          name,
+          badge,
+          price,
+          stock_quantity,
+          description,
+          benefits,
+          usage,
+          main_image,
+          gallery,
+          is_active,
+          categories (
+            slug,
+            name
+          )
+        `);
+
+      if (isUuid) {
+        query = query.or(`id.eq.${id},slug.eq.${id}`);
+      } else {
+        query = query.eq('slug', id);
+      }
+
+      const { data, error } = await query.single();
+      if (!error && data) {
+        const row: any = data;
+        const categorySlug = row.categories?.slug || 'skincare';
+        const categoryName = row.categories?.name || 'Skincare';
+        const galleryList = Array.isArray(row.gallery) && row.gallery.length > 0
+          ? row.gallery
+          : [row.main_image];
+
+        return {
+          id: row.slug || row.id,
+          slug: row.slug,
+          name: row.name,
+          category: categorySlug,
+          subcategory: categoryName,
+          badge: row.badge || undefined,
+          price: row.price,
+          stockQuantity: row.stock_quantity,
+          image: row.main_image,
+          gallery: galleryList,
+          description: row.description || '',
+          benefits: Array.isArray(row.benefits) ? row.benefits : [],
+          usage: row.usage || '',
+          inStock: (row.stock_quantity ?? 0) > 0,
+        };
+      }
     }
-    return parsed.data.product;
-  } catch {
-    return null;
+  } catch (err) {
+    console.warn('Failed to fetch product from Supabase:', err);
   }
+
+  return null;
 }
 
 export async function fetchStorefrontOrders(): Promise<Order[] | null> {

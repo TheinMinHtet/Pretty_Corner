@@ -18,6 +18,12 @@ export type TranslationSchema = Record<
   | 'viewAll'
   | 'curatedPicks'
   | 'curatedSubtitle'
+  | 'topPicksTitle'
+  | 'shopMore'
+  | 'exploreFullCollection'
+  | 'storeLocationBadge'
+  | 'storeLocationHeading'
+  | 'storeLocationDescription'
   | 'inStockOnly'
   | 'freeDeliveryBadge'
   | 'catAll'
@@ -193,6 +199,12 @@ export const translations: Record<Language, TranslationSchema> = {
     viewAll: 'View all',
     curatedPicks: 'Curated beauty & everyday picks',
     curatedSubtitle: 'Hand-selected items for your daily beauty, personal care, and lifestyle routine.',
+    topPicksTitle: 'Top Picks & Highlights',
+    shopMore: 'Shop more',
+    exploreFullCollection: 'Explore full collection in shop',
+    storeLocationBadge: 'Store Location & Online Orders',
+    storeLocationHeading: "You're always welcome to visit us.",
+    storeLocationDescription: 'Find our store address and contact details above, or easily order your favorite beauty & gadgets online with doorstep delivery.',
     inStockOnly: 'In Stock',
     freeDeliveryBadge: 'Free Delivery Across Myanmar',
 
@@ -385,6 +397,12 @@ export const translations: Record<Language, TranslationSchema> = {
     viewAll: 'အားလုံးကြည့်ရန်',
     curatedPicks: 'လူကြိုက်များသော ပစ္စည်းများ',
     curatedSubtitle: 'နေ့စဉ်အလှအပနှင့် သက်တောင့်သက်သာ လူနေမှုဘဝအတွက် အကောင်းဆုံးရွေးချယ်ထားသော ပစ္စည်းများ',
+    topPicksTitle: 'အထူးရွေးချယ်ထားသော ပစ္စည်းများ',
+    shopMore: 'ထပ်မံကြည့်ရှုရန်',
+    exploreFullCollection: 'ဆိုင်ရှိ ပစ္စည်းအားလုံးကို ကြည့်ရှုရန်',
+    storeLocationBadge: 'ဆိုင်လိပ်စာနှင့် အွန်လိုင်းအမှာစာများ',
+    storeLocationHeading: 'ဆိုင်သို့ လူကိုယ်တိုင် လာရောက်လေ့လာရန် နွေးထွေးစွာ ကြိုဆိုပါသည်။',
+    storeLocationDescription: 'အထက်ဖော်ပြပါ ဆိုင်လိပ်စာနှင့် ဆက်သွယ်ရန်အချက်အလက်များကို ကြည့်ရှုနိုင်သလို မိမိနှစ်သက်ရာ အလှအပနှင့် အီလက်ထရောနစ်ပစ္စည်းများကို အိမ်အရောက်ပို့စနစ်ဖြင့် အွန်လိုင်းမှ အလွယ်တကူ မှာယူနိုင်ပါသည်။',
     inStockOnly: 'ပစ္စည်းအသင့်ရှိ',
     freeDeliveryBadge: 'မြန်မာတစ်နိုင်ငံလုံး အိမ်ရောက်ပို့ဆောင်ပေးပါသည်',
 

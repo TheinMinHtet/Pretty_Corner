@@ -28,46 +28,46 @@ export default function HomePage() {
     {
       id: 'all',
       label: t.catAll,
-      description: 'Explore our complete variety of products',
+      description: language === 'my' ? 'ဆိုင်ရှိ ပစ္စည်းအားလုံးကို စုံလင်စွာ ကြည့်ရှုနိုင်ပါသည်' : 'Explore our complete variety of products',
       count: products.length,
     },
     {
       id: 'electrical',
       label: t.catElectrical,
-      description: 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
+      description: language === 'my' ? 'အလှအပသုံး စမတ်ကိရိယာများနှင့် ဂက်ဂျက်များ' : 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
       count: products.filter((p) => p.category === 'electrical').length,
     },
     {
       id: 'skincare',
       label: t.catSkincare,
-      description: 'Gentle barrier serums, moisturizers & UV daily defense',
+      description: language === 'my' ? 'နူးညံ့ထိရောက်သော အသားအရေထိန်း ပစ္စည်းများ' : 'Gentle barrier serums, moisturizers & UV daily defense',
       count: products.filter((p) => p.category === 'skincare').length,
     },
     {
       id: 'makeup',
       label: t.catMakeup,
-      description: 'Breathable cheek tints, lip glazes & complexion picks',
+      description: language === 'my' ? 'ပေါ့ပါးလန်းဆန်းသော မိတ်ကပ်နှင့် နှုတ်ခမ်းနီများ' : 'Breathable cheek tints, lip glazes & complexion picks',
       count: products.filter((p) => p.category === 'makeup').length,
     },
     {
       id: 'lifestyle',
       label: t.catLifestyle,
-      description: 'Silk hair accessories, vacuum tumblers & daily finds',
+      description: language === 'my' ? 'ခေတ်မီ လူနေမှုဘဝနှင့် နေ့စဉ်သုံးပစ္စည်းများ' : 'Silk hair accessories, vacuum tumblers & daily finds',
       count: products.filter((p) => p.category === 'lifestyle').length,
     },
     {
       id: 'lenses',
       label: t.catLenses,
-      description: 'Hydrated daily and monthly comfort beauty lenses',
+      description: language === 'my' ? 'မျက်လုံးအေးမြ သက်တောင့်သက်သာရှိသော မျက်ကပ်မှန်များ' : 'Hydrated daily and monthly comfort beauty lenses',
       count: products.filter((p) => p.category === 'lenses').length,
     },
     {
       id: 'more',
       label: t.catMore,
-      description: 'Pure silk ties, beauty tools & thoughtful additions',
+      description: language === 'my' ? 'အခြား အလှအပနှင့် အသုံးအဆောင်ပစ္စည်းများ' : 'Pure silk ties, beauty tools & thoughtful additions',
       count: products.filter((p) => p.category === 'more').length,
     },
-  ], [products, t]);
+  ], [products, t, language]);
 
   // Matching products for the selected category
   const matchingProducts = useMemo(() => {
@@ -171,14 +171,14 @@ export default function HomePage() {
         <div className="flex items-start sm:items-baseline justify-between gap-3 mb-5">
           <div className="min-w-0">
             <h3 className="font-serif text-[22px] sm:text-[32px] font-medium text-[#38262e] leading-tight">
-              Top Picks & Highlights
+              {t.topPicksTitle}
             </h3>
           </div>
           <Link
             href={activeCategory === 'all' ? '/shop' : `/shop?category=${activeCategory}`}
             className="text-[13px] font-bold text-[#b73d67] hover:underline shrink-0 whitespace-nowrap pt-1 sm:pt-0"
           >
-            Shop more
+            {t.shopMore}
           </Link>
         </div>
 
@@ -233,7 +233,7 @@ export default function HomePage() {
             href={activeCategory === 'all' ? '/shop' : `/shop?category=${activeCategory}`}
             className="inline-flex items-center justify-center gap-1.5 h-[42px] px-6 rounded-[10px] bg-[#faf7f8] text-[#b73d67] border border-[#eedfe5] hover:bg-[#fceef2] hover:border-[#b73d67] text-[13px] font-bold transition-all shadow-2xs"
           >
-            <span>Explore full collection in shop</span>
+            <span>{t.exploreFullCollection}</span>
           </Link>
         </div>
       </section>
@@ -257,13 +257,13 @@ export default function HomePage() {
           <div className="w-full md:w-auto md:max-w-md flex flex-col justify-center items-start gap-3">
             <div>
               <span className="inline-block text-[11px] uppercase tracking-wider font-bold text-[#b73d67] bg-white/80 px-2.5 py-0.5 rounded-full border border-[#eedfe5] mb-1.5">
-                Store Location & Online Orders
+                {t.storeLocationBadge}
               </span>
               <h4 className="font-serif text-[20px] sm:text-[24px] font-medium leading-snug text-[#38262e]">
-                You&apos;re always welcome to visit us.
+                {t.storeLocationHeading}
               </h4>
               <p className="text-[13px] text-[#7a6870] leading-relaxed mt-1">
-                Find our store address and contact details above, or easily order your favorite beauty &amp; gadgets online with doorstep delivery.
+                {t.storeLocationDescription}
               </p>
             </div>
           </div>
@@ -284,10 +284,10 @@ export default function HomePage() {
             <div className="flex items-center justify-between pb-3 border-b border-[#eedfe5]">
               <div>
                 <h3 className="font-serif text-[22px] font-medium text-[#38262e]">
-                  All Categories
+                  {t.allCategories}
                 </h3>
                 <p className="text-[12px] text-[#7a6870] mt-0.5">
-                  Select a category to explore
+                  {t.selectCategoryToView}
                 </p>
               </div>
               <button
