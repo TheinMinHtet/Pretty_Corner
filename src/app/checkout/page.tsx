@@ -54,13 +54,14 @@ export default function CheckoutPage() {
   const [formAlert, setFormAlert] = useState<string | null>(null);
   const [promoInput, setPromoInput] = useState('');
   const [promoFeedback, setPromoFeedback] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Redirect to bag if cart is empty
+  // Redirect to bag if cart is empty (only when not actively submitting an order)
   useEffect(() => {
-    if (isMounted && cart.length === 0) {
+    if (isMounted && cart.length === 0 && !isSubmitting) {
       router.push('/bag');
     }
-  }, [isMounted, cart.length, router]);
+  }, [isMounted, cart.length, isSubmitting, router]);
 
   const grandTotal = cartTotal;
 
@@ -134,15 +135,16 @@ export default function CheckoutPage() {
       deliveryFee: 0,
       total: grandTotal,
       paymentMethod,
-      paymentStatus: 'pending',
+      paymentStatus: isCOD ? 'pending' : 'pending',
       fulfillmentStatus: isCOD ? 'confirmed' : 'pending_review',
     });
 
+    setIsSubmitting(true);
+
     if (isCOD) {
-      clearCart();
-      router.push(`/order-confirmation?orderId=${newOrder.id}`);
+      router.push(`/order-confirmation?orderId=${encodeURIComponent(newOrder.id)}`);
     } else {
-      router.push(`/payment-pending?orderId=${newOrder.id}`);
+      router.push(`/payment-pending?orderId=${encodeURIComponent(newOrder.id)}`);
     }
   };
 
@@ -544,9 +546,17 @@ export default function CheckoutPage() {
               {/* Place Order CTA Button */}
               <button
                 type="submit"
-                className={`w-full ${formAlert ? 'mt-3' : 'mt-5'} h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer whitespace-nowrap`}
+                disabled={isSubmitting}
+                className={`w-full ${formAlert ? 'mt-3' : 'mt-5'} h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer whitespace-nowrap disabled:opacity-75`}
               >
-                {paymentMethod === 'Cash on Delivery' ? t.confirmOrder : t.proceedToPayment}
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>{language === 'my' ? 'လုပ်ဆောင်နေပါသည်...' : 'Processing...'}</span>
+                  </>
+                ) : (
+                  paymentMethod === 'Cash on Delivery' ? t.confirmOrder : t.proceedToPayment
+                )}
               </button>
 
               <p className="text-[11px] text-center text-[#7a6870] mt-3 leading-normal">
