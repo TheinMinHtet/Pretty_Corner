@@ -38,8 +38,49 @@ function PaymentPendingContent() {
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [mockPaymentSuccess, setMockPaymentSuccess] = useState(false);
+  const [isInitializingPayment, setIsInitializingPayment] = useState(false);
 
-  const handleSimulatePaymentGateway = () => {
+  const handleOpenPaymentGateway = async () => {
+    const pubKey = process.env.NEXT_PUBLIC_MMPAY_PUBLISHABLE_KEY;
+    const targetId = activeOrder?.id || cleanId;
+    const amountToPay = activeOrder?.total ?? 0;
+
+    if (pubKey && typeof window !== 'undefined') {
+      try {
+        setIsInitializingPayment(true);
+        const { MMPaySDK } = await import('mmpay-browser-sdk');
+        const mmpay = new MMPaySDK(pubKey, {
+          merchantName: 'Pretty Corner',
+          environment: 'sandbox',
+          design: {
+            mode: 'light',
+            color: '#b73d67',
+          },
+        });
+
+        await mmpay.showPaymentModal(
+          {
+            orderId: targetId,
+            amount: amountToPay,
+            nonce: Date.now().toString(),
+            callbackUrl: 'https://pretty-corner.vercel.app/api/payment/webhook',
+          },
+          (result) => {
+            if (result.success) {
+              updatePaymentStatus(targetId, 'paid');
+              router.push(`/order-confirmation?orderId=${targetId}`);
+            }
+          }
+        );
+        setIsInitializingPayment(false);
+        return;
+      } catch (err) {
+        console.warn('MyanMyanPay SDK modal failed, using standard modal:', err);
+        setIsInitializingPayment(false);
+      }
+    }
+
+    // Fallback if keys are not set yet or SDK modal is bypassed
     setShowPaymentModal(true);
   };
 
@@ -113,10 +154,18 @@ function PaymentPendingContent() {
 
         {/* Open Secure Payment Page CTA */}
         <button
-          onClick={handleSimulatePaymentGateway}
-          className="w-full h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] mt-4 hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center shadow-xs cursor-pointer"
+          onClick={handleOpenPaymentGateway}
+          disabled={isInitializingPayment}
+          className="w-full h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] mt-4 hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer disabled:opacity-75"
         >
-          {t.openPaymentPage}
+          {isInitializingPayment ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <span>Connecting to MyanMyanPay...</span>
+            </>
+          ) : (
+            t.openPaymentPage
+          )}
         </button>
 
         {/* Help & Recovery */}
@@ -136,21 +185,34 @@ function PaymentPendingContent() {
       {/* Payment Gateway Simulation Modal */}
       {showPaymentModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-[360px] bg-white rounded-[20px] p-6 shadow-2xl flex flex-col text-center">
+          <div className="w-full max-w-[380px] bg-white rounded-[20px] p-6 shadow-2xl flex flex-col text-center">
             <div className="w-12 h-12 rounded-full bg-[#fceef2] text-[#b73d67] flex items-center justify-center mx-auto mb-3">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <line x1="2" y1="10" x2="22" y2="10" />
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
               </svg>
             </div>
+            <div className="inline-block mx-auto mb-1 px-2.5 py-0.5 bg-[#fceef2] text-[#b73d67] text-[11px] font-bold rounded-full uppercase tracking-wider">
+              MyanMyanPay Sandbox
+            </div>
             <h3 className="font-serif text-[22px] font-bold text-[#38262e] mb-1">
-              {paymentMethod || 'Mobile Banking'}
+              MMQR Payment
             </h3>
-            <p className="text-[13px] text-[#7a6870] mb-4">
+            <p className="text-[13px] text-[#7a6870] mb-3">
               {language === 'my'
-                ? 'ငွေပေးချေမှုပုံစံတူစနစ် ဖြစ်ပါသည်။ စမ်းသပ်ရန် အောက်ပါခလုတ်ကို နှိပ်ပါ။'
-                : 'Demo Payment Gateway. Click below to simulate completing the transfer.'}
+                ? 'KBZPay, WavePay, AYA Pay သို့မဟုတ် CB Pay ဖြင့် ပေးချေနိုင်ပါသည်။'
+                : 'Supports KBZPay, WavePay, AYA Pay, CB Pay and any MMQR app.'}
             </p>
+
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="px-2 py-1 bg-[#002f6c]/10 text-[#002f6c] text-[11px] font-bold rounded">KBZPay</span>
+              <span className="px-2 py-1 bg-[#fcd116]/30 text-[#856404] text-[11px] font-bold rounded">WavePay</span>
+              <span className="px-2 py-1 bg-[#ed1b24]/10 text-[#ed1b24] text-[11px] font-bold rounded">AYA Pay</span>
+              <span className="px-2 py-1 bg-[#005ba4]/10 text-[#005ba4] text-[11px] font-bold rounded">CB Pay</span>
+            </div>
+
             <div className="bg-[#faf7f8] rounded-xl p-3 mb-5 border border-[#eedfe5]">
               <span className="text-[11px] text-[#7a6870] block">
                 {language === 'my' ? 'လွှဲပြောင်းရမည့်ငွေ' : 'Amount to transfer'}
@@ -172,7 +234,7 @@ function PaymentPendingContent() {
                 onClick={handleConfirmGatewayPayment}
                 className="w-full h-[46px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] transition-all flex items-center justify-center shadow-xs cursor-pointer"
               >
-                {language === 'my' ? 'ငွေပေးချေပြီးပြီ' : 'Simulate Successful Payment'}
+                {language === 'my' ? 'ငွေပေးချေပြီးပြီ (Simulate)' : 'Simulate Successful Payment'}
               </button>
             )}
 
