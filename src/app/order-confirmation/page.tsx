@@ -39,10 +39,12 @@ function OrderConfirmationContent() {
   const [copied, setCopied] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
 
-  // Ensure cart is cleared upon reaching confirmed order view
+  // Clear cart only when order is confirmed COD or successfully paid
   useEffect(() => {
-    clearCart();
-  }, [clearCart]);
+    if (isCOD || order?.paymentStatus === 'paid') {
+      clearCart();
+    }
+  }, [clearCart, isCOD, order?.paymentStatus]);
 
   const handleCopy = () => {
     if (!order) return;

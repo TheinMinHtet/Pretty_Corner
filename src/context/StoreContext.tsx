@@ -92,7 +92,27 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
     return INITIAL_CART;
   });
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrdersState] = useState<Order[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('pretty_corner_orders');
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return [];
+  });
+
+  const setOrders = useCallback((updater: Order[] | ((prev: Order[]) => Order[])) => {
+    setOrdersState((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('pretty_corner_orders', JSON.stringify(next.slice(0, 50)));
+        } catch {}
+      }
+      return next;
+    });
+  }, []);
   const [selectedTownship, setSelectedTownship] = useState<TownshipOption>(MOCK_TOWNSHIPS[0]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [manualDiscount, setManualDiscount] = useState<number>(0);
@@ -156,11 +176,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     };
   }, [repo]);
 
-  useEffect(() => {
-    try {
-      localStorage.removeItem('pretty_corner_orders');
-    } catch {}
-  }, []);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);

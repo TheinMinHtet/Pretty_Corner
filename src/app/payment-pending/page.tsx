@@ -102,8 +102,24 @@ function PaymentPendingContent() {
     );
   }
 
+  if (!cleanId && !activeOrder) {
+    return (
+      <div className="w-full max-w-md mx-auto px-4 py-16 text-center">
+        <h3 className="font-serif text-[22px] font-bold text-[#38262e] mb-2">
+          {language === 'my' ? 'အမှာစာ မတွေ့ရှိပါ' : 'No Order Specified'}
+        </h3>
+        <p className="text-[13px] text-[#7a6870] mb-6">
+          {language === 'my' ? 'ကျေးဇူးပြု၍ ပစ္စည်းများ ရွေးချယ်ပြီး အမှာစာ အသစ်ပြုလုပ်ပေးပါရန်။' : 'Please select products and checkout to initiate payment.'}
+        </p>
+        <Link href="/bag" className="inline-flex h-[44px] px-6 bg-[#b73d67] text-white rounded-lg items-center font-bold text-[14px] hover:bg-[#a33259] transition-colors">
+          {t.viewBag}
+        </Link>
+      </div>
+    );
+  }
+
   const currentId = activeOrder?.id || cleanId;
-  const paymentMethod = activeOrder?.paymentMethod || 'Mobile Banking';
+  const paymentMethod = activeOrder?.paymentMethod || 'MMQR';
   const totalAmount = activeOrder?.total ?? 0;
 
   return (
