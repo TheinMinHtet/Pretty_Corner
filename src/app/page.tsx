@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import HeroBannerSlider from '@/components/HeroBannerSlider';
 
-const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false });
 const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper'), {
   ssr: false,
   loading: () => (
@@ -20,9 +19,8 @@ const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper
 
 export default function HomePage() {
   const router = useRouter();
-  const { products, cartCount, setSearchQuery, addToCart, isMounted, t, language } = useStore();
+  const { products, t, language } = useStore();
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [searchInput, setSearchInput] = useState('');
   const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
 
   const categoriesList = useMemo(() => [
@@ -81,16 +79,6 @@ export default function HomePage() {
   const displayedProducts = useMemo(() => {
     return matchingProducts.slice(0, 4);
   }, [matchingProducts]);
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchInput.trim()) {
-      setSearchQuery(searchInput.trim());
-      router.push(`/shop?q=${encodeURIComponent(searchInput.trim())}`);
-    } else {
-      router.push('/shop');
-    }
-  };
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full">
@@ -155,6 +143,7 @@ export default function HomePage() {
                       src={product.image}
                       alt={product.name}
                       fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </Link>

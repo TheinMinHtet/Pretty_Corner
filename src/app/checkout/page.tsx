@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -8,10 +8,26 @@ import { useStore } from '@/context/StoreContext';
 import { MOCK_TOWNSHIPS } from '@/lib/mockData';
 import OrderingStepBar from '@/components/OrderingStepBar';
 import { validatePhoneNumber } from '@/lib/validation';
+import { getAddressResolver } from '@/lib/location/MyanmarAddressResolver';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, cartSubtotal, discount, cartTotal, selectedTownship, setSelectedTownship, createOrder, clearCart, isMounted, t, language } = useStore();
+  const {
+    cart,
+    cartSubtotal,
+    discount,
+    cartTotal,
+    selectedTownship,
+    setSelectedTownship,
+    appliedPromo,
+    applyPromoCode,
+    removePromoCode,
+    createOrder,
+    clearCart,
+    isMounted,
+    t,
+    language,
+  } = useStore();
 
   const [customerName, setCustomerName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -29,100 +45,46 @@ export default function CheckoutPage() {
   const [locationAccuracy, setLocationAccuracy] = useState<number | null>(null);
 
   const [formAlert, setFormAlert] = useState<string | null>(null);
+  const [promoInput, setPromoInput] = useState('');
+  const [promoFeedback, setPromoFeedback] = useState<string | null>(null);
 
-  const deliveryFee = 0;
-  const grandTotal = cartTotal;
-
-  const handleUseCurrentLocation = () => {
-    if (typeof window === 'undefined' || !navigator.geolocation) {
-      setGpsStatus('error');
-      setGpsErrorMsg(language === 'my' ? 'သင့်ဘရောင်ဇာတွင် GPS အသုံးမပြုနိုင်ပါ' : 'GPS location is not supported by your browser.');
-      return;
+  // Redirect to bag if cart is empty
+  useEffect(() => {
+    if (isMounted && cart.length === 0) {
+      router.push('/bag');
     }
+  }, [isMounted, cart.length, router]);
 
+  const deliveryFee = selectedTownship?.fee || 3000;
+  const grandTotal = cartTotal + deliveryFee;
+
+  const handleUseCurrentLocation = async () => {
     setIsLocating(true);
     setGpsStatus('locating');
     setGpsErrorMsg('');
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude, accuracy } = position.coords;
-        setPinCoords({ lat: latitude, lng: longitude });
-        setLocationAccuracy(Math.round(accuracy));
-        setGpsStatus('success');
-        setIsLocating(false);
-
-        // Real reverse geocoding to auto-fill delivery address (unconditionally overwrites)
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
-            {
-              headers: {
-                'Accept-Language': 'en,my',
-              },
-            }
-          );
-          if (res.ok) {
-            const data = await res.json();
-            if (data && data.address) {
-              const addr = data.address;
-              const buildingOrRoad = [
-                addr.house_number,
-                addr.building,
-                addr.road || addr.street || addr.pedestrian || addr.footway,
-              ]
-                .filter(Boolean)
-                .join(' ');
-
-              const area = addr.quarter || addr.neighbourhood || addr.suburb || addr.residential || addr.village;
-              const township = addr.township || addr.city_district || addr.district || addr.municipality;
-              const city = addr.city || addr.town || 'Yangon';
-
-              const parts = [buildingOrRoad, area, township, city].filter(Boolean);
-              const formatted = parts.length > 0 ? parts.join(', ') : (data.display_name?.split(',').slice(0, 4).join(', ') || '');
-
-              if (formatted) {
-                setStreetAddress(formatted);
-                if (township) {
-                  const match = MOCK_TOWNSHIPS.find(
-                    (t) => t.name.toLowerCase() === township.toLowerCase() || formatted.toLowerCase().includes(t.name.toLowerCase())
-                  );
-                  if (match) setSelectedTownship(match);
-                }
-              } else {
-                setStreetAddress(`GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-              }
-            } else if (data && data.display_name) {
-              setStreetAddress(data.display_name.split(',').slice(0, 4).join(', '));
-            } else {
-              setStreetAddress(`GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-            }
-          } else {
-            setStreetAddress(`GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-          }
-        } catch {
-          setStreetAddress(`GPS: ${latitude.toFixed(5)}, ${longitude.toFixed(5)}`);
-        }
-      },
-      (err) => {
-        setIsLocating(false);
-        setGpsStatus('error');
-        if (err.code === 1) {
-          setGpsErrorMsg(language === 'my' ? 'တည်နေရာအသုံးပြုခွင့် မရရှိပါ။ ဘရောင်ဇာ Setting တွင် တည်နေရာဖွင့်ပေးပါရန်။' : 'Location permission was denied. Please allow location permissions in your browser.');
-        } else if (err.code === 2) {
-          setGpsErrorMsg(language === 'my' ? 'GPS တည်နေရာရှာမတွေ့ပါ။ စက်တွင် GPS ဖွင့်ထားခြင်းရှိမရှိ စစ်ဆေးပေးပါ။' : 'GPS position unavailable. Please ensure GPS/Location is turned on.');
-        } else if (err.code === 3) {
-          setGpsErrorMsg(language === 'my' ? 'အချိန်ကြာမြင့်သွားပါသည်။ ထပ်မံနှိပ်ပေးပါ။' : 'GPS request timed out. Please click again.');
-        } else {
-          setGpsErrorMsg(language === 'my' ? 'တည်နေရာမတွေ့ရှိပါ။ လိပ်စာကို ကိုယ်တိုင်ရိုက်ထည့်ပေးပါရန်။' : 'Could not detect location. Please enter delivery address manually.');
-        }
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
+    try {
+      const resolver = getAddressResolver();
+      const fix = await resolver.resolveCurrentDeliveryLocation(language, 8000);
+      setPinCoords(fix.coordinates);
+      if (fix.accuracyMeters !== undefined) {
+        setLocationAccuracy(fix.accuracyMeters);
       }
-    );
+      setStreetAddress(fix.formattedAddress);
+      if (fix.township) {
+        setSelectedTownship(fix.township);
+      }
+      if (fix.landmark && !landmarkNote.trim()) {
+        setLandmarkNote(fix.landmark);
+      }
+      setGpsStatus('success');
+    } catch (err: unknown) {
+      setGpsStatus('error');
+      const resolver = getAddressResolver();
+      setGpsErrorMsg(resolver.mapGeolocationError(err, language));
+    } finally {
+      setIsLocating(false);
+    }
   };
 
   const handlePlaceOrder = (e: React.FormEvent) => {
@@ -147,22 +109,24 @@ export default function CheckoutPage() {
 
     const isCOD = paymentMethod === 'Cash on Delivery';
 
+    const resolver = getAddressResolver();
+    const townshipName = selectedTownship?.name || 'Yangon';
+    const completeAddress = resolver.formatAddressWithTownship(streetAddress, townshipName);
+
     const newOrder = createOrder({
-      customerName,
-      phone: phoneNumber,
-      township: selectedTownship?.name || 'Yangon',
-      deliveryAddress: streetAddress.trim().toLowerCase().includes('yangon')
-        ? streetAddress.trim()
-        : `${streetAddress.trim()}, Yangon`,
+      customerName: customerName.trim(),
+      phone: phoneNumber.trim(),
+      township: townshipName,
+      deliveryAddress: completeAddress,
       coordinates: pinCoords || { lat: 16.8302, lng: 96.1301 },
-      landmarkNote,
+      landmarkNote: landmarkNote.trim(),
       items: cart,
       subtotal: cartSubtotal,
       discount,
       deliveryFee,
       total: grandTotal,
       paymentMethod,
-      paymentStatus: isCOD ? 'pending' : 'pending',
+      paymentStatus: 'pending',
       fulfillmentStatus: isCOD ? 'confirmed' : 'pending_review',
     });
 
@@ -254,10 +218,11 @@ export default function CheckoutPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[12px] font-bold text-[#38262e] mb-1.5">
+                  <label htmlFor="checkout-name" className="block text-[12px] font-bold text-[#38262e] mb-1.5">
                     {t.fullName}
                   </label>
                   <input
+                    id="checkout-name"
                     type="text"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
@@ -278,10 +243,11 @@ export default function CheckoutPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[12px] font-bold text-[#38262e] mb-1.5">
+                  <label htmlFor="checkout-phone" className="block text-[12px] font-bold text-[#38262e] mb-1.5">
                     {t.phone}
                   </label>
                   <input
+                    id="checkout-phone"
                     type="tel"
                     required
                     value={phoneNumber}
@@ -312,9 +278,31 @@ export default function CheckoutPage() {
                   )}
                 </div>
 
+                {/* Township Selector Dropdown */}
+                <div className="sm:col-span-2">
+                  <label htmlFor="checkout-township" className="block text-[12px] font-bold text-[#38262e] mb-1.5">
+                    {t.township}
+                  </label>
+                  <select
+                    id="checkout-township"
+                    value={selectedTownship.name}
+                    onChange={(e) => {
+                      const match = MOCK_TOWNSHIPS.find((town) => town.name === e.target.value);
+                      if (match) setSelectedTownship(match);
+                    }}
+                    className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] outline-none focus:border-[#b73d67] cursor-pointer"
+                  >
+                    {MOCK_TOWNSHIPS.map((town) => (
+                      <option key={town.name} value={town.name}>
+                        {town.name} — {town.fee.toLocaleString()} MMK ({town.zone})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <div className="sm:col-span-2">
                   <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <label className="block text-[12px] font-bold text-[#38262e]">
+                    <label htmlFor="checkout-address" className="block text-[12px] font-bold text-[#38262e]">
                       {t.deliveryAddress}
                     </label>
                     <button
@@ -332,6 +320,7 @@ export default function CheckoutPage() {
                     </button>
                   </div>
                   <input
+                    id="checkout-address"
                     type="text"
                     value={streetAddress}
                     onChange={(e) => setStreetAddress(e.target.value)}
@@ -358,16 +347,17 @@ export default function CheckoutPage() {
                   {gpsStatus === 'success' && !gpsErrorMsg && pinCoords && (
                     <p className="text-emerald-700 text-[11px] font-medium mt-1.5 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                      <span>{language === 'my' ? `တည်နေရာ ရယူပြီးပါပြီ (${pinCoords.lat.toFixed(4)}, ${pinCoords.lng.toFixed(4)})` : `GPS location captured (${pinCoords.lat.toFixed(4)}, ${pinCoords.lng.toFixed(4)}) · You can edit the address above`}</span>
+                      <span>{language === 'my' ? `တည်နေရာ ရယူပြီးပါပြီ (${pinCoords.lat.toFixed(4)}, ${pinCoords.lng.toFixed(4)}${locationAccuracy ? ` · ±${locationAccuracy}m` : ''})` : `GPS location captured (${pinCoords.lat.toFixed(4)}, ${pinCoords.lng.toFixed(4)}${locationAccuracy ? ` · ±${locationAccuracy}m` : ''}) · You can edit the address above`}</span>
                     </p>
                   )}
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-[12px] font-bold text-[#38262e] mb-1.5">
+                  <label htmlFor="checkout-landmark" className="block text-[12px] font-bold text-[#38262e] mb-1.5">
                     {t.landmarkNote}
                   </label>
                   <input
+                    id="checkout-landmark"
                     type="text"
                     value={landmarkNote}
                     onChange={(e) => setLandmarkNote(e.target.value)}
@@ -387,52 +377,76 @@ export default function CheckoutPage() {
                 {t.choosePaymentMethod}
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <fieldset className="grid grid-cols-1 sm:grid-cols-2 gap-3.5" role="radiogroup" aria-label={t.paymentMethod}>
                 {/* 1. Mobile Banking */}
-                <div
-                  onClick={() => setPaymentMethod('Mobile Banking')}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center ${
+                <label
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
                     paymentMethod === 'Mobile Banking'
                       ? 'bg-[#fceef2] border-[#b73d67] ring-1 ring-[#b73d67]'
                       : 'bg-white border-[#eedfe5] hover:border-[#b73d67]'
                   }`}
                 >
-                  <span className={`text-[15px] font-bold ${paymentMethod === 'Mobile Banking' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
-                    {paymentMethod === 'Mobile Banking' ? '●' : '○'} {t.mobileBanking}
+                  <div className="flex items-center gap-2.5">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="Mobile Banking"
+                      checked={paymentMethod === 'Mobile Banking'}
+                      onChange={() => setPaymentMethod('Mobile Banking')}
+                      className="w-4 h-4 text-[#b73d67] accent-[#b73d67] cursor-pointer"
+                    />
+                    <span className={`text-[15px] font-bold ${paymentMethod === 'Mobile Banking' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                      {t.mobileBanking}
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold text-[#7a6870] bg-white px-2 py-0.5 rounded border border-[#eedfe5] shadow-2xs">
+                    KBZPay / WavePay
                   </span>
-                </div>
+                </label>
 
                 {/* 2. Cash on Delivery */}
-                <div
-                  onClick={() => setPaymentMethod('Cash on Delivery')}
-                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center ${
+                <label
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
                     paymentMethod === 'Cash on Delivery'
                       ? 'bg-[#fceef2] border-[#b73d67] ring-1 ring-[#b73d67]'
                       : 'bg-white border-[#eedfe5] hover:border-[#b73d67]'
                   }`}
                 >
-                  <span className={`text-[15px] font-bold ${paymentMethod === 'Cash on Delivery' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
-                    {paymentMethod === 'Cash on Delivery' ? '●' : '○'} {t.cod}
+                  <div className="flex items-center gap-2.5">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="Cash on Delivery"
+                      checked={paymentMethod === 'Cash on Delivery'}
+                      onChange={() => setPaymentMethod('Cash on Delivery')}
+                      className="w-4 h-4 text-[#b73d67] accent-[#b73d67] cursor-pointer"
+                    />
+                    <span className={`text-[15px] font-bold ${paymentMethod === 'Cash on Delivery' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                      {t.cod}
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold text-[#7a6870] bg-white px-2 py-0.5 rounded border border-[#eedfe5] shadow-2xs">
+                    Pay on Arrival
                   </span>
-                </div>
-              </div>
+                </label>
+              </fieldset>
             </div>
           </div>
 
           {/* Right Column: Sticky Order Summary & Submit */}
           <div className="md:col-span-5 lg:col-span-4 mt-6 md:mt-0">
-            <div className="sticky top-28 bg-[#fcf9fa] p-6 lg:p-7 rounded-2xl border border-[#eedfe5]">
+            <div className="sticky top-28 bg-[#fcf9fa] p-5 sm:p-6 lg:p-7 rounded-2xl border border-[#eedfe5]">
               <h2 className="font-serif text-[24px] sm:text-[26px] font-medium text-[#38262e] mb-4">
                 {t.reviewAndPay}
               </h2>
 
               {/* Items Miniature List */}
-              <div className="max-h-48 overflow-y-auto divide-y divide-[#eedfe5] mb-4 pr-1">
+              <div className="max-h-48 overflow-y-auto divide-y divide-[#eedfe5] mb-3.5 pr-1">
                 {cart.map((item) => (
                   <div key={item.id} className="py-2.5 flex items-center justify-between text-[13px]">
                     <div className="flex items-center gap-2.5 truncate mr-2">
                       <div className="relative w-9 h-9 rounded bg-[#f9f5f7] overflow-hidden shrink-0">
-                        <Image src={item.image} alt={item.name} fill className="object-cover" />
+                        <Image src={item.image} alt={item.name} fill sizes="36px" className="object-cover" />
                       </div>
                       <div className="truncate flex items-center">
                         <span className="font-medium text-[#38262e] truncate">{item.name}</span>
@@ -448,15 +462,78 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              {/* Sub Total, Discount, and Total */}
+              {/* Promo Code Box in Checkout */}
+              <div className="bg-white p-3 rounded-xl border border-[#eedfe5] mb-3.5 shadow-2xs">
+                {appliedPromo ? (
+                  <div className="flex items-center justify-between bg-[#fceef2] px-3 py-1.5 rounded-lg border border-[#f1d3df]">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-bold text-[#b73d67] bg-white px-2 py-0.5 rounded shadow-2xs uppercase tracking-wider">
+                        {appliedPromo.code}
+                      </span>
+                      <span className="text-[12px] font-bold text-[#38262e]">
+                        -{appliedPromo.discountPercentage}% OFF
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        removePromoCode();
+                        setPromoFeedback(null);
+                      }}
+                      className="text-[11px] font-bold text-[#b73d67] hover:underline cursor-pointer"
+                    >
+                      {t.remove}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={promoInput}
+                        onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                        placeholder={t.promoPlaceholder}
+                        className="flex-1 h-[36px] px-3 rounded-lg border border-[#eedfe5] text-[13px] font-mono uppercase text-[#38262e] placeholder:text-[#a89aa0] focus:outline-none focus:border-[#b73d67] transition-colors"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!promoInput.trim()) return;
+                          const res = applyPromoCode(promoInput.trim());
+                          setPromoFeedback(res.message);
+                          if (res.success) {
+                            setPromoInput('');
+                          }
+                        }}
+                        className="h-[36px] px-3.5 bg-[#38262e] hover:bg-[#b73d67] text-white text-[12px] font-bold rounded-lg transition-colors cursor-pointer shrink-0"
+                      >
+                        {t.apply}
+                      </button>
+                    </div>
+                    {promoFeedback && (
+                      <p className={`text-[11px] font-medium mt-1 ${appliedPromo ? 'text-emerald-700' : 'text-[#b73d67]'}`}>
+                        {promoFeedback}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Sub Total, Discount, Delivery Fee, and Total */}
               <div className="border-t border-[#eedfe5] pt-3.5 space-y-2 text-[14px]">
                 <div className="flex justify-between items-center text-[#7a6870]">
                   <span>{t.subTotal}</span>
                   <span className="font-semibold text-[#38262e]">{cartSubtotal.toLocaleString()} MMK</span>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between items-center text-[#b73d67]">
+                    <span>{t.discount} {appliedPromo ? `(${appliedPromo.discountPercentage}%)` : ''}</span>
+                    <span className="font-bold">-{discount.toLocaleString()} MMK</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-[#7a6870]">
-                  <span>{t.discount}</span>
-                  <span className="font-semibold text-[#38262e]">{discount.toLocaleString()} MMK</span>
+                  <span>{t.delivery} ({selectedTownship.name.split(',')[0]})</span>
+                  <span className="font-semibold text-[#38262e]">{deliveryFee.toLocaleString()} MMK</span>
                 </div>
                 <div className="border-t border-[#eedfe5] pt-2.5 flex justify-between items-center text-[18px] font-bold text-[#38262e]">
                   <span>{t.total}</span>

@@ -3,27 +3,29 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { Product } from '@/lib/types';
 
-const CartBadge = dynamic(() => import('@/components/CartBadge'), { ssr: false });
-
 export default function ProductDetailView({ product }: { product: Product }) {
   const router = useRouter();
-  const { addToCart, cartCount, isMounted, t } = useStore();
+  const { addToCart, t } = useStore();
 
   const [selectedGalleryIdx, setSelectedGalleryIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [openWhyLove, setOpenWhyLove] = useState(true);
   const [openHowToUse, setOpenHowToUse] = useState(false);
+  const [isAdded, setIsAdded] = useState(false);
 
   const unitPrice = product.price;
   const totalPrice = unitPrice * quantity;
 
   const handleAddToCart = () => {
     addToCart(product.id, '', quantity);
+    setIsAdded(true);
+    setTimeout(() => {
+      setIsAdded(false);
+    }, 2000);
   };
 
   return (
@@ -63,6 +65,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 alt={product.name}
                 fill
                 priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
                 className="object-cover"
               />
 
@@ -103,7 +106,13 @@ export default function ProductDetailView({ product }: { product: Product }) {
                       : 'border-transparent hover:border-[#eedfe5]'
                   }`}
                 >
-                  <Image src={img} alt={`${product.name} ${idx + 1}`} fill className="object-cover" />
+                  <Image
+                    src={img}
+                    alt={`${product.name} ${idx + 1}`}
+                    fill
+                    sizes="(max-width: 640px) 64px, 80px"
+                    className="object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -161,9 +170,20 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {/* Big Add to Bag Button */}
                 <button
                   onClick={handleAddToCart}
-                  className="flex-1 h-[52px] bg-[#b73d67]/80 hover:bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] active:scale-[0.98] transition-all flex items-center justify-center shadow-sm cursor-pointer"
+                  className={`flex-1 h-[52px] ${
+                    isAdded ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-[#b73d67] hover:bg-[#a33259]'
+                  } text-white rounded-[10px] font-bold text-[15px] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer`}
                 >
-                  {t.addToBag} · {totalPrice.toLocaleString()} MMK
+                  {isAdded ? (
+                    <>
+                      <svg className="w-5 h-5 animate-in zoom-in-75 duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      <span>{t.addedToBag} ✓</span>
+                    </>
+                  ) : (
+                    `${t.addToBag} · ${totalPrice.toLocaleString()} MMK`
+                  )}
                 </button>
               </div>
             </div>

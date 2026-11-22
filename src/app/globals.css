@@ -37,6 +37,26 @@
   scrollbar-width: none;
 }
 
+/* Hero promotion automated progress bar */
+@keyframes heroProgress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-hero-progress {
+  animation: heroProgress 5500ms linear forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-progress {
+    animation-duration: 0.01ms !important;
+  }
+}
+
 @media print {
   header, footer, nav, .print\:hidden, .no-print {
     display: none !important;

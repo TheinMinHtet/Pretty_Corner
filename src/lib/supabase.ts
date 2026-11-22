@@ -7,7 +7,9 @@ const supabaseAnonKey =
   '';
 
 // Client for public operations (browsing products, looking up receipts, placing orders)
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = (supabaseUrl && supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : (null as unknown as ReturnType<typeof createClient>);
 
 // Server-only client with admin service role (for admin dashboard, inventory management)
 export function getSupabaseAdmin() {

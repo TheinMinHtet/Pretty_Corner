@@ -1,4 +1,12 @@
 /**
+ * Normalizes Myanmar numerals (၀-၉) to standard ASCII digits (0-9)
+ */
+export function normalizeMyanmarDigits(input: string): string {
+  const mmDigits = ['၀', '၁', '၂', '၃', '၄', '၅', '၆', '၇', '၈', '၉'];
+  return input.replace(/[၀-၉]/g, (char) => mmDigits.indexOf(char).toString());
+}
+
+/**
  * Validates phone numbers according to the required Myanmar formats:
  * - Must start with 09, 01, or +959
  * - Must be followed by 6 to 10 digits
@@ -10,8 +18,11 @@ export function validatePhoneNumber(phone: string): { isValid: boolean; error?: 
     return { isValid: false, error: 'Phone number is required.' };
   }
 
+  // Normalize Myanmar Unicode digits (၀-၉) to ASCII (0-9)
+  const normalized = normalizeMyanmarDigits(trimmed);
+
   // Remove whitespace, dashes, parentheses, dots
-  const cleaned = trimmed.replace(/[\s\-\(\)\.]/g, '');
+  const cleaned = normalized.replace(/[\s\-\(\)\.]/g, '');
 
   // Must consist only of digits with optional leading '+'
   if (!/^\+?[0-9]+$/.test(cleaned)) {

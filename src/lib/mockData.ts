@@ -1,4 +1,4 @@
-import { TownshipOption } from './types';
+import { TownshipOption, Promotion } from './types';
 
 export const MOCK_TOWNSHIPS: TownshipOption[] = [
   { name: 'Kamayut, Yangon', fee: 3000, zone: 'Downtown / Inner Yangon' },
@@ -14,4 +14,49 @@ export const MOCK_TOWNSHIPS: TownshipOption[] = [
   { name: 'South Okkalapa, Yangon', fee: 4000, zone: 'Outer Yangon' },
   { name: 'North Okkalapa, Yangon', fee: 4000, zone: 'Outer Yangon' },
   { name: 'Mandalay City (Express Delivery)', fee: 5000, zone: 'Upper Myanmar' },
+];
+
+export const DEFAULT_PROMOTIONS: Promotion[] = [
+  {
+    id: 'promo-lens-duo',
+    code: 'LENSDUO10',
+    title: 'Contact Lens Duo Treat',
+    subtitle: '10% off when ordering 2+ pairs of monthly lenses',
+    discountPercentage: 10,
+    startDate: '2026-11-10',
+    endDate: '2026-12-15',
+    active: true,
+    imageUrl: '/assets/hero.png',
+    bannerBadge: 'BEAUTY DUO DROP · 10% OFF',
+    ctaText: 'Explore Contact Lenses',
+    ctaLink: '/shop?category=lenses',
+  },
+  {
+    id: 'promo-lash-lip',
+    code: 'PRETTY20',
+    title: 'Lash & Lip Weekend',
+    subtitle: 'Soft-focus beauty essentials and radiant lip tints',
+    discountPercentage: 20,
+    startDate: '2026-10-15',
+    endDate: '2026-12-31',
+    active: true,
+    imageUrl: '/assets/dew-drop-photograph.png',
+    bannerBadge: 'WEEKEND FLASH · 20% OFF',
+    ctaText: 'Explore Makeup & Lashes',
+    ctaLink: '/shop?category=makeup',
+  },
+  {
+    id: 'promo-curated-corner',
+    code: 'WELCOME10',
+    title: 'Curated Corner for Beauty & Tech',
+    subtitle: 'Authentic cosmetics, smart electrical devices, and everyday lifestyle finds delivered across Myanmar.',
+    discountPercentage: 10,
+    startDate: '2026-11-01',
+    endDate: '2026-12-31',
+    active: true,
+    imageUrl: '/assets/hero-banner.jpg',
+    bannerBadge: 'NEW CURATION · EVERYDAY FINDS',
+    ctaText: 'Shop All Favorites',
+    ctaLink: '/shop',
+  },
 ];

@@ -16,18 +16,22 @@ function PaymentPendingContent() {
   const localOrder = orders.find((o) => o.id.trim().toUpperCase() === cleanId) || orders[0];
 
   const [remoteOrder, setRemoteOrder] = useState<typeof localOrder | null>(null);
-  const [remoteLoading, setRemoteLoading] = useState(false);
+  const [remoteLoading, setRemoteLoading] = useState(!localOrder && Boolean(cleanId));
 
   useEffect(() => {
+    let active = true;
     if (!localOrder && cleanId && fetchOrderById) {
-      setRemoteLoading(true);
       fetchOrderById(cleanId)
         .then((res) => {
-          if (res) setRemoteOrder(res);
-          setRemoteLoading(false);
+          if (active && res) setRemoteOrder(res);
         })
-        .catch(() => setRemoteLoading(false));
+        .finally(() => {
+          if (active) setRemoteLoading(false);
+        });
     }
+    return () => {
+      active = false;
+    };
   }, [localOrder, cleanId, fetchOrderById]);
 
   const activeOrder = localOrder || remoteOrder;
@@ -158,7 +162,7 @@ function PaymentPendingContent() {
 
             {mockPaymentSuccess ? (
               <div className="h-[46px] bg-emerald-50 text-emerald-700 font-bold text-[14px] rounded-[10px] flex items-center justify-center gap-2">
-                <svg className="w-5 h-5 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg className="w-5 h-5 animate-in zoom-in-75 duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M20 6L9 17l-5-5" />
                 </svg>
                 {t.paymentAuthorized}

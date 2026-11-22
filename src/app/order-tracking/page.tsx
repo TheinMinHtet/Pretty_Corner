@@ -13,19 +13,23 @@ function OrderReceiptContent() {
   const cleanId = orderId.trim().toUpperCase();
   const order = orders.find((o) => o.id.trim().toUpperCase() === cleanId);
 
-  const [remoteLoading, setRemoteLoading] = React.useState(false);
+  const [remoteLoading, setRemoteLoading] = React.useState(!order && Boolean(cleanId));
   const [remoteOrder, setRemoteOrder] = React.useState<typeof order | null>(null);
 
   React.useEffect(() => {
+    let active = true;
     if (!order && cleanId && fetchOrderById) {
-      setRemoteLoading(true);
       fetchOrderById(cleanId)
         .then((res) => {
-          if (res) setRemoteOrder(res);
-          setRemoteLoading(false);
+          if (active && res) setRemoteOrder(res);
         })
-        .catch(() => setRemoteLoading(false));
+        .finally(() => {
+          if (active) setRemoteLoading(false);
+        });
     }
+    return () => {
+      active = false;
+    };
   }, [order, cleanId, fetchOrderById]);
 
   const activeOrder = order || remoteOrder;
