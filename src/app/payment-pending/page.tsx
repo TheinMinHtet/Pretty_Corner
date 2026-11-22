@@ -92,7 +92,7 @@ function PaymentPendingContent() {
         </h2>
 
         <p className="font-sans text-[14px] text-[#7a6870] mt-2 leading-relaxed">
-          {t.completePaymentSecurely}<br />{paymentMethod || 'KBZPay, WavePay'}.
+          {t.completePaymentSecurely}<br />{paymentMethod || 'MMQR'}.
         </p>
 
         {/* Provider Payment Card */}

@@ -3,12 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
-import { MOCK_TOWNSHIPS } from '@/lib/mockData';
 import OrderingStepBar from '@/components/OrderingStepBar';
 import { validatePhoneNumber } from '@/lib/validation';
 import { getAddressResolver } from '@/lib/location/MyanmarAddressResolver';
+
+const DeliveryMapPicker = dynamic(() => import('@/components/DeliveryMapPicker'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[220px] bg-[#fcf9fa] border border-[#eedfe5] rounded-xl flex items-center justify-center mt-2">
+      <div className="w-6 h-6 border-2 border-[#b73d67] border-t-transparent rounded-full animate-spin" />
+    </div>
+  ),
+});
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -17,8 +26,6 @@ export default function CheckoutPage() {
     cartSubtotal,
     discount,
     cartTotal,
-    selectedTownship,
-    setSelectedTownship,
     appliedPromo,
     applyPromoCode,
     removePromoCode,
@@ -55,8 +62,22 @@ export default function CheckoutPage() {
     }
   }, [isMounted, cart.length, router]);
 
-  const deliveryFee = selectedTownship?.fee || 3000;
-  const grandTotal = cartTotal + deliveryFee;
+  const grandTotal = cartTotal;
+
+  const handleMapLocationSelect = (
+    coords: { lat: number; lng: number },
+    address: string,
+    landmark?: string
+  ) => {
+    setPinCoords(coords);
+    setStreetAddress(address);
+    setAddressTouched(false);
+    setGpsStatus('success');
+    setGpsErrorMsg('');
+    if (landmark && !landmarkNote.trim()) {
+      setLandmarkNote(landmark);
+    }
+  };
 
   const handleUseCurrentLocation = async () => {
     setIsLocating(true);
@@ -71,9 +92,6 @@ export default function CheckoutPage() {
         setLocationAccuracy(fix.accuracyMeters);
       }
       setStreetAddress(fix.formattedAddress);
-      if (fix.township) {
-        setSelectedTownship(fix.township);
-      }
       if (fix.landmark && !landmarkNote.trim()) {
         setLandmarkNote(fix.landmark);
       }
@@ -109,21 +127,18 @@ export default function CheckoutPage() {
 
     const isCOD = paymentMethod === 'Cash on Delivery';
 
-    const resolver = getAddressResolver();
-    const townshipName = selectedTownship?.name || 'Yangon';
-    const completeAddress = resolver.formatAddressWithTownship(streetAddress, townshipName);
+    const completeAddress = streetAddress.trim();
 
     const newOrder = createOrder({
       customerName: customerName.trim(),
       phone: phoneNumber.trim(),
-      township: townshipName,
       deliveryAddress: completeAddress,
       coordinates: pinCoords || { lat: 16.8302, lng: 96.1301 },
       landmarkNote: landmarkNote.trim(),
       items: cart,
       subtotal: cartSubtotal,
       discount,
-      deliveryFee,
+      deliveryFee: 0,
       total: grandTotal,
       paymentMethod,
       paymentStatus: 'pending',
@@ -278,47 +293,12 @@ export default function CheckoutPage() {
                   )}
                 </div>
 
-                {/* Township Selector Dropdown */}
-                <div className="sm:col-span-2">
-                  <label htmlFor="checkout-township" className="block text-[12px] font-bold text-[#38262e] mb-1.5">
-                    {t.township}
-                  </label>
-                  <select
-                    id="checkout-township"
-                    value={selectedTownship.name}
-                    onChange={(e) => {
-                      const match = MOCK_TOWNSHIPS.find((town) => town.name === e.target.value);
-                      if (match) setSelectedTownship(match);
-                    }}
-                    className="w-full h-[46px] px-3.5 bg-white border border-[#eedfe5] rounded-[9px] text-[14px] text-[#38262e] outline-none focus:border-[#b73d67] cursor-pointer"
-                  >
-                    {MOCK_TOWNSHIPS.map((town) => (
-                      <option key={town.name} value={town.name}>
-                        {town.name} — {town.fee.toLocaleString()} MMK ({town.zone})
-                      </option>
-                    ))}
-                  </select>
-                </div>
 
                 <div className="sm:col-span-2">
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <label htmlFor="checkout-address" className="block text-[12px] font-bold text-[#38262e]">
-                      {t.deliveryAddress}
-                    </label>
-                    <button
-                      type="button"
-                      onClick={handleUseCurrentLocation}
-                      disabled={isLocating}
-                      className="inline-flex items-center gap-1.5 text-[11px] sm:text-[12px] font-semibold text-[#b73d67] hover:text-[#8e294d] bg-[#fceef2] hover:bg-[#fadce6] px-2.5 py-1 rounded-full transition-all cursor-pointer shadow-2xs disabled:opacity-60 shrink-0"
-                      title="Auto-fill address using device GPS"
-                    >
-                      <svg className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="10" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                      <span>{isLocating ? t.locating : t.locateMe}</span>
-                    </button>
-                  </div>
+                  <label htmlFor="checkout-address" className="block text-[12px] font-bold text-[#38262e] mb-1.5">
+                    {t.deliveryAddress}
+                  </label>
+
                   <input
                     id="checkout-address"
                     type="text"
@@ -338,6 +318,16 @@ export default function CheckoutPage() {
                       <span>{t.deliveryAddressRequired}</span>
                     </p>
                   )}
+
+                  {/* Interactive Map & Search Engine Picker */}
+                  <DeliveryMapPicker
+                    coords={pinCoords}
+                    onLocationSelect={handleMapLocationSelect}
+                    language={language}
+                    isLocatingGps={isLocating}
+                    onLocateGps={handleUseCurrentLocation}
+                  />
+
                   {gpsErrorMsg && (
                     <p className="text-[#b73d67] text-[11.5px] font-medium mt-1.5 flex items-center gap-1.5">
                       <span className="shrink-0">⚠</span>
@@ -347,7 +337,11 @@ export default function CheckoutPage() {
                   {gpsStatus === 'success' && !gpsErrorMsg && pinCoords && (
                     <p className="text-emerald-700 text-[11px] font-medium mt-1.5 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                      <span>{language === 'my' ? `တည်နေရာ ရယူပြီးပါပြီ (${pinCoords.lat.toFixed(4)}, ${pinCoords.lng.toFixed(4)}${locationAccuracy ? ` · ±${locationAccuracy}m` : ''})` : `GPS location captured (${pinCoords.lat.toFixed(4)}, ${pinCoords.lng.toFixed(4)}${locationAccuracy ? ` · ±${locationAccuracy}m` : ''}) · You can edit the address above`}</span>
+                      <span>
+                        {language === 'my'
+                          ? `တည်နေရာ ရယူပြီးပါပြီ (${pinCoords.lat.toFixed(4)}, ${pinCoords.lng.toFixed(4)}${locationAccuracy ? ` · ±${locationAccuracy}m` : ''}) · အပေါ်တွင် လိပ်စာ ပြင်ဆင်နိုင်ပါသည်`
+                          : `Pinned location active (${pinCoords.lat.toFixed(4)}, ${pinCoords.lng.toFixed(4)}${locationAccuracy ? ` · ±${locationAccuracy}m` : ''}) · You can edit the address above`}
+                      </span>
                     </p>
                   )}
                 </div>
@@ -400,7 +394,7 @@ export default function CheckoutPage() {
                     </span>
                   </div>
                   <span className="text-[11px] font-semibold text-[#7a6870] bg-white px-2 py-0.5 rounded border border-[#eedfe5] shadow-2xs">
-                    KBZPay / WavePay
+                    MMQR
                   </span>
                 </label>
 
@@ -519,7 +513,7 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {/* Sub Total, Discount, Delivery Fee, and Total */}
+              {/* Sub Total, Discount, and Total */}
               <div className="border-t border-[#eedfe5] pt-3.5 space-y-2 text-[14px]">
                 <div className="flex justify-between items-center text-[#7a6870]">
                   <span>{t.subTotal}</span>
@@ -531,10 +525,6 @@ export default function CheckoutPage() {
                     <span className="font-bold">-{discount.toLocaleString()} MMK</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center text-[#7a6870]">
-                  <span>{t.delivery} ({selectedTownship.name.split(',')[0]})</span>
-                  <span className="font-semibold text-[#38262e]">{deliveryFee.toLocaleString()} MMK</span>
-                </div>
                 <div className="border-t border-[#eedfe5] pt-2.5 flex justify-between items-center text-[18px] font-bold text-[#38262e]">
                   <span>{t.total}</span>
                   <span className="text-[#b73d67]">{grandTotal.toLocaleString()} MMK</span>

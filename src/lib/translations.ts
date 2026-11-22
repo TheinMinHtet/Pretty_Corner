@@ -105,6 +105,12 @@ export type TranslationSchema = Record<
   | 'locateMe'
   | 'located'
   | 'locating'
+  | 'pinOnMap'
+  | 'hideMap'
+  | 'pinMapHint'
+  | 'pinMapDragging'
+  | 'pinMapSuccess'
+  | 'searchMapPlaceholder'
   | 'landmarkNote'
   | 'landmarkPlaceholder'
   | 'paymentMethod'
@@ -309,13 +315,19 @@ export const translations: Record<Language, TranslationSchema> = {
     locateMe: 'Use GPS location',
     located: 'Located',
     locating: 'Detecting GPS…',
+    pinOnMap: 'Pin on Map',
+    hideMap: 'Hide Map',
+    pinMapHint: 'Click or drag the pin to set your exact location. The address will auto-fill below.',
+    pinMapDragging: 'Locating pinned address…',
+    pinMapSuccess: 'Address auto-filled from pinned location',
+    searchMapPlaceholder: 'Search township, city, or street (e.g. Kamayut, Bahan)…',
     landmarkNote: 'Delivery landmark note (optional)',
     landmarkPlaceholder: 'e.g. Near Hledan Centre · Please call on arrival',
     paymentMethod: '2. Payment method',
     choosePaymentMethod: 'Choose your preferred payment method.',
     mobileBanking: 'Mobile Banking',
     cod: 'Cash on Delivery',
-    mobileBankingDesc: 'KBZPay, WavePay, AYA, CB instant transfer',
+    mobileBankingDesc: 'MMQR instant transfer (all banking apps)',
     codDesc: 'Pay cash directly upon delivery',
     reviewAndPay: 'Review & pay',
     confirmOrder: 'Confirm Order',
@@ -518,13 +530,19 @@ export const translations: Record<Language, TranslationSchema> = {
     locateMe: 'လက်ရှိတည်နေရာ ယူမည်',
     located: 'တည်နေရာ ယူပြီးပါပြီ',
     locating: 'တည်နေရာ ရှာဖွေနေပါသည်…',
+    pinOnMap: 'မြေပုံပေါ်တွင် နေရာမှတ်မည်',
+    hideMap: 'မြေပုံပိတ်မည်',
+    pinMapHint: 'မြေပုံပေါ်တွင် နှိပ်၍ သို့မဟုတ် အမှတ်အသားကို ရွှေ့ပြီး နေရာသတ်မှတ်ပါ။ လိပ်စာ အလိုအလျောက် ဖြည့်ပေးပါမည်။',
+    pinMapDragging: 'လိပ်စာ ရှာဖွေနေပါသည်…',
+    pinMapSuccess: 'မြေပုံနေရာမှ လိပ်စာကို အလိုအလျောက် ဖြည့်ပြီးပါပြီ',
+    searchMapPlaceholder: 'မြို့နယ်၊ မြို့ သို့မဟုတ် လမ်းအမည် ရှာဖွေပါ…',
     landmarkNote: 'မှတ်ချက် / အထူးမှာကြားချက် (မဖြစ်မနေ မလိုပါ)',
     landmarkPlaceholder: 'ဥပမာ - လှည်းတန်းစင်တာအနီး၊ အိမ်ရောက်လျှင် ဖုန်းအရင်ဆက်ပေးပါ',
     paymentMethod: '၂။ ငွေချေစနစ် ရွေးချယ်ရန်',
     choosePaymentMethod: 'မိမိအဆင်ပြေရာ ငွေချေစနစ်ကို ရွေးချယ်ပေးပါ။',
     mobileBanking: 'မိုဘိုင်းဘဏ်ဖြင့် ငွေချေမည်',
     cod: 'ပစ္စည်းရောက်မှ ငွေချေမည် (COD)',
-    mobileBankingDesc: 'KBZPay, WavePay, AYA, CB မိုဘိုင်းဘဏ်များဖြင့် အလွယ်တကူ လွှဲနိုင်ပါသည်',
+    mobileBankingDesc: 'MMQR ဖြင့် မည်သည့်ဘဏ်အက်ပ်ဖြင့်မဆို စကင်ဖတ်ငွေလွှဲနိုင်ပါသည်',
     codDesc: 'အိမ်အရောက် ပစ္စည်းလက်ခံရရှိချိန်မှ ငွေချေပါ',
     reviewAndPay: 'အမှာစာ စစ်ဆေးပြီး ငွေချေမည်',
     confirmOrder: 'အမှာစာ အတည်ပြုမည်',
