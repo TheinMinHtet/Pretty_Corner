@@ -136,21 +136,7 @@ function OrderReceiptContent() {
               </span>
             </div>
 
-            {/* If unpaid MMQR, show prominent Pay Now callout */}
-            {!isCOD && activeOrder.paymentStatus !== 'paid' && (
-              <div className="mt-1 pt-2.5 border-t border-[#eedfe5]/70 flex items-center justify-between gap-3">
-                <span className="text-[12px] text-amber-900 font-medium">
-                  {language === 'my' ? 'ငွေပေးချေရန် ကျန်ရှိနေပါသည်' : 'Payment has not been completed yet.'}
-                </span>
-                <Link
-                  href={`/payment-pending?orderId=${encodeURIComponent(activeOrder.id)}`}
-                  className="px-3.5 py-1.5 bg-[#b73d67] text-white text-[12px] font-bold rounded-lg hover:bg-[#a33259] transition-colors shrink-0 shadow-2xs flex items-center gap-1.5"
-                >
-                  <span>{language === 'my' ? 'ငွေပေးချေရန်' : 'Pay Now'}</span>
-                  <span>→</span>
-                </Link>
-              </div>
-            )}
+
           </div>
 
           {/* Itemized Beauty Picks Summary */}
