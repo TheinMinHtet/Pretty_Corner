@@ -116,7 +116,7 @@ function OrderReceiptContent() {
               <span className="font-bold text-[#38262e]">
                 {activeOrder.paymentMethod === 'Cash on Delivery'
                   ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည် (COD)' : 'Cash on Delivery')
-                  : (activeOrder.paymentMethod || 'Mobile Banking')}
+                  : 'MMQR'}
               </span>
             </div>
             <div className="flex justify-between items-center text-[13px]">
@@ -135,6 +135,22 @@ function OrderReceiptContent() {
                   : (language === 'my' ? 'ငွေပေးချေရန်ကျန်' : 'Awaiting Payment')}
               </span>
             </div>
+
+            {/* If unpaid MMQR, show prominent Pay Now callout */}
+            {!isCOD && activeOrder.paymentStatus !== 'paid' && (
+              <div className="mt-1 pt-2.5 border-t border-[#eedfe5]/70 flex items-center justify-between gap-3">
+                <span className="text-[12px] text-amber-900 font-medium">
+                  {language === 'my' ? 'ငွေပေးချေရန် ကျန်ရှိနေပါသည်' : 'Payment has not been completed yet.'}
+                </span>
+                <Link
+                  href={`/payment-pending?orderId=${encodeURIComponent(activeOrder.id)}`}
+                  className="px-3.5 py-1.5 bg-[#b73d67] text-white text-[12px] font-bold rounded-lg hover:bg-[#a33259] transition-colors shrink-0 shadow-2xs flex items-center gap-1.5"
+                >
+                  <span>{language === 'my' ? 'ငွေပေးချေရန်' : 'Pay Now'}</span>
+                  <span>→</span>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Itemized Beauty Picks Summary */}
@@ -204,9 +220,28 @@ function OrderReceiptContent() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-2.5 mt-2">
+            {!isCOD && activeOrder.paymentStatus !== 'paid' && (
+              <Link
+                href={`/payment-pending?orderId=${encodeURIComponent(activeOrder.id)}`}
+                className="w-full h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                </svg>
+                <span>{language === 'my' ? 'MMQR ဖြင့် ငွေပေးချေမည်' : 'Pay Now with MMQR'}</span>
+              </Link>
+            )}
+
             <Link
               href="/shop"
-              className="w-full h-[48px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] transition-all flex items-center justify-center shadow-xs cursor-pointer"
+              className={`w-full h-[48px] ${
+                !isCOD && activeOrder.paymentStatus !== 'paid'
+                  ? 'bg-white border border-[#eedfe5] text-[#38262e] hover:bg-[#faf7f8]'
+                  : 'bg-[#b73d67] text-white hover:bg-[#a33259]'
+              } rounded-[10px] font-bold text-[14px] transition-all flex items-center justify-center shadow-xs cursor-pointer`}
             >
               {t.continueShopping}
             </Link>
