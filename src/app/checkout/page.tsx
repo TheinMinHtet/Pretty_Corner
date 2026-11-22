@@ -66,17 +66,13 @@ export default function CheckoutPage() {
 
   const handleMapLocationSelect = (
     coords: { lat: number; lng: number },
-    address: string,
-    landmark?: string
+    address: string
   ) => {
     setPinCoords(coords);
     setStreetAddress(address);
     setAddressTouched(false);
     setGpsStatus('success');
     setGpsErrorMsg('');
-    if (landmark && !landmarkNote.trim()) {
-      setLandmarkNote(landmark);
-    }
   };
 
   const handleUseCurrentLocation = async () => {
@@ -92,9 +88,6 @@ export default function CheckoutPage() {
         setLocationAccuracy(fix.accuracyMeters);
       }
       setStreetAddress(fix.formattedAddress);
-      if (fix.landmark && !landmarkNote.trim()) {
-        setLandmarkNote(fix.landmark);
-      }
       setGpsStatus('success');
     } catch (err: unknown) {
       setGpsStatus('error');
