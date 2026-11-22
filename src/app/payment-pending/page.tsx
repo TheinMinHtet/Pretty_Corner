@@ -11,9 +11,9 @@ function PaymentPendingContent() {
   const searchParams = useSearchParams();
   const { orders, updatePaymentStatus, fetchOrderById, isMounted, t, language } = useStore();
 
-  const orderId = searchParams.get('orderId') || 'PC-261117-024';
+  const orderId = searchParams.get('orderId') || '';
   const cleanId = orderId.trim().toUpperCase();
-  const localOrder = orders.find((o) => o.id.trim().toUpperCase() === cleanId) || orders[0];
+  const localOrder = cleanId ? orders.find((o) => o.id.trim().toUpperCase() === cleanId) : undefined;
 
   const [remoteOrder, setRemoteOrder] = useState<typeof localOrder | null>(null);
   const [remoteLoading, setRemoteLoading] = useState(!localOrder && Boolean(cleanId));

@@ -124,11 +124,15 @@ function OrderReceiptContent() {
               <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${
                 isCOD
                   ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                  : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  : activeOrder.paymentStatus === 'paid'
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  : 'bg-rose-50 text-rose-800 border border-rose-200'
               }`}>
                 {isCOD
                   ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည်' : 'Cash on Delivery (Pay on arrival)')
-                  : (language === 'my' ? 'ငွေပေးချေမှု အတည်ပြုပြီး' : 'Payment Verified')}
+                  : activeOrder.paymentStatus === 'paid'
+                  ? (language === 'my' ? 'ငွေပေးချေမှု အတည်ပြုပြီး' : 'Payment Verified')
+                  : (language === 'my' ? 'ငွေပေးချေရန်ကျန်' : 'Awaiting Payment')}
               </span>
             </div>
           </div>

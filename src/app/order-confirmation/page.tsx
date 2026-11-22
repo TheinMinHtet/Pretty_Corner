@@ -94,8 +94,15 @@ function OrderConfirmationContent() {
     ctx.fillText(`${t.orderRef}: ${order.id}`, 60, y);
     ctx.fillStyle = '#7a6870';
     ctx.font = '14px sans-serif';
-    const paymentLabel = order.paymentMethod === 'Cash on Delivery' ? 'Cash on Delivery' : 'MMQR';
-    ctx.fillText(`Payment: ${paymentLabel} (${t.paymentVerified})`, 60, y + 50);
+    const isPaid = order.paymentStatus === 'paid';
+    const isCODOrder = order.paymentMethod === 'Cash on Delivery';
+    const paymentLabel = isCODOrder ? 'Cash on Delivery' : 'MMQR';
+    const paymentStatusText = isPaid
+      ? t.paymentVerified
+      : isCODOrder
+      ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည်' : 'Pay on arrival')
+      : (language === 'my' ? 'ငွေပေးချေရန်ကျန်' : 'Awaiting Payment');
+    ctx.fillText(`Payment: ${paymentLabel} (${paymentStatusText})`, 60, y + 50);
 
     // Divider
     y += 85;
@@ -290,9 +297,13 @@ function OrderConfirmationContent() {
             ? (language === 'my'
                 ? `ကျေးဇူးတင်ပါသည် ${order.customerName}။ သင့်အမှာစာ အတည်ပြုပြီးပါပြီ။ ပစ္စည်းရောက်ရှိချိန်တွင် ငွေအဆင်သင့် ထားရှိပေးပါခင်ဗျာ။`
                 : `Thank you, ${order.customerName}. Your order is confirmed! Please have cash ready when our courier arrives.`)
-            : (language === 'my'
+            : order.paymentStatus === 'paid'
+            ? (language === 'my'
                 ? `ကျေးဇူးတင်ပါသည် ${order.customerName}။ ငွေပေးချေမှု အတည်ပြုပြီးဖြစ်၍ အမှာစာကို လက်ခံရရှိထားပါပြီ။`
-                : `Thank you, ${order.customerName}. Your payment is verified and we’ve received your order.`)}
+                : `Thank you, ${order.customerName}. Your payment is verified and we’ve received your order.`)
+            : (language === 'my'
+                ? `သင့်အမှာစာကို စာရင်းသွင်းထားပြီးဖြစ်ပါသည်။ MMQR ဖြင့် ငွေပေးချေရန် စောင့်ဆိုင်းနေပါသည်။`
+                : `Your order has been registered. Awaiting MMQR payment completion.`)}
         </p>
 
         {/* Order reference card */}
@@ -330,27 +341,46 @@ function OrderConfirmationContent() {
           <span className="font-bold text-[#38262e]">
             {order.paymentMethod === 'Cash on Delivery'
               ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည် (COD)' : 'Cash on Delivery · Pay on arrival')
-              : (language === 'my' ? 'ငွေပေးချေပြီး · MMQR' : 'Paid · MMQR')}
+              : order.paymentStatus === 'paid'
+              ? (language === 'my' ? 'ငွေပေးချေပြီး · MMQR' : 'Paid · MMQR')
+              : (language === 'my' ? 'ငွေမချေရသေးပါ · MMQR' : 'Unpaid · MMQR')}
           </span>
         </div>
 
         <div className="flex justify-between items-center text-[13px] py-1">
           <span className="text-[#7a6870]">{t.orderStatus}</span>
           <span className={`font-bold flex items-center gap-1.5 ${
-            order.paymentStatus === 'paid' || order.fulfillmentStatus === 'confirmed' || isCOD
+            order.paymentStatus === 'paid' || isCOD
               ? 'text-emerald-700'
-              : 'text-[#b73d67]'
+              : 'text-amber-700'
           }`}>
             <span className={`w-2 h-2 rounded-full shrink-0 ${
-              order.paymentStatus === 'paid' || order.fulfillmentStatus === 'confirmed' || isCOD
+              order.paymentStatus === 'paid' || isCOD
                 ? 'bg-emerald-500'
-                : 'bg-[#b73d67]'
+                : 'bg-amber-500'
             }`} />
-            {order.paymentStatus === 'paid' || order.fulfillmentStatus === 'confirmed' || isCOD
+            {order.paymentStatus === 'paid'
               ? (language === 'my' ? 'အော်ဒါအတည်ပြုပြီး (ပြင်ဆင်နေပါသည်)' : 'Confirmed · Processing')
-              : t.pendingReview}
+              : isCOD
+              ? (language === 'my' ? 'အော်ဒါအတည်ပြုပြီး (COD)' : 'Confirmed · Pay on Delivery')
+              : (language === 'my' ? 'ငွေပေးချေမှု စောင့်ဆိုင်းဆဲ' : 'Awaiting Payment')}
           </span>
         </div>
+
+        {/* If unpaid MMQR, show button to pay now */}
+        {!isCOD && order.paymentStatus !== 'paid' && (
+          <div className="mt-3 p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between gap-3">
+            <span className="text-[12.5px] text-amber-900 font-medium">
+              {language === 'my' ? 'ငွေပေးချေမှု မပြီးမြောက်သေးပါ။' : 'Payment has not been completed yet.'}
+            </span>
+            <Link
+              href={`/payment-pending?orderId=${encodeURIComponent(order.id)}`}
+              className="px-3.5 py-1.5 bg-[#b73d67] text-white text-[12px] font-bold rounded-lg hover:bg-[#a33259] transition-colors shrink-0 shadow-2xs"
+            >
+              {language === 'my' ? 'ငွေပေးချေရန်' : 'Pay Now'}
+            </Link>
+          </div>
+        )}
 
         <div className="my-3 border-t border-[#eedfe5]" />
 
