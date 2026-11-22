@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 
 const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper'), {
@@ -17,15 +17,26 @@ const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper
 });
 
 function ShopContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const { products, isMounted, t, language } = useStore();
+  const { products, t, language } = useStore();
 
-  const initialCat = searchParams.get('category') || 'all';
-  const initialQuery = searchParams.get('q') || '';
+  const categoryParam = searchParams.get('category') || 'all';
+  const queryParam = searchParams.get('q') || '';
 
-  const [activeCategory, setActiveCategory] = useState<string>(initialCat);
-  const [searchFilter, setSearchFilter] = useState<string>(initialQuery);
+  const [prevCategoryParam, setPrevCategoryParam] = useState(categoryParam);
+  const [activeCategory, setActiveCategory] = useState<string>(categoryParam);
+  if (categoryParam !== prevCategoryParam) {
+    setPrevCategoryParam(categoryParam);
+    setActiveCategory(categoryParam);
+  }
+
+  const [prevQueryParam, setPrevQueryParam] = useState(queryParam);
+  const [searchFilter, setSearchFilter] = useState<string>(queryParam);
+  if (queryParam !== prevQueryParam) {
+    setPrevQueryParam(queryParam);
+    setSearchFilter(queryParam);
+  }
+
   const [sortBy, setSortBy] = useState<'featured' | 'newest' | 'price-asc' | 'price-desc'>('featured');
   const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
@@ -45,19 +56,6 @@ function ShopContent() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showSortDropdown]);
-
-  // Sync state when URL query params change
-  useEffect(() => {
-    const cat = searchParams.get('category');
-    setActiveCategory(cat || 'all');
-  }, [searchParams]);
-
-  useEffect(() => {
-    const q = searchParams.get('q');
-    if (q !== null) {
-      setSearchFilter(q);
-    }
-  }, [searchParams]);
 
   // Filter Modal specific states
   const [maxPrice, setMaxPrice] = useState<number>(60000);
@@ -379,7 +377,7 @@ function ShopContent() {
                       key={option.value}
                       type="button"
                       onClick={() => {
-                        setSortBy(option.value as any);
+                        setSortBy(option.value as 'featured' | 'newest' | 'price-asc' | 'price-desc');
                         setShowSortDropdown(false);
                       }}
                       className={`w-full text-left px-4 py-2.5 text-[13px] transition-colors flex items-center justify-between cursor-pointer ${
@@ -412,6 +410,7 @@ function ShopContent() {
                         src={product.image}
                         alt={product.name}
                         fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </Link>

@@ -166,6 +166,14 @@ export type TranslationSchema = Record<
   | 'termsAndConditions'
   | 'paymentAndDelivery'
   | 'doorstepDelivery'
+  | 'township'
+  | 'selectTownship'
+  | 'promoCode'
+  | 'promoPlaceholder'
+  | 'apply'
+  | 'promoApplied'
+  | 'promoInvalid'
+  | 'remove'
   | 'followUs'
   | 'followUsDesc'
   | 'allRightsReserved'
@@ -352,12 +360,12 @@ export const translations: Record<Language, TranslationSchema> = {
     saveOrderIdHint: 'Save your Order ID! You can check your receipt anytime using only your ID — no login needed.',
     questionsHelp: 'Questions? We’re happy to help.',
     findReceipt: 'Find your order receipt.',
-    findReceiptSubtitle: 'Enter your Order ID to view your receipt anytime. No login or password required.',
-    orderIdPlaceholder: 'e.g. PC-261117-024',
-    orderIdLabel: 'Order ID / Reference *',
+    findReceiptSubtitle: 'Enter your Order ID or phone number to view your receipt anytime. No login required.',
+    orderIdPlaceholder: 'e.g. PC-261117-024 or 09...',
+    orderIdLabel: 'Order ID or Phone Number *',
     searchOrder: 'View Order Receipt',
     orderNotFoundTitle: 'Receipt Not Found',
-    orderNotFoundDesc: 'We couldn’t find an order receipt matching that ID. Please verify your Order ID and try again.',
+    orderNotFoundDesc: 'We couldn’t find an order matching that ID or phone number. Please verify and try again.',
     searchByOrderId: 'Search by Order ID',
     recentOrdersOnDevice: 'Recent orders on this device:',
 
@@ -373,6 +381,14 @@ export const translations: Record<Language, TranslationSchema> = {
     termsAndConditions: 'Terms & Conditions',
     paymentAndDelivery: 'Payment & Delivery',
     doorstepDelivery: 'Doorstep delivery & digital payment:',
+    township: 'Delivery Township *',
+    selectTownship: 'Select delivery township',
+    promoCode: 'Promo Code',
+    promoPlaceholder: 'e.g. PRETTY20',
+    apply: 'Apply',
+    promoApplied: 'Promo code applied!',
+    promoInvalid: 'Invalid or expired promo code',
+    remove: 'Remove',
     followUs: 'Follow Us',
     followUsDesc: 'Follow our socials for the latest updates:',
     allRightsReserved: 'All rights reserved.',
@@ -553,12 +569,12 @@ export const translations: Record<Language, TranslationSchema> = {
     saveOrderIdHint: 'အမှာစာအမှတ် (Order ID) ကို သိမ်းထားပေးပါ! အကောင့်ဖွင့်စရာမလိုဘဲ အချိန်မရွေး ပြေစာပြန်လည်ကြည့်ရှုနိုင်ပါသည်။',
     questionsHelp: 'မေးမြန်းလိုသည်များရှိပါက အချိန်မရွေး ကူညီပေးပါမည်။',
     findReceipt: 'မိမိအမှာစာပြေစာ ရှာရန်',
-    findReceiptSubtitle: 'အကောင့်ဖွင့်စရာမလိုဘဲ အမှာစာအမှတ် (Order ID) ဖြင့် အချိန်မရွေး ပြေစာကြည့်နိုင်ပါသည်။',
-    orderIdPlaceholder: 'ဥပမာ - PC-261117-024',
-    orderIdLabel: 'အမှာစာ အမှတ် (Order ID) *',
+    findReceiptSubtitle: 'အကောင့်ဖွင့်စရာမလိုဘဲ အမှာစာအမှတ် (Order ID) သို့မဟုတ် ဖုန်းနံပါတ်ဖြင့် အချိန်မရွေး ပြေစာကြည့်နိုင်ပါသည်။',
+    orderIdPlaceholder: 'ဥပမာ - PC-261117-024 သို့မဟုတ် 09...',
+    orderIdLabel: 'အမှာစာ အမှတ် သို့မဟုတ် ဖုန်းနံပါတ် *',
     searchOrder: 'ပြေစာကြည့်မည်',
     orderNotFoundTitle: 'ပြေစာ ရှာမတွေ့ပါ',
-    orderNotFoundDesc: 'ထိုအမှာစာအမှတ်နှင့် ကိုက်ညီသော ပြေစာမရှိပါ။ ကျေးဇူးပြု၍ အမှတ်အသားကို သေချာစစ်ဆေးပြီး ထပ်မံကြိုးစားကြည့်ပါ။',
+    orderNotFoundDesc: 'ထိုအမှာစာအမှတ် သို့မဟုတ် ဖုန်းနံပါတ်နှင့် ကိုက်ညီသော ပြေစာမရှိပါ။ ကျေးဇူးပြု၍ သေချာစစ်ဆေးပြီး ထပ်မံကြိုးစားကြည့်ပါ။',
     searchByOrderId: 'အမှာစာအမှတ်ဖြင့် ရှာမည်',
     recentOrdersOnDevice: 'မကြာသေးမီက တင်ထားသော အမှာစာများ -',
 
@@ -574,6 +590,14 @@ export const translations: Record<Language, TranslationSchema> = {
     termsAndConditions: 'စည်းကမ်းသတ်မှတ်ချက်များ',
     paymentAndDelivery: 'ငွေပေးချေမှုနှင့် ပို့ဆောင်ရေး',
     doorstepDelivery: 'အိမ်တိုင်ရာရောက် ပို့ဆောင်မှုနှင့် မိုဘိုင်းငွေချေစနစ် -',
+    township: 'ပို့ဆောင်မည့် မြို့နယ် *',
+    selectTownship: 'မြို့နယ် ရွေးချယ်ပါ',
+    promoCode: 'ပရိုမိုးရှင်းကုဒ်',
+    promoPlaceholder: 'ဥပမာ - PRETTY20',
+    apply: 'ထည့်သွင်းမည်',
+    promoApplied: 'ပရိုမိုးရှင်းကုဒ် အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ!',
+    promoInvalid: 'ပရိုမိုးရှင်းကုဒ် မမှန်ကန်ပါ သို့မဟုတ် သက်တမ်းကုန်သွားပါပြီ',
+    remove: 'ဖယ်ရှားမည်',
     followUs: 'ကျွန်ုပ်တို့၏ လူမှုကွန်ရက်များ',
     followUsDesc: 'နောက်ဆုံးရ ပစ္စည်းအသစ်များနှင့် ပရိုမိုးရှင်းများကို စောင့်ကြည့်လိုက်ပါ -',
     allRightsReserved: 'မူပိုင်ခွင့်များ ရယူထားပြီးဖြစ်ပါသည်။',

@@ -2,18 +2,39 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import OrderingStepBar from '@/components/OrderingStepBar';
 
 function OrderConfirmationContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const { orders, clearCart, t, language } = useStore();
+  const { orders, clearCart, t, language, fetchOrderById, isMounted } = useStore();
 
   const orderId = searchParams.get('orderId') || 'PC-261117-024';
-  const order = orders.find((o) => o.id === orderId) || orders[0];
-  const isCOD = order.paymentMethod === 'Cash on Delivery';
+  const cleanId = orderId.trim().toUpperCase();
+  const localOrder = orders.find((o) => o.id.trim().toUpperCase() === cleanId);
+
+  const [remoteOrder, setRemoteOrder] = useState<typeof localOrder | null>(null);
+  const [remoteLoading, setRemoteLoading] = useState(!localOrder && Boolean(cleanId));
+
+  useEffect(() => {
+    let active = true;
+    if (!localOrder && cleanId && fetchOrderById) {
+      fetchOrderById(cleanId)
+        .then((res) => {
+          if (active && res) setRemoteOrder(res);
+        })
+        .finally(() => {
+          if (active) setRemoteLoading(false);
+        });
+    }
+    return () => {
+      active = false;
+    };
+  }, [localOrder, cleanId, fetchOrderById]);
+
+  const order = localOrder || remoteOrder;
+  const isCOD = order?.paymentMethod === 'Cash on Delivery';
 
   const [copied, setCopied] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
@@ -24,12 +45,14 @@ function OrderConfirmationContent() {
   }, [clearCart]);
 
   const handleCopy = () => {
+    if (!order) return;
     navigator.clipboard.writeText(order.id);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDownloadReceipt = () => {
+    if (!order) return;
     const formattedDate = order.createdAt || new Date().toLocaleString();
     
     // Draw an elegant, high-res canvas image for the receipt (JPEG)
@@ -193,6 +216,49 @@ function OrderConfirmationContent() {
     setDownloaded(true);
     setTimeout(() => setDownloaded(false), 2500);
   };
+
+  if (!isMounted || remoteLoading) {
+    return (
+      <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-16 flex items-center justify-center min-h-[50vh]">
+        <div className="w-8 h-8 rounded-full border-2 border-[#b73d67] border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  if (!order) {
+    return (
+      <div className="w-full max-w-xl mx-auto px-4 sm:px-6 py-5 md:py-10 flex flex-col min-h-full pb-12">
+        <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-6 sm:p-8 flex flex-col items-center text-center">
+          <div className="w-14 h-14 rounded-full bg-[#fceef2] flex items-center justify-center text-[#b73d67] mb-4">
+            <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+          </div>
+          <h2 className="font-serif text-[26px] sm:text-[30px] font-medium text-[#38262e] mb-2">
+            {t.orderNotFoundTitle}
+          </h2>
+          <p className="text-[13px] text-[#7a6870] max-w-sm mb-6">
+            {t.orderNotFoundDesc} (<span className="font-mono font-bold text-[#38262e]">{orderId}</span>)
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 w-full">
+            <Link
+              href="/order-lookup"
+              className="flex-1 h-[46px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] flex items-center justify-center hover:bg-[#a33259] transition-all cursor-pointer"
+            >
+              {t.searchByOrderId}
+            </Link>
+            <Link
+              href="/shop"
+              className="flex-1 h-[46px] bg-white border border-[#eedfe5] text-[#38262e] rounded-[10px] font-bold text-[14px] flex items-center justify-center hover:bg-[#faf7f8] transition-colors cursor-pointer"
+            >
+              {t.continueShopping}
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-5 md:py-8 flex flex-col min-h-full pb-12">

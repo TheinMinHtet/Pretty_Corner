@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
+import { normalizeMyanmarDigits } from '@/lib/validation';
 
 export default function OrderLookupPage() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function OrderLookupPage() {
 
   const handleLookup = async (e: React.FormEvent) => {
     e.preventDefault();
-    const cleanRef = orderRef.trim();
+    const cleanRef = normalizeMyanmarDigits(orderRef.trim());
     if (!cleanRef) {
       setLookupError(true);
       return;
@@ -80,7 +81,7 @@ export default function OrderLookupPage() {
                   setLookupError(false);
                 }}
                 placeholder={t.orderIdPlaceholder}
-                className="w-full h-[48px] px-3.5 bg-white border border-[#eedfe5] rounded-[10px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67] font-mono uppercase"
+                className="w-full h-[48px] px-3.5 bg-white border border-[#eedfe5] rounded-[10px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67] font-sans"
               />
               <p className="text-[12px] text-[#7a6870] mt-1.5">
                 {t.saveOrderIdHint}

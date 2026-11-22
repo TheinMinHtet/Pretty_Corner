@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -8,7 +8,24 @@ import { useStore } from '@/context/StoreContext';
 
 export default function ShoppingBagPage() {
   const router = useRouter();
-  const { cart, updateCartQuantity, removeFromCart, cartCount, cartSubtotal, discount, cartTotal, selectedTownship, isMounted, t, language } = useStore();
+  const {
+    cart,
+    updateCartQuantity,
+    removeFromCart,
+    cartCount,
+    cartSubtotal,
+    discount,
+    cartTotal,
+    appliedPromo,
+    applyPromoCode,
+    removePromoCode,
+    isMounted,
+    t,
+    language,
+  } = useStore();
+
+  const [promoInput, setPromoInput] = useState('');
+  const [promoFeedback, setPromoFeedback] = useState<string | null>(null);
 
   if (!isMounted) {
     return (
@@ -139,7 +156,7 @@ export default function ShoppingBagPage() {
                     <div key={item.id} className="py-2.5 flex items-center justify-between gap-3 text-[13px]">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="relative w-10 h-10 rounded-lg bg-white border border-[#eedfe5] overflow-hidden shrink-0">
-                          <Image src={item.image} alt={item.name} fill className="object-cover" />
+                          <Image src={item.image} alt={item.name} fill sizes="40px" className="object-cover" />
                         </div>
                         <div className="min-w-0 flex items-center">
                           <span className="font-medium text-[#38262e] truncate">{item.name}</span>
@@ -155,16 +172,78 @@ export default function ShoppingBagPage() {
                   ))}
                 </div>
 
+                {/* Promo Code Input Box */}
+                <div className="bg-white p-3 sm:p-3.5 rounded-xl border border-[#eedfe5] mb-3.5 shadow-2xs">
+                  {appliedPromo ? (
+                    <div className="flex items-center justify-between bg-[#fceef2] px-3 py-2 rounded-lg border border-[#f1d3df]">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-bold text-[#b73d67] bg-white px-2 py-0.5 rounded shadow-2xs uppercase tracking-wider">
+                          {appliedPromo.code}
+                        </span>
+                        <span className="text-[12px] font-bold text-[#38262e]">
+                          -{appliedPromo.discountPercentage}% OFF
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          removePromoCode();
+                          setPromoFeedback(null);
+                        }}
+                        className="text-[11px] font-bold text-[#b73d67] hover:underline cursor-pointer"
+                      >
+                        {t.remove}
+                      </button>
+                    </div>
+                  ) : (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!promoInput.trim()) return;
+                        const res = applyPromoCode(promoInput.trim());
+                        setPromoFeedback(res.message);
+                        if (res.success) {
+                          setPromoInput('');
+                        }
+                      }}
+                      className="space-y-1.5"
+                    >
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={promoInput}
+                          onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                          placeholder={t.promoPlaceholder}
+                          className="flex-1 h-[38px] px-3 rounded-lg border border-[#eedfe5] text-[13px] font-mono uppercase text-[#38262e] placeholder:text-[#a89aa0] focus:outline-none focus:border-[#b73d67] transition-colors"
+                        />
+                        <button
+                          type="submit"
+                          className="h-[38px] px-4 bg-[#38262e] hover:bg-[#b73d67] text-white text-[12px] font-bold rounded-lg transition-colors cursor-pointer shrink-0"
+                        >
+                          {t.apply}
+                        </button>
+                      </div>
+                      {promoFeedback && (
+                        <p className={`text-[11px] font-medium mt-1 ${appliedPromo ? 'text-emerald-700' : 'text-[#b73d67]'}`}>
+                          {promoFeedback}
+                        </p>
+                      )}
+                    </form>
+                  )}
+                </div>
+
                 {/* Sub Total, Discount, and Total */}
                 <div className="border-t border-[#eedfe5] pt-3.5 space-y-2 text-[14px]">
                   <div className="flex justify-between items-center text-[#7a6870]">
                     <span>{t.subTotal}</span>
                     <span className="font-semibold text-[#38262e]">{cartSubtotal.toLocaleString()} MMK</span>
                   </div>
-                  <div className="flex justify-between items-center text-[#7a6870]">
-                    <span>{t.discount}</span>
-                    <span className="font-semibold text-[#38262e]">{discount.toLocaleString()} MMK</span>
-                  </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between items-center text-[#b73d67]">
+                      <span>{t.discount} {appliedPromo ? `(${appliedPromo.discountPercentage}%)` : ''}</span>
+                      <span className="font-bold">-{discount.toLocaleString()} MMK</span>
+                    </div>
+                  )}
                   <div className="border-t border-[#eedfe5] pt-2.5 flex justify-between items-center text-[18px] font-bold text-[#38262e]">
                     <span>{t.total}</span>
                     <span className="text-[#b73d67]">{cartTotal.toLocaleString()} MMK</span>
