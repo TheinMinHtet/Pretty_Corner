@@ -94,8 +94,8 @@ function OrderConfirmationContent() {
     ctx.fillText(`${t.orderRef}: ${order.id}`, 60, y);
     ctx.fillStyle = '#7a6870';
     ctx.font = '14px sans-serif';
-    ctx.fillText(`Date: ${formattedDate}`, 60, y + 26);
-    ctx.fillText(`Payment: ${order.paymentMethod || 'Mobile Banking'} (${t.paymentVerified})`, 60, y + 50);
+    const paymentLabel = order.paymentMethod === 'Cash on Delivery' ? 'Cash on Delivery' : 'MMQR';
+    ctx.fillText(`Payment: ${paymentLabel} (${t.paymentVerified})`, 60, y + 50);
 
     // Divider
     y += 85;
@@ -330,14 +330,25 @@ function OrderConfirmationContent() {
           <span className="font-bold text-[#38262e]">
             {order.paymentMethod === 'Cash on Delivery'
               ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည် (COD)' : 'Cash on Delivery · Pay on arrival')
-              : (language === 'my' ? `ငွေပေးချေပြီး · ${order.paymentMethod || 'မိုဘိုင်းဘဏ်'}` : `Paid · ${order.paymentMethod || 'Mobile Banking'}`)}
+              : (language === 'my' ? 'ငွေပေးချေပြီး · MMQR' : 'Paid · MMQR')}
           </span>
         </div>
 
         <div className="flex justify-between items-center text-[13px] py-1">
           <span className="text-[#7a6870]">{t.orderStatus}</span>
-          <span className="font-bold text-[#38262e]">
-            {t.pendingReview}
+          <span className={`font-bold flex items-center gap-1.5 ${
+            order.paymentStatus === 'paid' || order.fulfillmentStatus === 'confirmed' || isCOD
+              ? 'text-emerald-700'
+              : 'text-[#b73d67]'
+          }`}>
+            <span className={`w-2 h-2 rounded-full shrink-0 ${
+              order.paymentStatus === 'paid' || order.fulfillmentStatus === 'confirmed' || isCOD
+                ? 'bg-emerald-500'
+                : 'bg-[#b73d67]'
+            }`} />
+            {order.paymentStatus === 'paid' || order.fulfillmentStatus === 'confirmed' || isCOD
+              ? (language === 'my' ? 'အော်ဒါအတည်ပြုပြီး (ပြင်ဆင်နေပါသည်)' : 'Confirmed · Processing')
+              : t.pendingReview}
           </span>
         </div>
 
