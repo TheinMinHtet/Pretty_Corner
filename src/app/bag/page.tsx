@@ -299,41 +299,20 @@ export default function ShoppingBagPage() {
                     <span className="font-semibold text-[#38262e]">{cartSubtotal.toLocaleString()} MMK</span>
                   </div>
 
-                  {discount > 0 && promoSubtotal > 0 && nonPromoSubtotal > 0 && (
-                    <>
-                      <div className="flex justify-between items-center text-xs text-[#7a6870] pl-2 border-l-2 border-[#eedfe5]">
-                        <span>Promo Items Subtotal</span>
-                        <span>{promoSubtotal.toLocaleString()} MMK</span>
-                      </div>
-                      <div className="flex justify-between items-center text-xs text-[#7a6870] pl-2 border-l-2 border-[#eedfe5]">
-                        <span>Regular Items Subtotal</span>
-                        <span>{nonPromoSubtotal.toLocaleString()} MMK</span>
-                      </div>
-                    </>
-                  )}
-
                   {discount > 0 && (
-                    <div className="space-y-1">
-                      <div className="flex justify-between items-center text-[#b73d67]">
-                        <span>
-                          {t.discount} {appliedPromo ? `(${appliedPromo.code} · ${appliedPromo.discountPercentage}%)` : ''}
-                        </span>
-                        <span className="font-bold">-{discount.toLocaleString()} MMK</span>
-                      </div>
-                      {lineItemsPricing && lineItemsPricing.filter((lp) => lp.discountAmount > 0).length > 0 && (
-                        <div className="pl-2 border-l-2 border-[#f5d9e3] space-y-0.5 pt-0.5">
-                          {lineItemsPricing
-                            .filter((lp) => lp.discountAmount > 0)
-                            .map((lp) => (
-                              <div key={lp.itemId} className="flex justify-between items-center text-[11px] text-[#b73d67]">
-                                <span className="truncate mr-2">↳ {lp.name}</span>
-                                <span className="shrink-0 font-medium">-{lp.discountAmount.toLocaleString()} MMK</span>
-                              </div>
-                            ))}
-                        </div>
-                      )}
+                    <div className="flex justify-between items-center text-emerald-700">
+                      <span className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-medium">{t.discount}</span>
+                        {appliedPromo && (
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
+                            {appliedPromo.code} · {appliedPromo.discountPercentage}% OFF
+                          </span>
+                        )}
+                      </span>
+                      <span className="font-bold">-{discount.toLocaleString()} MMK</span>
                     </div>
                   )}
+
                   <div className="border-t border-[#eedfe5] pt-2.5 flex justify-between items-center text-[18px] font-bold text-[#38262e]">
                     <span>{t.total}</span>
                     <span className="text-[#b73d67]">{cartTotal.toLocaleString()} MMK</span>
