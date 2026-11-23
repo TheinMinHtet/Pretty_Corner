@@ -20,19 +20,19 @@ export default function Navigation() {
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 w-full bg-white/98 backdrop-blur-md z-40 border-t border-[#eedfe5] shadow-lg pb-[env(safe-area-inset-bottom,0px)]">
-      <div className="h-[58px] max-w-md mx-auto flex items-center justify-around px-1">
+      <div className="h-[54px] sm:h-[58px] max-w-md mx-auto flex items-center justify-around px-0.5 sm:px-1">
         {/* Home Tab */}
         <Link
           href="/"
-          className={`flex flex-col items-center justify-center flex-1 max-w-[68px] py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 max-w-[60px] sm:max-w-[68px] py-0.5 sm:py-1 transition-colors ${
             isHome ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
-          <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <svg className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" />
             <path d="M9 21V12h6v9" />
           </svg>
-          <span className={`text-[10px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isHome ? 'font-bold' : 'font-medium'}`}>
+          <span className={`text-[9.5px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isHome ? 'font-bold' : 'font-medium'}`}>
             {t.navHome}
           </span>
         </Link>
@@ -40,17 +40,17 @@ export default function Navigation() {
         {/* Shop Tab */}
         <Link
           href="/shop"
-          className={`flex flex-col items-center justify-center flex-1 max-w-[68px] py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 max-w-[60px] sm:max-w-[68px] py-0.5 sm:py-1 transition-colors ${
             isShop ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
-          <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <svg className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <rect x="3" y="3" width="7" height="7" rx="1.5" />
             <rect x="14" y="3" width="7" height="7" rx="1.5" />
             <rect x="14" y="14" width="7" height="7" rx="1.5" />
             <rect x="3" y="14" width="7" height="7" rx="1.5" />
           </svg>
-          <span className={`text-[10px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isShop ? 'font-bold' : 'font-medium'}`}>
+          <span className={`text-[9.5px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isShop ? 'font-bold' : 'font-medium'}`}>
             {t.navShop}
           </span>
         </Link>
@@ -58,12 +58,12 @@ export default function Navigation() {
         {/* Bag Tab */}
         <Link
           href="/bag"
-          className={`flex flex-col items-center justify-center flex-1 max-w-[68px] py-1 transition-colors relative ${
+          className={`flex flex-col items-center justify-center flex-1 max-w-[60px] sm:max-w-[68px] py-0.5 sm:py-1 transition-colors relative ${
             isBag ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
           <div className="relative">
-            <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <svg className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
               <path d="M3 6h18" />
               <path d="M16 10a4 4 0 01-8 0" />
@@ -71,7 +71,7 @@ export default function Navigation() {
             <CartBadge />
           </div>
           <span
-            className={`text-[10px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isBag ? 'font-bold' : 'font-medium'}`}
+            className={`text-[9.5px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isBag ? 'font-bold' : 'font-medium'}`}
           >
             {t.navBag}
           </span>
@@ -82,17 +82,17 @@ export default function Navigation() {
           href="/order-lookup"
           aria-label={t.navReceipt}
           title={t.navReceipt}
-          className={`flex flex-col items-center justify-center flex-1 max-w-[68px] py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 max-w-[60px] sm:max-w-[68px] py-0.5 sm:py-1 transition-colors ${
             isReceipt ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
-          <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z" />
             <path d="M8 7h8" />
             <path d="M8 11h8" />
             <path d="M8 15h5" />
           </svg>
-          <span className={`text-[10px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isReceipt ? 'font-bold' : 'font-medium'}`}>
+          <span className={`text-[9.5px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isReceipt ? 'font-bold' : 'font-medium'}`}>
             {t.navReceipt}
           </span>
         </Link>
@@ -100,14 +100,14 @@ export default function Navigation() {
         {/* Contact Tab */}
         <Link
           href="/contact"
-          className={`flex flex-col items-center justify-center flex-1 max-w-[68px] py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 max-w-[60px] sm:max-w-[68px] py-0.5 sm:py-1 transition-colors ${
             isContact ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
-          <svg className="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <svg className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
           </svg>
-          <span className={`text-[10px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isContact ? 'font-bold' : 'font-medium'}`}>
+          <span className={`text-[9.5px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 ${isContact ? 'font-bold' : 'font-medium'}`}>
             {t.navContact}
           </span>
         </Link>

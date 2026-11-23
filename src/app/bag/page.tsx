@@ -47,7 +47,7 @@ export default function ShoppingBagPage() {
   return (
     <div className="w-full bg-white flex flex-col min-h-full pb-12">
       {/* Breadcrumb & Heading - Consistent across mobile and desktop */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-4">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-3 sm:pb-4">
         <div className="flex items-center justify-between gap-3 mb-2 sm:mb-3">
           <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870]">
             <Link href="/" className="hover:text-[#38262e]">{t.navHome}</Link>
@@ -84,7 +84,7 @@ export default function ShoppingBagPage() {
       </div>
 
       {/* Main Content Area - Responsive 2-Column Grid */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-2">
         {cart.length > 0 ? (
           <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-start">
             {/* Left Column: Bag Line Items (col-span-12 on mobile, col-span-7 or 8 on desktop) */}
@@ -96,8 +96,8 @@ export default function ShoppingBagPage() {
                 const finalUnitPrice = isDiscounted ? item.price - unitDiscount : item.price;
 
                 return (
-                  <div key={item.id} className="py-5 flex gap-4 sm:gap-6 items-center">
-                    <div className="relative w-[104px] sm:w-[120px] h-[126px] sm:h-[140px] bg-[#f9f5f7] rounded-[10px] overflow-hidden shrink-0">
+                  <div key={item.id} className="py-4 sm:py-5 flex gap-3 sm:gap-6 items-center">
+                    <div className="relative w-[88px] sm:w-[120px] h-[108px] sm:h-[140px] bg-[#f9f5f7] rounded-[10px] overflow-hidden shrink-0">
                       <Image
                         src={item.image}
                         alt={item.name}

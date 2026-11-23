@@ -21,13 +21,13 @@ export default function Header() {
   return (
     <header className="w-full sticky top-0 z-50 bg-white/98 sm:bg-white/95 backdrop-blur-md border-b border-[#eedfe5] transition-all">
       {/* Main Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[58px] sm:h-[64px] md:h-[74px] flex items-center justify-between gap-2.5 sm:gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-[56px] sm:h-[64px] md:h-[74px] flex items-center justify-between gap-2 sm:gap-4">
         {/* Brand Logo */}
         <Link href="/" className="flex flex-col group shrink-0">
-          <span className="font-serif text-[22px] sm:text-[28px] md:text-[30px] lg:text-[34px] font-medium leading-none text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
+          <span className="font-serif text-[20px] sm:text-[28px] md:text-[30px] lg:text-[34px] font-medium leading-none text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
             {t.brandName}
           </span>
-          <span className="font-sans text-[7.5px] sm:text-[9px] font-bold tracking-[1.5px] sm:tracking-[2px] text-[#7a6870] uppercase mt-0.5 sm:mt-1">
+          <span className="font-sans text-[7px] sm:text-[9px] font-bold tracking-[1.2px] sm:tracking-[2px] text-[#7a6870] uppercase mt-0.5 sm:mt-1">
             {t.brandSlogan}
           </span>
         </Link>
@@ -91,7 +91,7 @@ export default function Header() {
           {/* Bag Button */}
           <Link
             href="/bag"
-            className="flex items-center gap-1.5 sm:gap-2 bg-[#fceef2] hover:bg-[#fae2ea] text-[#38262e] px-2.5 sm:px-4 py-1 sm:py-2 rounded-full transition-all group"
+            className="flex items-center gap-1 sm:gap-2 bg-[#fceef2] hover:bg-[#fae2ea] text-[#38262e] px-2 sm:px-4 py-1 sm:py-2 rounded-full transition-all group"
           >
             <div className="relative">
               <svg className="w-4 h-4 sm:w-5 sm:h-5 text-[#38262e] group-hover:text-[#b73d67] transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">

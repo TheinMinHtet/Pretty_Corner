@@ -211,7 +211,7 @@ export default function CheckoutPage() {
   return (
     <div className="w-full bg-white flex flex-col min-h-full pb-12">
       {/* Breadcrumb & Heading */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-4">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-3 sm:pb-4">
         <div className="flex items-center justify-between gap-3 mb-2 sm:mb-3">
           <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870]">
             <Link href="/" className="hover:text-[#38262e]">{t.navHome}</Link>
@@ -267,13 +267,13 @@ export default function CheckoutPage() {
           }
         }}
         noValidate
-        className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2"
+        className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-2"
       >
         <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-start">
           {/* Left Column: Delivery Form & Payment Methods */}
-          <div className="md:col-span-7 lg:col-span-8 space-y-6">
+          <div className="md:col-span-7 lg:col-span-8 space-y-5 sm:space-y-6">
             {/* Step 1: Contact Details */}
-            <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
+            <div className="bg-white p-4 sm:p-6 rounded-2xl border border-[#eedfe5]">
               <h2 className="font-serif text-[24px] sm:text-[26px] font-medium text-[#38262e] mb-4">
                 {t.contactAndDelivery}
               </h2>

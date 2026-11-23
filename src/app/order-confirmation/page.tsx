@@ -303,8 +303,8 @@ function OrderConfirmationContent() {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-5 md:py-8 flex flex-col min-h-full pb-12">
-      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-6 sm:p-8 flex flex-col">
+    <div className="w-full max-w-2xl mx-auto px-3 sm:px-6 py-4 md:py-8 flex flex-col min-h-full pb-12">
+      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-4 sm:p-8 flex flex-col">
         {/* Step Bar */}
         <div className="mb-4 print:hidden">
           <OrderingStepBar currentStep={isCOD ? 2 : 3} isCOD={isCOD} orderId={order.id} />

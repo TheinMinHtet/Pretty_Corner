@@ -236,13 +236,13 @@ export default function PromotionHubPage() {
       </section>
 
       {/* 2. Eligible Products Section */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-14">
-        <div className="flex items-center justify-between pb-6 border-b border-[#eedfe5]">
+      <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-8 sm:pt-14">
+        <div className="flex items-center justify-between pb-4 sm:pb-6 border-b border-[#eedfe5]">
           <div>
-            <h2 className="font-serif text-[24px] sm:text-[28px] font-bold text-[#38262e]">
+            <h2 className="font-serif text-[20px] sm:text-[28px] font-bold text-[#38262e]">
               {language === 'my' ? 'ပါဝင်သော အထူးပစ္စည်းများ' : 'Eligible Promotional Products'}
             </h2>
-            <p className="text-[13px] sm:text-[14px] text-[#7a6870] mt-1">
+            <p className="text-[12px] sm:text-[14px] text-[#7a6870] mt-1">
               {language === 'my'
                 ? `ဤပရိုမိုးရှင်းဖြင့် ${promotion.discountPercentage}% လျှော့စျေး ရယူလိုက်ပါ။`
                 : `Enjoy ${promotion.discountPercentage}% automatic discount on these qualifying products.`}
@@ -250,7 +250,7 @@ export default function PromotionHubPage() {
           </div>
           <Link
             href="/shop"
-            className="text-[13px] font-bold text-[#b73d67] hover:underline shrink-0"
+            className="text-[12px] sm:text-[13px] font-bold text-[#b73d67] hover:underline shrink-0"
           >
             {t.viewAll} →
           </Link>
@@ -258,7 +258,7 @@ export default function PromotionHubPage() {
 
         {/* Product Grid */}
         {eligibleProducts.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 pt-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 pt-5 sm:pt-8">
             {eligibleProducts.map((product) => {
               const discountedPrice = Math.round(
                 product.price * (1 - Math.min(60, promotion.discountPercentage) / 100)
@@ -267,9 +267,9 @@ export default function PromotionHubPage() {
               return (
                 <div
                   key={product.id}
-                  className="flex flex-col group bg-white p-3 sm:p-4 rounded-[24px] border border-[#eedfe5] hover:shadow-sm transition-all"
+                  className="flex flex-col group bg-white p-2 sm:p-4 rounded-[14px] sm:rounded-[24px] border border-[#eedfe5] hover:shadow-sm transition-all"
                 >
-                  <div className="relative w-full h-[200px] sm:h-[240px] bg-[#f9f5f7] rounded-[18px] overflow-hidden">
+                  <div className="relative w-full h-[155px] sm:h-[240px] bg-[#f9f5f7] rounded-[10px] sm:rounded-[18px] overflow-hidden">
                     <Link href={`/product/${product.slug || product.id}`} className="block relative w-full h-full">
                       <Image
                         src={product.image}
@@ -281,30 +281,30 @@ export default function PromotionHubPage() {
                     </Link>
 
                     {/* Promo Discount Tag */}
-                    <span className="absolute top-2.5 left-2.5 bg-[#b73d67] text-white text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-2xs select-none">
+                    <span className="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 bg-[#b73d67] text-white text-[9px] sm:text-[11px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-full shadow-2xs select-none">
                       -{promotion.discountPercentage}% OFF
                     </span>
                   </div>
 
                   {/* Details */}
-                  <div className="pt-2 sm:pt-3 flex-1 flex flex-col justify-between">
+                  <div className="pt-1.5 sm:pt-3 flex-1 flex flex-col justify-between">
                     <div>
-                      <p className="text-[10px] sm:text-[11px] font-medium tracking-wide text-[#7a6870] uppercase">
+                      <p className="text-[9.5px] sm:text-[11px] font-medium tracking-wide text-[#7a6870] uppercase">
                         {product.category}
                       </p>
                       <Link href={`/product/${product.slug || product.id}`}>
-                        <h3 className="text-[14px] sm:text-[16px] font-medium text-[#38262e] hover:text-[#b73d67] transition-colors line-clamp-2 mt-0.5 leading-snug">
+                        <h3 className="text-[13px] sm:text-[16px] font-medium text-[#38262e] hover:text-[#b73d67] transition-colors line-clamp-2 mt-0.5 leading-snug">
                           {product.name}
                         </h3>
                       </Link>
                     </div>
 
-                    <div className="flex items-center justify-between gap-1.5 mt-2.5 pt-2 border-t border-[#f5edf0]">
+                    <div className="flex items-center justify-between gap-1 mt-2 pt-1.5 border-t border-[#f5edf0]">
                       <div>
-                        <span className="block text-[13px] sm:text-[15px] font-bold text-[#b73d67] whitespace-nowrap leading-tight">
-                          {discountedPrice.toLocaleString()} <span className="text-[10px] sm:text-[11px] font-medium">MMK</span>
+                        <span className="block text-[12px] sm:text-[15px] font-bold text-[#b73d67] whitespace-nowrap leading-tight">
+                          {discountedPrice.toLocaleString()} <span className="text-[9px] sm:text-[11px] font-medium">MMK</span>
                         </span>
-                        <span className="block text-[10.5px] sm:text-[11px] text-[#7a6870] line-through whitespace-nowrap leading-tight">
+                        <span className="block text-[10px] sm:text-[11px] text-[#7a6870] line-through whitespace-nowrap leading-tight">
                           {product.price.toLocaleString()} MMK
                         </span>
                       </div>

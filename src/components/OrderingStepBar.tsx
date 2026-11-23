@@ -39,17 +39,17 @@ export default function OrderingStepBar({ currentStep, isCOD = false, orderId }:
     : '100%';
 
   return (
-    <div className="w-full py-2">
+    <div className="w-full py-1.5 sm:py-2">
       {/* Unified Responsive Step Bar */}
       <div
-        className={`relative flex items-center justify-between mx-auto px-2 ${
+        className={`relative flex items-center justify-between mx-auto px-1 sm:px-2 ${
           isCOD
             ? 'w-[280px] sm:w-[300px]'
             : 'w-full max-w-[360px] sm:max-w-none sm:w-[390px] md:w-[410px]'
         }`}
       >
         {/* Track Line behind steps */}
-        <div className="absolute left-7 right-7 sm:left-8 sm:right-8 top-1/2 -translate-y-1/2 h-[2px] bg-[#eedfe5] z-0">
+        <div className="absolute left-5 right-5 sm:left-8 sm:right-8 top-1/2 -translate-y-1/2 h-[2px] bg-[#eedfe5] z-0">
           <div
             className="h-full bg-[#b73d67] transition-all duration-300"
             style={{
@@ -61,9 +61,9 @@ export default function OrderingStepBar({ currentStep, isCOD = false, orderId }:
         {steps.map((s) => {
           const isCompleted = s.step < activeStep;
           const isCurrent = s.step === activeStep;
-          const pillClasses = `flex items-center gap-1.5 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[11px] sm:text-[12px] transition-all select-none ${
+          const pillClasses = `flex items-center gap-1 sm:gap-1.5 px-2 sm:px-4 py-0.5 sm:py-1.5 rounded-full text-[10px] sm:text-[12px] transition-all select-none ${
             isCurrent
-              ? 'bg-[#b73d67] text-white font-bold shadow-sm ring-4 ring-[#b73d67]/15 scale-105'
+              ? 'bg-[#b73d67] text-white font-bold shadow-sm ring-2 sm:ring-4 ring-[#b73d67]/15 scale-105'
               : isCompleted
               ? 'bg-[#fceef2] text-[#b73d67] font-semibold border border-[#eedfe5] hover:bg-[#f8dde5] cursor-pointer'
               : 'bg-white text-[#7a6870] font-medium border border-[#eedfe5]'
@@ -72,11 +72,11 @@ export default function OrderingStepBar({ currentStep, isCOD = false, orderId }:
           const content = (
             <>
               {isCompleted ? (
-                <svg className="w-3.5 h-3.5 text-[#b73d67]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#b73d67]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               ) : (
-                <span className="text-[10px] sm:text-[11px] opacity-80">{s.step}.</span>
+                <span className="text-[9px] sm:text-[11px] opacity-80">{s.step}.</span>
               )}
               <span>{s.label}</span>
             </>

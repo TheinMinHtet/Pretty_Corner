@@ -343,7 +343,7 @@ function ShopContent() {
   return (
     <div className="w-full bg-white flex flex-col min-h-full">
       {/* Catalog Header & Breadcrumb */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-4">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-3 sm:pb-4">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-[12px] text-[#7a6870] mb-2 sm:mb-3">
           <Link href="/" className="hover:text-[#38262e]">{t.navHome}</Link>
@@ -417,7 +417,7 @@ function ShopContent() {
       </div>
 
       {/* Main Category Tabs */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-2">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-2 pb-2">
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
           {visibleCategories.map((cat) => (
             <button
@@ -454,7 +454,7 @@ function ShopContent() {
       </div>
 
       {/* 3. Catalog Section */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 pb-16">
+      <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 pb-16">
         {/* Controls Toolbar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#eedfe5]">
           {/* Left: Product Counter & Active Filter Badges */}
@@ -572,11 +572,11 @@ function ShopContent() {
 
         {/* Responsive Product Grid */}
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6 mt-5 sm:mt-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 mt-4 sm:mt-6">
             {filteredProducts.map((product) => {
               return (
                 <div key={product.id} className="flex flex-col group">
-                  <div className="relative w-full h-[180px] sm:h-[230px] md:h-[260px] lg:h-[280px] bg-[#f9f5f7] rounded-[12px] overflow-hidden">
+                  <div className="relative w-full h-[160px] sm:h-[230px] md:h-[260px] lg:h-[280px] bg-[#f9f5f7] rounded-[10px] sm:rounded-[12px] overflow-hidden">
                     <Link href={`/product/${product.id}`} className="block relative w-full h-full">
                       <Image
                         src={product.image}
@@ -589,27 +589,27 @@ function ShopContent() {
 
                     {/* Badge */}
                     {product.badge && (
-                      <span className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 bg-white text-[#b73d67] text-[9.5px] sm:text-[11px] font-bold px-2 sm:px-2.5 py-0.5 rounded-[5px] shadow-sm select-none">
+                      <span className="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 bg-white text-[#b73d67] text-[9px] sm:text-[11px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-[4px] sm:rounded-[5px] shadow-sm select-none">
                         {product.badge}
                       </span>
                     )}
                   </div>
 
                   {/* Details */}
-                  <div className="pt-2 sm:pt-3 flex flex-col flex-1 justify-between">
+                  <div className="pt-1.5 sm:pt-3 flex flex-col flex-1 justify-between">
                     <div>
-                      <p className="text-[10px] sm:text-[11px] font-medium tracking-wide text-[#7a6870] uppercase">
+                      <p className="text-[9.5px] sm:text-[11px] font-medium tracking-wide text-[#7a6870] uppercase">
                         {product.category}
                       </p>
                       <Link href={`/product/${product.id}`}>
-                        <h4 className="text-[14px] sm:text-[16px] font-normal text-[#38262e] hover:text-[#b73d67] transition-colors line-clamp-2 mt-0.5 leading-snug">
+                        <h4 className="text-[13px] sm:text-[16px] font-normal text-[#38262e] hover:text-[#b73d67] transition-colors line-clamp-2 mt-0.5 leading-snug">
                           {product.name}
                         </h4>
                       </Link>
                     </div>
-                    <div className="flex items-center justify-between gap-1.5 mt-2 pt-1">
-                      <p className="text-[13px] sm:text-[15px] font-bold text-[#b73d67] whitespace-nowrap leading-none">
-                        {product.price.toLocaleString()} <span className="text-[10px] sm:text-[11px] font-medium">MMK</span>
+                    <div className="flex items-center justify-between gap-1 mt-1.5 sm:mt-2 pt-1">
+                      <p className="text-[12px] sm:text-[15px] font-bold text-[#b73d67] whitespace-nowrap leading-none">
+                        {product.price.toLocaleString()} <span className="text-[9.5px] sm:text-[11px] font-medium">MMK</span>
                       </p>
                       <ProductCardStepper productId={product.id} />
                     </div>
