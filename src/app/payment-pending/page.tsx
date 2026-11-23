@@ -151,7 +151,7 @@ function PaymentPendingContent() {
             nonce: Date.now().toString(),
             callbackUrl: 'https://pretty-corner.vercel.app/api/payment/webhook',
           },
-          (result) => {
+          (result: any) => {
             if (result.success) {
               clearPaymentSession();
               updatePaymentStatus(targetId, 'paid');

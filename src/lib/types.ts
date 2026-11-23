@@ -7,6 +7,7 @@ export interface ProductSize {
 export interface Product {
   id: string;
   slug: string;
+  databaseId?: string;
   name: string;
   brand?: string;
   category: 'electrical' | 'skincare' | 'makeup' | 'lifestyle' | 'lenses' | 'more' | string;
@@ -37,6 +38,7 @@ export interface CartItem {
   price: number;
   quantity: number;
   image: string;
+  category?: string;
 }
 
 export interface TownshipOption {
@@ -67,8 +69,16 @@ export interface Order {
   createdAt: string;
 }
 
+export type PromotionTargetType =
+  | 'SINGLE_PRODUCT'
+  | 'CATEGORY'
+  | 'ENTIRE_STORE';
+
+export type RedemptionMethod = 'CODE' | 'AUTOMATIC';
+
 export interface Promotion {
   id: string;
+  slug?: string;
   code: string;
   title: string;
   subtitle?: string;
@@ -76,11 +86,17 @@ export interface Promotion {
   startDate: string;
   endDate: string;
   active: boolean;
+  targetType?: PromotionTargetType;
+  targetSlug?: string;
+  redemptionMethod?: RedemptionMethod;
+  usageLimit?: number | null;
+  usageCount?: number;
+  minimumOrderAmount?: number | null;
   bannerColor?: string;
   imageUrl?: string;
   bannerBadge?: string;
   ctaText?: string;
   ctaLink?: string;
   featuredProductIds?: string[];
-  usageCount?: number;
+  isOutOfStock?: boolean;
 }
