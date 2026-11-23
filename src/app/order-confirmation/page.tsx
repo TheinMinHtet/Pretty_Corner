@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import OrderingStepBar from '@/components/OrderingStepBar';
 
 function OrderConfirmationContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { orders, clearCart, t, language, fetchOrderById, isMounted } = useStore();
 
@@ -35,6 +36,13 @@ function OrderConfirmationContent() {
 
   const order = localOrder || remoteOrder;
   const isCOD = order?.paymentMethod === 'Cash on Delivery';
+
+  // Automatically clear cart when order confirmation is reached
+  useEffect(() => {
+    if (order && order.paymentStatus !== 'cancelled') {
+      clearCart();
+    }
+  }, [order?.id, order?.paymentStatus, clearCart]);
 
   const [copied, setCopied] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
@@ -440,12 +448,16 @@ function OrderConfirmationContent() {
             <span className="text-[12.5px] text-gray-700 font-medium">
               {language === 'my' ? 'ဤအမှာစာကို ပယ်ဖျက်ထားပါသည်။' : 'This order has been cancelled.'}
             </span>
-            <Link
-              href="/shop"
-              className="px-3.5 py-1.5 bg-[#b73d67] text-white text-[12px] font-bold rounded-lg hover:bg-[#a33259] transition-colors shrink-0 shadow-2xs"
+            <button
+              type="button"
+              onClick={() => {
+                clearCart();
+                router.push('/shop');
+              }}
+              className="px-3.5 py-1.5 bg-[#b73d67] text-white text-[12px] font-bold rounded-lg hover:bg-[#a33259] transition-colors shrink-0 shadow-2xs cursor-pointer"
             >
               {language === 'my' ? 'ပစ္စည်းများ ကြည့်ရှုဝယ်ယူရန်' : 'Start New Order'}
-            </Link>
+            </button>
           </div>
         )}
 
