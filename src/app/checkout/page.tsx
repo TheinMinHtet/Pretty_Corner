@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import OrderingStepBar from '@/components/OrderingStepBar';
+import SlideToConfirm from '@/components/SlideToConfirm';
 import { validatePhoneNumber } from '@/lib/validation';
 import { getAddressResolver } from '@/lib/location/MyanmarAddressResolver';
 
@@ -68,6 +69,7 @@ export default function CheckoutPage() {
   const [promoInput, setPromoInput] = useState('');
   const [promoFeedback, setPromoFeedback] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCodConfirmModal, setShowCodConfirmModal] = useState(false);
 
   // Ensure submitting state resets if customer navigates back to checkout
   useEffect(() => {
@@ -129,6 +131,45 @@ export default function CheckoutPage() {
     }
   };
 
+  const processPlaceOrder = async (isCashOnDelivery: boolean) => {
+    setIsSubmitting(true);
+    setFormAlert(null);
+
+    try {
+      const newOrder = await createOrder({
+        customerName: customerName.trim(),
+        phone: phoneNumber.trim(),
+        deliveryAddress: streetAddress.trim(),
+        coordinates: pinCoords || { lat: 16.8302, lng: 96.1301 },
+        landmarkNote: landmarkNote.trim(),
+        items: cart,
+        subtotal: cartSubtotal,
+        discount,
+        deliveryFee: 0,
+        total: grandTotal,
+        paymentMethod: isCashOnDelivery ? 'Cash on Delivery' : paymentMethod,
+        paymentStatus: 'pending',
+        fulfillmentStatus: isCashOnDelivery ? 'confirmed' : 'pending_review',
+      });
+
+      if (isCashOnDelivery) {
+        clearCart();
+        setShowCodConfirmModal(false);
+        router.push(`/order-confirmation?orderId=${encodeURIComponent(newOrder.id)}`);
+      } else {
+        router.push(`/payment-pending?orderId=${encodeURIComponent(newOrder.id)}`);
+      }
+    } catch (err: any) {
+      console.error('Order placement failed:', err);
+      setFormAlert(
+        err?.message ||
+        (language === 'my' ? 'အော်ဒါတင်ခြင်း မအောင်မြင်ပါ။ ထပ်မံကြိုးစားပေးပါ။' : 'Order placement failed. Please try again.')
+      );
+      setIsSubmitting(false);
+      setShowCodConfirmModal(false);
+    }
+  };
+
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     const activeEl = typeof document !== 'undefined' ? (document.activeElement as HTMLElement) : null;
@@ -150,41 +191,11 @@ export default function CheckoutPage() {
     }
 
     const isCOD = paymentMethod === 'Cash on Delivery';
-    const completeAddress = streetAddress.trim();
-
-    setIsSubmitting(true);
-    setFormAlert(null);
-
-    try {
-      const newOrder = await createOrder({
-        customerName: customerName.trim(),
-        phone: phoneNumber.trim(),
-        deliveryAddress: completeAddress,
-        coordinates: pinCoords || { lat: 16.8302, lng: 96.1301 },
-        landmarkNote: landmarkNote.trim(),
-        items: cart,
-        subtotal: cartSubtotal,
-        discount,
-        deliveryFee: 0,
-        total: grandTotal,
-        paymentMethod,
-        paymentStatus: 'pending',
-        fulfillmentStatus: isCOD ? 'confirmed' : 'pending_review',
-      });
-
-      if (isCOD) {
-        clearCart();
-        router.push(`/order-confirmation?orderId=${encodeURIComponent(newOrder.id)}`);
-      } else {
-        router.push(`/payment-pending?orderId=${encodeURIComponent(newOrder.id)}`);
-      }
-    } catch (err: any) {
-      console.error('Order placement failed:', err);
-      setFormAlert(
-        err?.message ||
-        (language === 'my' ? 'အော်ဒါတင်ခြင်း မအောင်မြင်ပါ။ ထပ်မံကြိုးစားပေးပါ။' : 'Order placement failed. Please try again.')
-      );
-      setIsSubmitting(false);
+    if (isCOD) {
+      // Trigger mobile-first slide to confirm UI
+      setShowCodConfirmModal(true);
+    } else {
+      await processPlaceOrder(false);
     }
   };
 
@@ -647,6 +658,25 @@ export default function CheckoutPage() {
           </div>
         </div>
       </form>
+
+      {/* Mobile-first draggable confirmation modal for COD */}
+      {showCodConfirmModal && (
+        <SlideToConfirm
+          amount={grandTotal}
+          currency="MMK"
+          title="ORDER CONFIRMATION"
+          subtitle="Total amount (Cash on Delivery)"
+          promptText="Slide to confirm order"
+          cancelText="Cancel"
+          isSubmitting={isSubmitting}
+          onConfirm={async () => {
+            await processPlaceOrder(true);
+          }}
+          onCancel={() => {
+            setShowCodConfirmModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }
