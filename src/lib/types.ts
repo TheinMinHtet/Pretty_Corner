@@ -64,8 +64,8 @@ export interface Order {
   deliveryFee?: number;
   total: number;
   paymentMethod: 'Mobile Banking' | 'Cash on Delivery' | 'MyanMyanPay' | 'KBZPay' | 'WavePay' | string;
-  paymentStatus: 'paid' | 'pending' | 'failed' | 'expired';
-  fulfillmentStatus: 'pending_review' | 'confirmed' | 'processing' | 'shipped' | 'delivered';
+  paymentStatus: 'paid' | 'pending' | 'failed' | 'expired' | 'cancelled';
+  fulfillmentStatus: 'pending_review' | 'confirmed' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   createdAt: string;
 }
 
