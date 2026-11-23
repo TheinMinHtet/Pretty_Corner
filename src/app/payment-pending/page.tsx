@@ -170,6 +170,9 @@ function PaymentPendingContent() {
               clearPaymentSession();
               updatePaymentStatus(targetId, 'paid');
               router.push(`/order-confirmation?orderId=${targetId}`);
+            } else if (result.failed) {
+              setIsInitializingPayment(false);
+              setShowPaymentModal(true);
             }
           }
         );
