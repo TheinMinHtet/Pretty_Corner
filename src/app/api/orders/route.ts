@@ -285,7 +285,12 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Generate Order Ref & Persist
-    let orderId = customOrderId || `PC-${Date.now().toString().slice(-8)}`;
+    const now = new Date();
+    const day = now.getDate().toString().padStart(2, '0');
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const yearShort = now.getFullYear().toString().slice(-2);
+    const initialSeq = Math.floor(10000 + Math.random() * 90000);
+    let orderId = customOrderId || `PC-${yearShort}${month}${day}-${initialSeq}`;
 
     let { data: insertedOrder, error: orderErr } = await client
       .from('orders')
@@ -314,13 +319,8 @@ export async function POST(request: NextRequest) {
         orderErr.message?.includes('orders_pkey'))
     ) {
       console.warn(`Order primary key collision on ${orderId}. Auto-regenerating unique ID and retrying...`);
-      const date = new Date();
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const yearShort = date.getFullYear().toString().slice(-2);
-      const timeFrag = Date.now().toString().slice(-4);
-      const randomSeq = Math.floor(1000 + Math.random() * 9000);
-      orderId = `PC-${yearShort}${month}${day}-${timeFrag}${randomSeq}`;
+      const retrySeq = Math.floor(10000 + Math.random() * 90000);
+      orderId = `PC-${yearShort}${month}${day}-${retrySeq}`;
 
       const retryRes = await client
         .from('orders')

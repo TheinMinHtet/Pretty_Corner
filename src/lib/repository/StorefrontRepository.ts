@@ -362,7 +362,12 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
     customOrderId?: string,
     formattedDate?: string
   ): Promise<Order> {
-    const orderId = customOrderId || `PC-${Date.now().toString().slice(-8)}`;
+    const d = new Date();
+    const dd = d.getDate().toString().padStart(2, '0');
+    const mm = (d.getMonth() + 1).toString().padStart(2, '0');
+    const yy = d.getFullYear().toString().slice(-2);
+    const seq = Math.floor(10000 + Math.random() * 90000);
+    const orderId = customOrderId || `PC-${yy}${mm}${dd}-${seq}`;
     const createdAt = formattedDate || new Date().toLocaleString();
 
     const createdOrder: Order = {
@@ -488,9 +493,14 @@ export class InMemoryStorefrontRepository implements StorefrontRepository {
     customOrderId?: string,
     formattedDate?: string
   ): Promise<Order> {
+    const d = new Date();
+    const dd = d.getDate().toString().padStart(2, '0');
+    const mm = (d.getMonth() + 1).toString().padStart(2, '0');
+    const yy = d.getFullYear().toString().slice(-2);
+    const seq = Math.floor(10000 + Math.random() * 90000);
     const order: Order = {
       ...submission,
-      id: customOrderId || `PC-${Date.now().toString().slice(-8)}`,
+      id: customOrderId || `PC-${yy}${mm}${dd}-${seq}`,
       createdAt: formattedDate || new Date().toLocaleString(),
     };
     this.orders.unshift(order);
