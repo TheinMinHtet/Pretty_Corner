@@ -25,9 +25,8 @@ export function generateOrderId(): string {
   const day = date.getDate().toString().padStart(2, '0');
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
   const yearShort = date.getFullYear().toString().slice(-2);
-  const timeFrag = Date.now().toString().slice(-4);
-  const randomSeq = Math.floor(1000 + Math.random() * 9000);
-  return `PC-${yearShort}${month}${day}-${timeFrag}${randomSeq}`;
+  const randomSeq = Math.floor(100 + Math.random() * 900);
+  return `PC-${yearShort}${month}${day}-${randomSeq}`;
 }
 
 export function formatOrderDate(input?: Date | string | null): string {
