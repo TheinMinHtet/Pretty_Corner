@@ -115,6 +115,7 @@ export type TranslationSchema = Record<
   | 'landmarkNote'
   | 'landmarkPlaceholder'
   | 'paymentMethod'
+  | 'paymentMethodLabel'
   | 'choosePaymentMethod'
   | 'mobileBanking'
   | 'cod'
@@ -326,6 +327,7 @@ export const translations: Record<Language, TranslationSchema> = {
     landmarkNote: 'Delivery landmark note (optional)',
     landmarkPlaceholder: 'e.g. Near Hledan Centre · Please call on arrival',
     paymentMethod: '2. Payment method',
+    paymentMethodLabel: 'Payment Method',
     choosePaymentMethod: 'Choose your preferred payment method.',
     mobileBanking: 'Mobile Banking',
     cod: 'Cash on Delivery',
@@ -542,6 +544,7 @@ export const translations: Record<Language, TranslationSchema> = {
     landmarkNote: 'မှတ်ချက် / အထူးမှာကြားချက် (မဖြစ်မနေ မလိုပါ)',
     landmarkPlaceholder: 'ဥပမာ - လှည်းတန်းစင်တာအနီး၊ အိမ်ရောက်လျှင် ဖုန်းအရင်ဆက်ပေးပါ',
     paymentMethod: '၂။ ငွေချေစနစ် ရွေးချယ်ရန်',
+    paymentMethodLabel: 'ငွေပေးချေမှုစနစ်',
     choosePaymentMethod: 'မိမိအဆင်ပြေရာ ငွေချေစနစ်ကို ရွေးချယ်ပေးပါ။',
     mobileBanking: 'မိုဘိုင်းဘဏ်ဖြင့် ငွေချေမည်',
     cod: 'ပစ္စည်းရောက်မှ ငွေချေမည် (COD)',

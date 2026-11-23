@@ -4,6 +4,7 @@ import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
+import { formatOrderDate } from '@/lib/order/OrderLifecycleService';
 
 function OrderReceiptContent() {
   const searchParams = useSearchParams();
@@ -101,31 +102,37 @@ function OrderReceiptContent() {
           </div>
 
           <div>
-            <h2 className="font-serif text-[28px] sm:text-[32px] font-medium text-[#38262e]">
+            <h2 className="font-serif text-[26px] sm:text-[32px] font-medium text-[#38262e]">
               {language === 'my' ? 'အမှာစာပြေစာနှင့် ကုန်ကျငွေ' : 'Order Receipt & Summary'}
             </h2>
-            <p className="text-[13px] text-[#7a6870] mt-1 font-medium">
-              {t.orderRef}: <strong className="text-[#38262e] font-mono">{activeOrder.id}</strong> · {activeOrder.createdAt}
-            </p>
+            <div className="text-[12px] sm:text-[13px] text-[#7a6870] mt-1 font-medium flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <span>{t.orderRef}: <strong className="text-[#38262e] font-mono">{activeOrder.id}</strong></span>
+              {activeOrder.createdAt && (
+                <>
+                  <span className="text-[#eedfe5]">•</span>
+                  <span className="text-[#7a6870] text-[11px] sm:text-[12px] font-normal">{formatOrderDate(activeOrder.createdAt)}</span>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Payment & Status Overview Card */}
-          <div className="bg-white rounded-xl p-4 border border-[#eedfe5] flex flex-col gap-2.5 shadow-2xs">
-            <div className="flex justify-between items-center text-[13px]">
-              <span className="text-[#7a6870]">{t.paymentMethod}</span>
-              <span className="font-bold text-[#38262e]">
+          <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-[#eedfe5] flex flex-col gap-2.5 shadow-2xs">
+            <div className="flex justify-between items-center text-[12.5px] sm:text-[13px]">
+              <span className="text-[#7a6870]">{t.paymentMethodLabel}</span>
+              <span className="font-bold text-[#38262e] text-right">
                 {activeOrder.paymentMethod === 'Cash on Delivery'
-                  ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည် (COD)' : 'Cash on Delivery')
+                  ? (language === 'my' ? 'ပစ္စည်းရောက်မှငွေချေ' : 'Cash on Delivery')
                   : 'MMQR'}
               </span>
             </div>
-            <div className="flex justify-between items-center text-[13px]">
+            <div className="flex justify-between items-center text-[12.5px] sm:text-[13px]">
               <span className="text-[#7a6870]">{t.orderStatus}</span>
-              <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${
+              <span className={`font-bold px-2 py-0.5 rounded text-[11px] text-right ${
                 activeOrder.paymentStatus === 'cancelled'
                   ? 'bg-gray-100 text-gray-700 border border-gray-200'
                   : isCOD
-                  ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                   : activeOrder.paymentStatus === 'paid'
                   ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                   : 'bg-rose-50 text-rose-800 border border-rose-200'
@@ -133,14 +140,12 @@ function OrderReceiptContent() {
                 {activeOrder.paymentStatus === 'cancelled'
                   ? (language === 'my' ? 'အမှာစာ ပယ်ဖျက်ပြီး' : 'Cancelled')
                   : isCOD
-                  ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည်' : 'Cash on Delivery (Pay on arrival)')
+                  ? (language === 'my' ? 'အတည်ပြုပြီး (COD)' : 'Confirmed (COD)')
                   : activeOrder.paymentStatus === 'paid'
                   ? (language === 'my' ? 'ငွေပေးချေမှု အတည်ပြုပြီး' : 'Payment Verified')
                   : (language === 'my' ? 'ငွေပေးချေရန်ကျန်' : 'Awaiting Payment')}
               </span>
             </div>
-
-
           </div>
 
           {/* Itemized Beauty Picks Summary */}
@@ -189,9 +194,13 @@ function OrderReceiptContent() {
                   <span>{activeOrder.deliveryFee.toLocaleString()} MMK</span>
                 </div>
               ) : null}
-              <div className="flex justify-between pt-1 text-[16px] font-bold text-[#38262e]">
-                <span>{isCOD ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ပေးချေရမည့်ငွေ' : 'Total to Pay on Delivery') : t.total}</span>
-                <span className="text-[#b73d67]">{activeOrder.total.toLocaleString()} MMK</span>
+              <div className="flex items-baseline justify-between pt-1.5 text-[14px] sm:text-[16px] font-bold text-[#38262e] gap-2">
+                <span className="shrink min-w-0">
+                  {isCOD ? (language === 'my' ? 'စုစုပေါင်း (COD)' : 'Total (Pay on Delivery)') : t.total}
+                </span>
+                <span className="text-[#b73d67] shrink-0 whitespace-nowrap">
+                  {activeOrder.total.toLocaleString()} MMK
+                </span>
               </div>
             </div>
           </div>

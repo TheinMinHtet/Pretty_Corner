@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import OrderingStepBar from '@/components/OrderingStepBar';
+import { formatOrderDate } from '@/lib/order/OrderLifecycleService';
 
 function OrderConfirmationContent() {
   const router = useRouter();
@@ -85,7 +86,7 @@ function OrderConfirmationContent() {
 
   const handleDownloadReceipt = () => {
     if (!order) return;
-    const formattedDate = order.createdAt || new Date().toLocaleString();
+    const formattedDate = formatOrderDate(order.createdAt);
     
     // Draw an elegant, high-res canvas image for the receipt (JPEG)
     const canvas = document.createElement('canvas');
@@ -303,8 +304,8 @@ function OrderConfirmationContent() {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-3 sm:px-6 py-4 md:py-8 flex flex-col min-h-full pb-12">
-      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-4 sm:p-8 flex flex-col">
+    <div className="w-full max-w-2xl mx-auto px-2.5 sm:px-6 py-4 md:py-8 flex flex-col min-h-full pb-12">
+      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-3 min-[360px]:p-4 sm:p-8 flex flex-col">
         {/* Step Bar */}
         <div className="mb-4 print:hidden">
           <OrderingStepBar currentStep={isCOD ? 2 : 3} isCOD={isCOD} orderId={order.id} />
@@ -387,12 +388,12 @@ function OrderConfirmationContent() {
       </section>
 
       {/* 3. Order Details */}
-      <section className="px-5 pt-6 flex flex-col">
-        <div className="flex justify-between items-center text-[13px] py-1">
-          <span className="text-[#7a6870]">{t.paymentMethod}</span>
-          <span className="font-bold text-[#38262e]">
+      <section className="px-1 min-[360px]:px-3 sm:px-5 pt-5 sm:pt-6 flex flex-col">
+        <div className="flex justify-between items-center text-[12.5px] sm:text-[13px] py-1 gap-2">
+          <span className="text-[#7a6870] shrink-0">{t.paymentMethodLabel}</span>
+          <span className="font-bold text-[#38262e] text-right">
             {order.paymentMethod === 'Cash on Delivery'
-              ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည် (COD)' : 'Cash on Delivery · Pay on arrival')
+              ? (language === 'my' ? 'ပစ္စည်းရောက်မှငွေချေ' : 'Cash on Delivery')
               : order.paymentStatus === 'cancelled'
               ? (language === 'my' ? 'ပယ်ဖျက်ပြီး · MMQR' : 'Cancelled · MMQR')
               : order.paymentStatus === 'paid'
@@ -401,9 +402,9 @@ function OrderConfirmationContent() {
           </span>
         </div>
 
-        <div className="flex justify-between items-center text-[13px] py-1">
-          <span className="text-[#7a6870]">{t.orderStatus}</span>
-          <span className={`font-bold flex items-center gap-1.5 ${
+        <div className="flex justify-between items-center text-[12.5px] sm:text-[13px] py-1 gap-2">
+          <span className="text-[#7a6870] shrink-0">{t.orderStatus}</span>
+          <span className={`font-bold flex items-center gap-1.5 text-right ${
             order.paymentStatus === 'cancelled'
               ? 'text-gray-600'
               : order.paymentStatus === 'paid' || isCOD
@@ -420,9 +421,9 @@ function OrderConfirmationContent() {
             {order.paymentStatus === 'cancelled'
               ? (language === 'my' ? 'အမှာစာ ပယ်ဖျက်ပြီး' : 'Cancelled')
               : order.paymentStatus === 'paid'
-              ? (language === 'my' ? 'အော်ဒါအတည်ပြုပြီး (ပြင်ဆင်နေပါသည်)' : 'Confirmed · Processing')
+              ? (language === 'my' ? 'အတည်ပြုပြီး (ပြင်ဆင်နေပါသည်)' : 'Confirmed · Processing')
               : isCOD
-              ? (language === 'my' ? 'အော်ဒါအတည်ပြုပြီး (COD)' : 'Confirmed · Pay on Delivery')
+              ? (language === 'my' ? 'အတည်ပြုပြီး (COD)' : 'Confirmed · COD')
               : (language === 'my' ? 'ငွေပေးချေမှု စောင့်ဆိုင်းဆဲ' : 'Awaiting Payment')}
           </span>
         </div>
@@ -519,13 +520,13 @@ function OrderConfirmationContent() {
 
         <div className="my-3 border-t border-[#eedfe5]" />
 
-        <div className="flex justify-between items-center text-[17px] py-1">
-          <span className="text-[#7a6870]">
+        <div className="flex items-baseline justify-between text-[15px] sm:text-[17px] py-1 gap-2">
+          <span className="text-[#7a6870] shrink min-w-0">
             {order.paymentMethod === 'Cash on Delivery'
               ? (language === 'my' ? 'ပေးချေရမည့် စုစုပေါင်း' : 'Total to pay')
               : (language === 'my' ? 'ပေးချေပြီး စုစုပေါင်း' : 'Total paid')}
           </span>
-          <span className="font-bold text-[#38262e]">
+          <span className="font-bold text-[#38262e] shrink-0 whitespace-nowrap">
             {order.total.toLocaleString()} MMK
           </span>
         </div>

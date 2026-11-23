@@ -30,11 +30,21 @@ export function generateOrderId(): string {
   return `PC-${yearShort}${month}${day}-${timeFrag}${randomSeq}`;
 }
 
-export function formatOrderDate(date: Date = new Date()): string {
+export function formatOrderDate(input?: Date | string | null): string {
+  if (!input) {
+    const now = new Date();
+    const day = now.getDate().toString().padStart(2, '0');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthName = months[now.getMonth()];
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    return `${day} ${monthName} ${now.getFullYear()} · ${timeStr}`;
+  }
+  const date = typeof input === 'string' ? new Date(input) : input;
+  if (isNaN(date.getTime())) return typeof input === 'string' ? input : '';
   const day = date.getDate().toString().padStart(2, '0');
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const monthName = months[date.getMonth()];
-  const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
   return `${day} ${monthName} ${date.getFullYear()} · ${timeStr}`;
 }
 
