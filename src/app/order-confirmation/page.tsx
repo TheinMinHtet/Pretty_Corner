@@ -307,7 +307,7 @@ function OrderConfirmationContent() {
       <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-6 sm:p-8 flex flex-col">
         {/* Step Bar */}
         <div className="mb-4 print:hidden">
-          <OrderingStepBar currentStep={isCOD ? 2 : 3} isCOD={isCOD} />
+          <OrderingStepBar currentStep={isCOD ? 2 : 3} isCOD={isCOD} orderId={order.id} />
         </div>
 
         {/* Confirmation State */}
@@ -469,16 +469,26 @@ function OrderConfirmationContent() {
 
         <div className="space-y-3">
           {order.items.map((item, idx) => (
-            <div key={idx} className="flex justify-between items-center text-[13px]">
-              <span className="text-[#38262e] font-medium flex items-center">
-                <span>{item.name}</span>
-                <span className="inline-flex items-center font-bold text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-1.5 py-0.5 rounded text-[11px] ml-2 shrink-0">
-                  x{item.quantity}
-                </span>
-              </span>
-              <span className="font-bold text-[#38262e]">
+            <div key={idx} className="flex items-start justify-between gap-3 text-[13px] py-1 border-b border-[#eedfe5]/40 last:border-0">
+              <div className="flex-1 min-w-0 pr-2">
+                <div className="text-[#38262e] font-medium leading-snug">
+                  {item.name}
+                </div>
+                <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[#7a6870]">
+                  <span>Qty:</span>
+                  <span className="font-bold text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-1.5 py-0.5 rounded">
+                    x{item.quantity}
+                  </span>
+                  {item.size && (
+                    <span className="text-[10.5px] text-[#7a6870] font-normal">
+                      ({item.size})
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="font-bold text-[#38262e] text-right shrink-0 whitespace-nowrap pt-0.5">
                 {(item.price * item.quantity).toLocaleString()} MMK
-              </span>
+              </div>
             </div>
           ))}
 

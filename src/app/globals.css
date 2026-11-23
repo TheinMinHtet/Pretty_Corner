@@ -86,3 +86,65 @@
     color: #111111 !important;
   }
 }
+
+/* ==========================================================================
+   MyanMyanPay (MMPay) MMQR Popup - Mobile Scroll & Vertical Centering Fix
+   ========================================================================== */
+#mmpay-full-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding: 16px 12px !important;
+  box-sizing: border-box !important;
+  z-index: 99999 !important;
+}
+
+#mmpay-full-modal .mmpay-overlay-content {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 100% !important;
+  height: auto !important;
+  width: 100% !important;
+  margin: auto !important;
+  padding: 8px 0 !important;
+  box-sizing: border-box !important;
+}
+
+#mmpay-full-modal .mmpay-card {
+  max-height: calc(100dvh - 32px) !important;
+  max-width: 380px !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  margin: auto !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08) !important;
+}
+
+@media (max-height: 720px) {
+  #mmpay-full-modal .mmpay-qr-view {
+    padding: 44px 16px 18px 16px !important;
+  }
+  #mmpay-full-modal .mmpay-qr-container {
+    width: 180px !important;
+    height: 180px !important;
+    padding: 8px !important;
+    margin: 0 auto 10px auto !important;
+  }
+  #mmpay-full-modal .mmpay-amount-wrapper {
+    margin-bottom: 10px !important;
+  }
+  #mmpay-full-modal .mmpay-detail-box {
+    padding: 10px 12px !important;
+    margin-bottom: 14px !important;
+  }
+}

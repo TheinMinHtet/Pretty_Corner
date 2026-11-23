@@ -151,16 +151,19 @@ function OrderReceiptContent() {
 
             <div className="space-y-2.5 text-[13px] text-[#38262e] divide-y divide-[#eedfe5]/60">
               {activeOrder.items.map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center pt-2 first:pt-0">
-                  <div className="flex items-center">
-                    <span className="font-medium text-[#38262e]">{item.name}</span>
-                    <span className="inline-flex items-center font-bold text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-1.5 py-0.5 rounded text-[11px] ml-2 shrink-0">
-                      x{item.quantity}
-                    </span>
+                <div key={idx} className="flex items-start justify-between gap-3 pt-2 first:pt-0">
+                  <div className="flex-1 min-w-0 pr-2">
+                    <div className="font-medium text-[#38262e] leading-snug">{item.name}</div>
+                    <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[#7a6870]">
+                      <span>Qty:</span>
+                      <span className="font-bold text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-1.5 py-0.5 rounded">
+                        x{item.quantity}
+                      </span>
+                    </div>
                   </div>
-                  <span className="font-bold text-[#38262e]">
+                  <div className="font-bold text-[#38262e] text-right shrink-0 whitespace-nowrap pt-0.5">
                     {(item.price * item.quantity).toLocaleString()} MMK
-                  </span>
+                  </div>
                 </div>
               ))}
             </div>

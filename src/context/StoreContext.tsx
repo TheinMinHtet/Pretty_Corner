@@ -276,11 +276,39 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const incrementProduct = (productId: string, sizeName?: string) => {
+    const normalizedId = productId.toLowerCase();
+    // 1. If item already exists in cart, directly increment it
+    const existing = cart.find((i) => {
+      const match = i.productId?.toLowerCase() === normalizedId || i.id?.toLowerCase() === normalizedId;
+      if (sizeName) return match && i.size === sizeName;
+      return match;
+    });
+
+    if (existing) {
+      updateCartQuantity(existing.id, 1);
+      return;
+    }
+
+    // 2. Otherwise add new product entry
     addToCart(productId, sizeName, 1);
   };
 
   const decrementProduct = (productId: string, sizeName?: string) => {
-    const product = products.find((p) => p.id === productId || p.slug === productId);
+    const normalizedId = productId.toLowerCase();
+    // 1. Find directly in cart
+    const existing = cart.find((i) => {
+      const match = i.productId?.toLowerCase() === normalizedId || i.id?.toLowerCase() === normalizedId;
+      if (sizeName) return match && i.size === sizeName;
+      return match;
+    });
+
+    if (existing) {
+      updateCartQuantity(existing.id, -1);
+      return;
+    }
+
+    // 2. Fallback to products catalog lookup
+    const product = products.find((p) => p.id?.toLowerCase() === normalizedId || p.slug?.toLowerCase() === normalizedId);
     if (!product) return;
     const chosenSize = sizeName || product.sizes?.[0]?.name || '';
     const itemId = chosenSize ? `${product.id}-${chosenSize}` : product.id;

@@ -545,7 +545,7 @@ function PaymentPendingContent() {
       <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-6 sm:p-8 flex flex-col">
         {/* Step indicator */}
         <div className="mb-4">
-          <OrderingStepBar currentStep={2} />
+          <OrderingStepBar currentStep={2} orderId={cleanId} />
         </div>
 
         {/* Payment Instructions */}
@@ -667,9 +667,9 @@ function PaymentPendingContent() {
 
       {/* 03: Transaction Control - Confirmation Modal for Order Cancellation */}
       {showCancelModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-[360px] bg-white rounded-[20px] p-6 shadow-2xl flex flex-col text-center">
-            <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-3">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="w-full max-w-[360px] my-auto bg-white rounded-[20px] p-5 sm:p-6 shadow-2xl flex flex-col text-center max-h-[calc(100dvh-32px)] overflow-y-auto">
+            <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-3 shrink-0">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
@@ -693,7 +693,7 @@ function PaymentPendingContent() {
               </button>
               <button
                 onClick={() => setShowCancelModal(false)}
-                className="w-full h-[40px] text-[13px] text-[#7a6870] hover:text-[#38262e] font-semibold"
+                className="w-full h-[40px] text-[13px] text-[#7a6870] hover:text-[#38262e] font-semibold cursor-pointer"
               >
                 {language === 'my' ? 'မပယ်ဖျက်တော့ပါ' : 'Keep Order & Return'}
               </button>
@@ -704,9 +704,9 @@ function PaymentPendingContent() {
 
       {/* Payment Gateway Simulation Modal */}
       {showPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-[380px] bg-white rounded-[20px] p-6 shadow-2xl flex flex-col text-center">
-            <div className="w-12 h-12 rounded-full bg-[#fceef2] text-[#b73d67] flex items-center justify-center mx-auto mb-3">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="w-full max-w-[380px] my-auto bg-white rounded-[20px] p-5 sm:p-6 shadow-2xl flex flex-col text-center max-h-[calc(100dvh-32px)] overflow-y-auto">
+            <div className="w-12 h-12 rounded-full bg-[#fceef2] text-[#b73d67] flex items-center justify-center mx-auto mb-3 shrink-0">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="3" y="3" width="7" height="7" />
                 <rect x="14" y="3" width="7" height="7" />
@@ -726,7 +726,7 @@ function PaymentPendingContent() {
                 : 'Supports KBZPay, WavePay, AYA Pay, CB Pay and any MMQR app.'}
             </p>
 
-            <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
               <span className="px-2 py-1 bg-[#002f6c]/10 text-[#002f6c] text-[11px] font-bold rounded">KBZPay</span>
               <span className="px-2 py-1 bg-[#fcd116]/30 text-[#856404] text-[11px] font-bold rounded">WavePay</span>
               <span className="px-2 py-1 bg-[#ed1b24]/10 text-[#ed1b24] text-[11px] font-bold rounded">AYA Pay</span>

@@ -51,18 +51,26 @@ export default function ProductCardStepper({
     >
       <button
         type="button"
-        onClick={() => decrementProduct(productId, sizeName)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          decrementProduct(productId, sizeName);
+        }}
         className="w-6 h-6 sm:w-8 sm:h-8 rounded flex items-center justify-center hover:bg-black/15 active:scale-90 text-[13px] sm:text-[15px] font-bold cursor-pointer transition-transform"
         aria-label="Decrease quantity"
       >
         −
       </button>
-      <span className="text-[11px] sm:text-[12px] font-bold min-w-[16px] sm:min-w-[18px] text-center px-0.5">
+      <span className="text-[11px] sm:text-[12px] font-bold min-w-[16px] sm:min-w-[18px] text-center px-0.5 pointer-events-none">
         {quantity}
       </span>
       <button
         type="button"
-        onClick={() => incrementProduct(productId, sizeName)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          incrementProduct(productId, sizeName);
+        }}
         className="w-6 h-6 sm:w-8 sm:h-8 rounded flex items-center justify-center hover:bg-black/15 active:scale-90 text-[13px] sm:text-[15px] font-bold cursor-pointer transition-transform"
         aria-label="Increase quantity"
       >
