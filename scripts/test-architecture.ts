@@ -178,7 +178,7 @@ console.log('  ✔ updatePaymentStatus transitions payment to paid and fulfillme
 console.log('\n[3/4] Testing OrderLifecycleService...');
 
 const orderId = generateOrderId();
-assert.ok(/^PC-\d{6}-\d{3}$/.test(orderId), `Order ID ${orderId} does not match expected pattern`);
+assert.ok(/^PC-\d{6}-\d{5}$/.test(orderId), `Order ID ${orderId} does not match expected pattern`);
 console.log(`  ✔ generateOrderId outputs valid pattern: ${orderId}`);
 
 const dateStr = formatOrderDate();

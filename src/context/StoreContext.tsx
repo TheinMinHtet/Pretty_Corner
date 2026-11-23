@@ -18,6 +18,7 @@ import {
 import {
   generateOrderId,
   formatOrderDate,
+  processOrderSubmission,
   resolveOrder as resolveOrderLifecycle,
   completePayment as completePaymentLifecycle,
 } from '@/lib/order/OrderLifecycleService';
@@ -416,34 +417,28 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const createOrder = async (orderData: Omit<Order, 'id' | 'createdAt'>): Promise<Order> => {
-    const orderId = generateOrderId();
-    const formattedDate = formatOrderDate();
+    const result = await processOrderSubmission(
+      orderData,
+      appliedPromo,
+      repo
+    );
 
-    const orderSubmissionWithPromo = {
-      ...orderData,
-      promoCode: appliedPromo?.code,
-      appliedPromotionId: appliedPromo?.id,
-    };
-
-    // Authoritative Ingress: await server persistence before confirming
-    const saved = await repo.createOrder(orderSubmissionWithPromo, orderId, formattedDate);
+    const saved = result.order;
 
     setOrders((prev) => [
       saved,
       ...prev.filter(
         (o) =>
-          o.id.toUpperCase() !== orderId.toUpperCase() &&
           o.id.toUpperCase() !== saved.id.toUpperCase()
       ),
     ]);
 
-    // If Cash on Delivery, clear the cart immediately upon verified order creation
-    if (orderData.paymentMethod === 'Cash on Delivery') {
+    if (result.shouldClearCart) {
       clearCart();
     }
 
-    if (orderData.paymentMethod !== 'Cash on Delivery') {
-      setActivePendingOrderId(saved.id || orderId);
+    if (result.activePendingOrderId) {
+      setActivePendingOrderId(result.activePendingOrderId);
     }
 
     return saved;

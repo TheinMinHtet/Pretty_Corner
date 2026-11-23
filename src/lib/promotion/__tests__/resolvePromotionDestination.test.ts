@@ -1,6 +1,10 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { resolvePromotionDestination } from '../resolvePromotionDestination';
+import {
+  resolvePromotionDestination,
+  evaluatePromotionAction,
+} from '../resolvePromotionDestination';
+import { Promotion } from '../../types';
 
 describe('resolvePromotionDestination', () => {
   describe('SINGLE_PRODUCT target tier', () => {
@@ -102,6 +106,46 @@ describe('resolvePromotionDestination', () => {
         ctaLink: 'javascript:alert(1)',
       });
       assert.equal(dest, '/shop?promo=SAFE');
+    });
+  });
+
+  describe('Deep evaluatePromotionAction Descriptor', () => {
+    test('evaluates valid active promotion with authoritative action descriptor', () => {
+      const promo: Promotion = {
+        id: 'promo-active',
+        code: 'SAVE20',
+        title: 'Spring Glow Sale',
+        discountPercentage: 20,
+        startDate: '2026-01-01',
+        endDate: '2026-12-31',
+        active: true,
+        targetType: 'CATEGORY',
+        targetSlug: 'skincare',
+      };
+
+      const action = evaluatePromotionAction(promo);
+      assert.equal(action.isValid, true);
+      assert.equal(action.destinationUrl, '/shop?category=skincare&promo=SAVE20');
+      assert.equal(action.discountPercentage, 20);
+      assert.equal(action.hasCode, true);
+      assert.equal(action.code, 'SAVE20');
+      assert.equal(action.badgeLabel, '20% OFF EXCLUSIVE');
+    });
+
+    test('flags expired and out-of-stock promotions as invalid', () => {
+      const expiredPromo: Promotion = {
+        id: 'promo-exp',
+        code: 'OLD',
+        title: 'Expired',
+        discountPercentage: 10,
+        startDate: '2020-01-01',
+        endDate: '2020-01-02',
+        active: true,
+      };
+
+      const action = evaluatePromotionAction(expiredPromo);
+      assert.equal(action.isValid, false);
+      assert.equal(action.isExpired, true);
     });
   });
 });

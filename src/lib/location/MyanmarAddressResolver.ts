@@ -17,6 +17,11 @@ export interface DeliveryLocationFix {
   accuracyMeters?: number;
 }
 
+export interface ResolvedDeliveryFix extends DeliveryLocationFix {
+  deliveryFee: number;
+  zone: string;
+}
+
 export interface IAddressResolver {
   resolveCurrentDeliveryLocation(
     language: 'en' | 'my',
@@ -28,6 +33,11 @@ export interface IAddressResolver {
     lng: number,
     language: 'en' | 'my'
   ): Promise<DeliveryLocationFix>;
+
+  resolveDeliveryFix(
+    input: { lat: number; lng: number } | { useCurrentGps: true; timeoutMs?: number },
+    language: 'en' | 'my'
+  ): Promise<ResolvedDeliveryFix>;
 
   formatAddressWithTownship(street: string, townshipName?: string): string;
 
@@ -79,6 +89,24 @@ export class MyanmarAddressResolver implements IAddressResolver {
       township: result.township || null,
       landmark: result.landmark,
       coordinates: { lat, lng },
+    };
+  }
+
+  async resolveDeliveryFix(
+    input: { lat: number; lng: number } | { useCurrentGps: true; timeoutMs?: number },
+    language: 'en' | 'my'
+  ): Promise<ResolvedDeliveryFix> {
+    const base = 'useCurrentGps' in input
+      ? await this.resolveCurrentDeliveryLocation(language, input.timeoutMs)
+      : await this.resolveFromCoordinates(input.lat, input.lng, language);
+
+    const fee = base.township?.fee ?? 3000;
+    const zone = base.township?.zone ?? 'Downtown / Inner Yangon';
+
+    return {
+      ...base,
+      deliveryFee: fee,
+      zone,
     };
   }
 
@@ -148,6 +176,24 @@ export class OfflineAddressResolver implements IAddressResolver {
       formattedAddress: formalAddress,
       township: matchedTownship,
       coordinates: { lat, lng },
+    };
+  }
+
+  async resolveDeliveryFix(
+    input: { lat: number; lng: number } | { useCurrentGps: true; timeoutMs?: number },
+    language: 'en' | 'my'
+  ): Promise<ResolvedDeliveryFix> {
+    const base = 'useCurrentGps' in input
+      ? await this.resolveCurrentDeliveryLocation(language)
+      : await this.resolveFromCoordinates(input.lat, input.lng, language);
+
+    const fee = base.township?.fee ?? 3000;
+    const zone = base.township?.zone ?? 'Downtown / Inner Yangon';
+
+    return {
+      ...base,
+      deliveryFee: fee,
+      zone,
     };
   }
 

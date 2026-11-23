@@ -20,6 +20,57 @@ export interface OrderSubmissionDraft {
   paymentMethod: 'Mobile Banking' | 'Cash on Delivery' | 'MyanMyanPay' | 'KBZPay' | 'WavePay' | string;
 }
 
+export interface OrderSubmissionResult {
+  order: Order;
+  redirectUrl: string;
+  shouldClearCart: boolean;
+  activePendingOrderId: string | null;
+}
+
+/**
+ * Deep Order Intake interface: normalizes digits, computes date & ID, persists via repository,
+ * and determines atomic redirection and cart-clearing rules.
+ */
+export async function processOrderSubmission(
+  draft: OrderSubmissionDraft,
+  appliedPromo?: { code?: string; id?: string } | null,
+  repo: StorefrontRepository = getStorefrontRepository()
+): Promise<OrderSubmissionResult> {
+  const isCOD = draft.paymentMethod === 'Cash on Delivery';
+  const orderId = generateOrderId();
+  const createdAt = formatOrderDate();
+
+  const submission: Omit<Order, 'id' | 'createdAt'> & { promoCode?: string; appliedPromotionId?: string } = {
+    customerName: draft.customerName.trim(),
+    phone: normalizeMyanmarDigits(draft.phone).replace(/[\s-]/g, ''),
+    township: draft.township?.trim(),
+    deliveryAddress: draft.deliveryAddress.trim(),
+    coordinates: draft.coordinates || { lat: 16.8302, lng: 96.1301 },
+    landmarkNote: draft.landmarkNote?.trim() || undefined,
+    items: draft.items,
+    subtotal: draft.subtotal,
+    discount: draft.discount || 0,
+    deliveryFee: draft.deliveryFee || 0,
+    total: draft.total,
+    paymentMethod: draft.paymentMethod,
+    paymentStatus: 'pending',
+    fulfillmentStatus: isCOD ? 'confirmed' : 'pending_review',
+    promoCode: appliedPromo?.code,
+    appliedPromotionId: appliedPromo?.id,
+  };
+
+  const savedOrder = await repo.createOrder(submission, orderId, createdAt);
+
+  return {
+    order: savedOrder,
+    redirectUrl: isCOD
+      ? `/order-confirmation?orderId=${encodeURIComponent(savedOrder.id)}`
+      : `/payment-pending?orderId=${encodeURIComponent(savedOrder.id)}`,
+    shouldClearCart: isCOD,
+    activePendingOrderId: isCOD ? null : savedOrder.id,
+  };
+}
+
 export function generateOrderId(): string {
   const date = new Date();
   const day = date.getDate().toString().padStart(2, '0');

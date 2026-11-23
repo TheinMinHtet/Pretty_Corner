@@ -445,4 +445,49 @@ describe('CartEngine', () => {
       assert.match(res.message, /minimum order amount.*qualifying promotional items/i);
     });
   });
+
+  describe('Deepened Pricing Summary Rows & Presentation Metadata', () => {
+    test('produces authoritative summaryRows for subtotal, discount, shipping, and grand total', () => {
+      const promo: Promotion = {
+        id: 'promo-1',
+        code: 'STORE10',
+        title: '10% Off All',
+        discountPercentage: 10,
+        startDate: '2026-01-01',
+        endDate: '2026-12-31',
+        active: true,
+        targetType: 'ENTIRE_STORE',
+      };
+
+      const summary = calculatePricing(cartItems, promo, 3000, 0, sampleProducts);
+      assert.ok(summary.summaryRows);
+      assert.equal(summary.summaryRows.length, 4);
+
+      const subtotalRow = summary.summaryRows.find((r) => r.key === 'subtotal');
+      assert.ok(subtotalRow);
+      assert.equal(subtotalRow.amount, 140000);
+      assert.equal(subtotalRow.formattedAmount, '140,000 MMK');
+
+      const discountRow = summary.summaryRows.find((r) => r.key === 'discount');
+      assert.ok(discountRow);
+      assert.equal(discountRow.amount, 14000);
+      assert.equal(discountRow.formattedAmount, '−14,000 MMK');
+      assert.equal(discountRow.isNegative, true);
+
+      const shippingRow = summary.summaryRows.find((r) => r.key === 'shipping');
+      assert.ok(shippingRow);
+      assert.equal(shippingRow.amount, 3000);
+      assert.equal(shippingRow.formattedAmount, '3,000 MMK');
+
+      const totalRow = summary.summaryRows.find((r) => r.key === 'total');
+      assert.ok(totalRow);
+      assert.equal(totalRow.amount, 129000);
+      assert.equal(totalRow.formattedAmount, '129,000 MMK');
+
+      // Verify enriched line items
+      assert.equal(summary.lineItems[0].hasDiscount, true);
+      assert.equal(summary.lineItems[0].formattedFinalTotal, '54,000 MMK');
+      assert.equal(summary.lineItems[0].formattedSubtotal, '60,000 MMK');
+    });
+  });
 });

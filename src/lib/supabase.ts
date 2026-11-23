@@ -1,14 +1,46 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const directSupabaseUrl = (
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://vbcdopdttqmplwnknppl.supabase.co'
+).replace(/\/+$/, '');
+
 const supabaseAnonKey =
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   '';
 
+/**
+ * Returns the effective Supabase URL.
+ * In the browser, it routes through window.location.origin + '/supabase'
+ * so that traffic travels through Vercel's edge proxy, bypassing Myanmar ISP blocks.
+ * On the server, it talks directly to the official Supabase endpoint.
+ *
+ * @param useDirectConnection If true, bypasses the proxy and connects directly to Supabase cloud.
+ */
+export function getEffectiveSupabaseUrl(useDirectConnection: boolean = false): string {
+  if (typeof window !== 'undefined' && !useDirectConnection) {
+    return `${window.location.origin}/supabase`;
+  }
+  return directSupabaseUrl;
+}
+
+/**
+ * Creates or retrieves the public Supabase client.
+ * In browser runtime, connects through /supabase Vercel edge rewrite.
+ */
+export function createPublicSupabaseClient(useDirectConnection: boolean = false) {
+  const url = getEffectiveSupabaseUrl(useDirectConnection);
+  return (url && supabaseAnonKey)
+    ? createClient(url, supabaseAnonKey)
+    : (null as unknown as ReturnType<typeof createClient>);
+}
+
 // Client for public operations (browsing products, looking up receipts, placing orders)
-export const supabase = (supabaseUrl && supabaseAnonKey)
-  ? createClient(supabaseUrl, supabaseAnonKey)
+// In the browser, routes through /supabase rewrite on current origin; on server, routes directly.
+export const supabase = (directSupabaseUrl && supabaseAnonKey)
+  ? (typeof window !== 'undefined'
+      ? createClient(`${window.location.origin}/supabase`, supabaseAnonKey)
+      : createClient(directSupabaseUrl, supabaseAnonKey))
   : (null as unknown as ReturnType<typeof createClient>);
 
 // Server-only client with admin service role (for admin dashboard, inventory management)
@@ -17,7 +49,7 @@ export function getSupabaseAdmin() {
   if (!serviceRoleKey) {
     throw new Error('SUPABASE_SERVICE_ROLE_KEY is required for admin operations.');
   }
-  return createClient(supabaseUrl, serviceRoleKey, {
+  return createClient(directSupabaseUrl, serviceRoleKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
