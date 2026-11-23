@@ -210,6 +210,7 @@ export function addCartItem(
       price: itemPrice,
       quantity,
       image: product.image,
+      category: product.category,
     },
   ];
 }

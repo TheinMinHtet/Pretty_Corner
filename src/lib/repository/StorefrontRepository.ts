@@ -508,6 +508,8 @@ export class InMemoryStorefrontRepository implements StorefrontRepository {
     order.paymentStatus = status;
     if (status === 'paid') {
       order.fulfillmentStatus = 'confirmed';
+    } else if (status === 'cancelled') {
+      order.fulfillmentStatus = 'cancelled';
     }
     return { ...order };
   }

@@ -127,20 +127,6 @@ export default function HelpAndContactPage() {
           </Link>
 
           <Link
-            href="/policies/shipping"
-            className="w-full h-[52px] bg-[#f9f5f7] hover:bg-[#fceef2] rounded-xl px-5 flex items-center justify-between text-[#38262e] font-bold text-[14px] transition-colors"
-          >
-            <span>{language === 'my' ? 'ပို့ဆောင်ရေးနှင့် ရန်ကုန်မြို့နယ်များ' : 'Shipping & Yangon Townships'}</span>
-          </Link>
-
-          <Link
-            href="/policies/returns"
-            className="w-full h-[52px] bg-[#f9f5f7] hover:bg-[#fceef2] rounded-xl px-5 flex items-center justify-between text-[#38262e] font-bold text-[14px] transition-colors"
-          >
-            <span>{language === 'my' ? 'ပစ္စည်းလဲလှယ်ခြင်းနှင့် ငွေပြန်အမ်းခြင်း မူဝါဒ' : 'Return & Refund policy'}</span>
-          </Link>
-
-          <Link
             href="/policies/privacy"
             className="w-full h-[52px] bg-[#f9f5f7] hover:bg-[#fceef2] rounded-xl px-5 flex items-center justify-between text-[#38262e] font-bold text-[14px] transition-colors"
           >

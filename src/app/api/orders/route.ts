@@ -244,14 +244,18 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Re-calculate Pricing Server-Side with Full Catalog Awareness
-    const { data: dbProducts } = await client.from('products').select('id, slug, name, price');
-    const catalogProducts: any[] = (dbProducts || []).map((p: any) => ({
-      id: p.id,
-      databaseId: p.id,
-      slug: p.slug || p.id,
-      name: p.name,
-      price: p.price,
-    }));
+    const { data: dbProducts } = await client.from('products').select('id, slug, name, price, categories(slug, name)');
+    const catalogProducts: any[] = (dbProducts || []).map((p: any) => {
+      const cat = Array.isArray(p.categories) ? p.categories[0] : p.categories;
+      return {
+        id: p.id,
+        databaseId: p.id,
+        slug: p.slug || p.id,
+        name: p.name,
+        price: p.price,
+        category: cat?.slug || undefined,
+      };
+    });
 
     const pricing = calculatePricing(normalizedItems, matchedPromo, 0, 0, catalogProducts);
     promoDiscount = pricing.discountAmount;

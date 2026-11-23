@@ -62,6 +62,11 @@ export default function CheckoutPage() {
   const [promoFeedback, setPromoFeedback] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Ensure submitting state resets if customer navigates back to checkout
+  useEffect(() => {
+    setIsSubmitting(false);
+  }, []);
+
   // Rule 04: Duplicate Prevention - warning on refresh while form is submitting
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -583,11 +588,25 @@ export default function CheckoutPage() {
                 )}
 
                 {discount > 0 && (
-                  <div className="flex justify-between items-center text-[#b73d67]">
-                    <span>
-                      {t.discount} {appliedPromo ? `(${appliedPromo.code} · ${appliedPromo.discountPercentage}%)` : ''}
-                    </span>
-                    <span className="font-bold">-{discount.toLocaleString()} MMK</span>
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-[#b73d67]">
+                      <span>
+                        {t.discount} {appliedPromo ? `(${appliedPromo.code} · ${appliedPromo.discountPercentage}%)` : ''}
+                      </span>
+                      <span className="font-bold">-{discount.toLocaleString()} MMK</span>
+                    </div>
+                    {lineItemsPricing && lineItemsPricing.filter((lp) => lp.discountAmount > 0).length > 0 && (
+                      <div className="pl-2 border-l-2 border-[#f5d9e3] space-y-0.5 pt-0.5">
+                        {lineItemsPricing
+                          .filter((lp) => lp.discountAmount > 0)
+                          .map((lp) => (
+                            <div key={lp.itemId} className="flex justify-between items-center text-[11px] text-[#b73d67]">
+                              <span className="truncate mr-2">↳ {lp.name}</span>
+                              <span className="shrink-0 font-medium">-{lp.discountAmount.toLocaleString()} MMK</span>
+                            </div>
+                          ))}
+                      </div>
+                    )}
                   </div>
                 )}
                 <div className="border-t border-[#eedfe5] pt-2.5 flex justify-between items-center text-[18px] font-bold text-[#38262e]">

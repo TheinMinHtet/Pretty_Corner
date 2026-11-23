@@ -186,24 +186,50 @@ export default function ShoppingBagPage() {
 
                 {/* Products miniature list with customer quantity and item total */}
                 <div className="max-h-56 overflow-y-auto divide-y divide-[#eedfe5]/70 pr-1 mb-3">
-                  {cart.map((item) => (
-                    <div key={item.id} className="py-2.5 flex items-center justify-between gap-3 text-[13px]">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="relative w-10 h-10 rounded-lg bg-white border border-[#eedfe5] overflow-hidden shrink-0">
-                          <Image src={item.image} alt={item.name} fill sizes="40px" className="object-cover" />
+                  {cart.map((item) => {
+                    const itemPricing = lineItemsPricing?.find((lp) => lp.itemId === item.id);
+                    const isDiscounted = Boolean(itemPricing && itemPricing.discountAmount > 0);
+                    const finalLineTotal = itemPricing ? itemPricing.finalTotal : (item.price * item.quantity);
+
+                    return (
+                      <div key={item.id} className="py-2.5 flex items-center justify-between gap-3 text-[13px]">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="relative w-10 h-10 rounded-lg bg-white border border-[#eedfe5] overflow-hidden shrink-0">
+                            <Image src={item.image} alt={item.name} fill sizes="40px" className="object-cover" />
+                          </div>
+                          <div className="min-w-0 flex flex-col">
+                            <div className="flex items-center">
+                              <span className="font-medium text-[#38262e] truncate">{item.name}</span>
+                              <span className="inline-flex items-center font-bold text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-1.5 py-0.5 rounded text-[11px] ml-2 shrink-0">
+                                x{item.quantity}
+                              </span>
+                            </div>
+                            {isDiscounted ? (
+                              <span className="text-[10px] text-[#b73d67] font-semibold">
+                                ✨ Promo applied (-{appliedPromo?.discountPercentage}%)
+                              </span>
+                            ) : (
+                              appliedPromo && (
+                                <span className="text-[10px] text-[#7a6870]">
+                                  Regular item
+                                </span>
+                              )
+                            )}
+                          </div>
                         </div>
-                        <div className="min-w-0 flex items-center">
-                          <span className="font-medium text-[#38262e] truncate">{item.name}</span>
-                          <span className="inline-flex items-center font-bold text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-1.5 py-0.5 rounded text-[11px] ml-2 shrink-0">
-                            x{item.quantity}
+                        <div className="text-right shrink-0">
+                          <span className={`font-bold whitespace-nowrap ${isDiscounted ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                            {finalLineTotal.toLocaleString()} MMK
                           </span>
+                          {isDiscounted && (
+                            <div className="text-[10px] text-[#7a6870] line-through">
+                              {(item.price * item.quantity).toLocaleString()} MMK
+                            </div>
+                          )}
                         </div>
                       </div>
-                      <span className="font-bold text-[#38262e] shrink-0 whitespace-nowrap">
-                        {(item.price * item.quantity).toLocaleString()} MMK
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Promo Code Input Box */}
@@ -287,11 +313,25 @@ export default function ShoppingBagPage() {
                   )}
 
                   {discount > 0 && (
-                    <div className="flex justify-between items-center text-[#b73d67]">
-                      <span>
-                        {t.discount} {appliedPromo ? `(${appliedPromo.code} · ${appliedPromo.discountPercentage}%)` : ''}
-                      </span>
-                      <span className="font-bold">-{discount.toLocaleString()} MMK</span>
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center text-[#b73d67]">
+                        <span>
+                          {t.discount} {appliedPromo ? `(${appliedPromo.code} · ${appliedPromo.discountPercentage}%)` : ''}
+                        </span>
+                        <span className="font-bold">-{discount.toLocaleString()} MMK</span>
+                      </div>
+                      {lineItemsPricing && lineItemsPricing.filter((lp) => lp.discountAmount > 0).length > 0 && (
+                        <div className="pl-2 border-l-2 border-[#f5d9e3] space-y-0.5 pt-0.5">
+                          {lineItemsPricing
+                            .filter((lp) => lp.discountAmount > 0)
+                            .map((lp) => (
+                              <div key={lp.itemId} className="flex justify-between items-center text-[11px] text-[#b73d67]">
+                                <span className="truncate mr-2">↳ {lp.name}</span>
+                                <span className="shrink-0 font-medium">-{lp.discountAmount.toLocaleString()} MMK</span>
+                              </div>
+                            ))}
+                        </div>
+                      )}
                     </div>
                   )}
                   <div className="border-t border-[#eedfe5] pt-2.5 flex justify-between items-center text-[18px] font-bold text-[#38262e]">

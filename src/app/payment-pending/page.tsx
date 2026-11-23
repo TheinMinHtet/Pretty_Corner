@@ -169,6 +169,10 @@ function PaymentPendingContent() {
             clearPaymentSession();
             router.push(`/order-confirmation?orderId=${encodeURIComponent(cleanId)}`);
             return true;
+          } else if (data.paymentStatus === 'cancelled') {
+            cancelOrder(cleanId);
+            clearPaymentSession();
+            return true;
           }
         }
       } catch {}

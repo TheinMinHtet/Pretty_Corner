@@ -39,12 +39,34 @@ function OrderConfirmationContent() {
   const [copied, setCopied] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
 
-  // Clear cart only when order is confirmed COD or successfully paid
+  // Live status synchronization: poll while paymentStatus is pending
   useEffect(() => {
-    if (isCOD || order?.paymentStatus === 'paid') {
-      clearCart();
+    if (!cleanId || !order || order.paymentStatus === 'paid' || order.paymentStatus === 'cancelled' || isCOD) {
+      return;
     }
-  }, [clearCart, isCOD, order?.paymentStatus]);
+
+    let active = true;
+    const pollStatus = async () => {
+      try {
+        const res = await fetch(`/api/payment/status?orderId=${encodeURIComponent(cleanId)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (active && data.paymentStatus && data.paymentStatus !== order.paymentStatus) {
+            if (fetchOrderById) {
+              const fresh = await fetchOrderById(cleanId);
+              if (active && fresh) setRemoteOrder(fresh);
+            }
+          }
+        }
+      } catch {}
+    };
+
+    const interval = setInterval(pollStatus, 3000);
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [cleanId, order, isCOD, fetchOrderById]);
 
   const handleCopy = () => {
     if (!order) return;
@@ -449,13 +471,15 @@ function OrderConfirmationContent() {
           ))}
 
           {order.discount && order.discount > 0 ? (
-            <div className="flex justify-between items-center text-[13px]">
-              <span className="text-[#7a6870]">
-                {t.discount}
-              </span>
-              <span className="font-bold text-[#b73d67]">
-                -{order.discount.toLocaleString()} MMK
-              </span>
+            <div className="space-y-1">
+              <div className="flex justify-between items-center text-[13px]">
+                <span className="text-[#7a6870]">
+                  {t.discount}
+                </span>
+                <span className="font-bold text-[#b73d67]">
+                  -{order.discount.toLocaleString()} MMK
+                </span>
+              </div>
             </div>
           ) : null}
 
