@@ -1,5 +1,5 @@
 import { Product, Order, Promotion, CartItem, SocialChannel } from '../types';
-import { supabase } from '../supabase';
+import { supabase, getSupabaseAdmin } from '../supabase';
 import { DEFAULT_PROMOTIONS } from '../mockData';
 import { normalizeMyanmarDigits } from '../validation';
 
@@ -374,16 +374,28 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
 
     const normalized = normalizeMyanmarDigits(raw);
     const digitsOnly = normalized.replace(/[\s-]/g, '');
+    const safeRaw = raw.replace(/[^a-zA-Z0-9_-]/g, '');
+    const safeDigits = digitsOnly.replace(/[^0-9]/g, '');
 
     try {
-      if (supabase) {
-        let query = supabase.from('orders').select('*, order_items(*)');
-        if (raw.startsWith('PC-')) {
-          query = query.ilike('id', raw);
-        } else if (digitsOnly.length >= 6) {
-          query = query.or(`id.ilike.%${raw}%,phone.ilike.%${digitsOnly}%`);
+      // On the server (e.g. /api/payment/* handlers), use admin client to ensure RLS does not block internal verification
+      let client = supabase;
+      if (typeof window === 'undefined') {
+        try {
+          client = getSupabaseAdmin();
+        } catch {
+          client = supabase;
+        }
+      }
+
+      if (client) {
+        let query = client.from('orders').select('*, order_items(*)');
+        if (safeRaw.startsWith('PC-')) {
+          query = query.ilike('id', safeRaw);
+        } else if (safeDigits.length >= 6) {
+          query = query.or(`id.ilike.%${safeRaw}%,phone.ilike.%${safeDigits}%`);
         } else {
-          query = query.ilike('id', raw);
+          query = query.ilike('id', safeRaw);
         }
 
         const { data, error } = await query
@@ -450,19 +462,28 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
   ): Promise<Order | null> {
     const cleanId = orderId.trim().toUpperCase();
 
-    // 1. Update Supabase
-    if (supabase) {
+    // 1. Update Supabase (Server-only authoritative mutation; client browser runtime does not update DB directly)
+    if (typeof window === 'undefined') {
+      let client = supabase;
       try {
-        await supabase
-          .from('orders')
-          .update({
-            payment_status: status,
-            fulfillment_status: status === 'paid' ? 'confirmed' : status === 'cancelled' ? 'cancelled' : undefined,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', cleanId);
-      } catch (err) {
-        console.warn('Failed to update order payment in Supabase:', err);
+        client = getSupabaseAdmin();
+      } catch {
+        client = supabase;
+      }
+
+      if (client) {
+        try {
+          await client
+            .from('orders')
+            .update({
+              payment_status: status,
+              fulfillment_status: status === 'paid' ? 'confirmed' : status === 'cancelled' ? 'cancelled' : undefined,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', cleanId);
+        } catch (err) {
+          console.warn('Failed to update order payment in Supabase:', err);
+        }
       }
     }
 

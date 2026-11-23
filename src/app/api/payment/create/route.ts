@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerMMPaySdk, getMMPayConfig } from '@/lib/mmpay';
+import { getStorefrontRepository } from '@/lib/repository/StorefrontRepository';
 
 // In-memory idempotency cache for active payment requests (orderId -> response, expires in 15 mins)
 const idempotencyCache = new Map<string, { timestamp: number; response: unknown }>();
@@ -7,16 +8,36 @@ const idempotencyCache = new Map<string, { timestamp: number; response: unknown 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { orderId, amount, items, customMessage } = body;
+    const { orderId, customMessage } = body;
 
-    if (!orderId || !amount) {
+    if (!orderId) {
       return NextResponse.json(
-        { error: 'Missing orderId or amount' },
+        { error: 'Missing orderId' },
         { status: 400 }
       );
     }
 
     const cleanId = String(orderId).trim().toUpperCase();
+
+    // Verify order exists and determine authoritative total amount
+    const repo = getStorefrontRepository();
+    const order = await repo.findOrder(cleanId);
+
+    if (!order) {
+      return NextResponse.json(
+        { error: 'Order not found' },
+        { status: 404 }
+      );
+    }
+
+    if (order.paymentStatus === 'paid') {
+      return NextResponse.json(
+        { error: 'Order is already marked as paid' },
+        { status: 400 }
+      );
+    }
+
+    const authoritativeAmount = Math.max(1, Math.round(order.total));
 
     // Rule 04: Duplicate Prevention & Idempotency check
     const cached = idempotencyCache.get(cleanId);
@@ -37,8 +58,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         isConfigured: false,
-        orderId,
-        amount,
+        orderId: cleanId,
+        amount: authoritativeAmount,
         message: 'MyanMyanPay sandbox keys not configured yet. Fallback to simulation.',
       });
     }
@@ -48,15 +69,15 @@ export async function POST(req: NextRequest) {
     }/api/payment/webhook`;
 
     const payResponse = await sdk.pay({
-      orderId,
-      amount: Math.round(Number(amount)),
+      orderId: cleanId,
+      amount: authoritativeAmount,
       currency: 'MMK',
       callbackUrl,
-      customMessage: customMessage || `Order ${orderId} at Pretty Corner`,
-      items: Array.isArray(items)
-        ? items.map((it: { name: string; price?: number; amount?: number; quantity: number }) => ({
+      customMessage: customMessage || `Order ${cleanId} at Pretty Corner`,
+      items: Array.isArray(order.items)
+        ? order.items.map((it) => ({
             name: it.name,
-            amount: it.price || it.amount || 0,
+            amount: it.price || 0,
             quantity: it.quantity || 1,
           }))
         : undefined,

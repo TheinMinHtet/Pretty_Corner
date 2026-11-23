@@ -75,23 +75,9 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 const INITIAL_CART: CartItem[] = [];
 
-const emptySubscribe = () => () => {};
-
 export function StoreProvider({ children }: { children: React.ReactNode }) {
-  const isMounted = React.useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  );
-  const [language, setLanguageState] = useState<Language>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const savedLang = localStorage.getItem('pretty_corner_lang') as Language;
-        if (savedLang === 'en' || savedLang === 'my') return savedLang;
-      } catch {}
-    }
-    return 'en';
-  });
+  const [isMounted, setIsMounted] = useState(false);
+  const [language, setLanguageState] = useState<Language>('en');
   const [products, setProducts] = useState<Product[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -101,24 +87,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     facebook: 'https://facebook.com/prettycornermm',
     tiktok: 'https://www.tiktok.com/@prettycorner',
   });
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const savedCart = localStorage.getItem('pretty_corner_cart');
-        if (savedCart) return JSON.parse(savedCart);
-      } catch {}
-    }
-    return INITIAL_CART;
-  });
-  const [orders, setOrdersState] = useState<Order[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('pretty_corner_orders');
-        if (saved) return JSON.parse(saved);
-      } catch {}
-    }
-    return [];
-  });
+  const [cart, setCart] = useState<CartItem[]>(INITIAL_CART);
+  const [orders, setOrdersState] = useState<Order[]>([]);
 
   const setOrders = useCallback((updater: Order[] | ((prev: Order[]) => Order[])) => {
     setOrdersState((prev) => {
@@ -132,14 +102,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
   const [selectedTownship, setSelectedTownship] = useState<TownshipOption>(MOCK_TOWNSHIPS[0]);
-  const [activePendingOrderId, setActivePendingOrderIdState] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        return localStorage.getItem('pretty_corner_active_pending_order') || null;
-      } catch {}
-    }
-    return null;
-  });
+  const [activePendingOrderId, setActivePendingOrderIdState] = useState<string | null>(null);
 
   const setActivePendingOrderId = useCallback((id: string | null) => {
     setActivePendingOrderIdState(id);
@@ -155,15 +118,34 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [manualDiscount, setManualDiscount] = useState<number>(0);
-  const [appliedPromo, setAppliedPromoState] = useState<Promotion | null>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = sessionStorage.getItem('pretty_corner_applied_promo');
-        if (saved) return JSON.parse(saved);
-      } catch {}
-    }
-    return null;
-  });
+  const [appliedPromo, setAppliedPromoState] = useState<Promotion | null>(null);
+
+  // Sync client storage preferences once after hydration to ensure initial render matches SSR
+  useEffect(() => {
+    setIsMounted(true);
+    try {
+      const savedLang = localStorage.getItem('pretty_corner_lang') as Language;
+      if (savedLang === 'en' || savedLang === 'my') {
+        setLanguageState(savedLang);
+      }
+      const savedCart = localStorage.getItem('pretty_corner_cart');
+      if (savedCart) {
+        setCart(JSON.parse(savedCart));
+      }
+      const savedOrders = localStorage.getItem('pretty_corner_orders');
+      if (savedOrders) {
+        setOrdersState(JSON.parse(savedOrders));
+      }
+      const savedActive = localStorage.getItem('pretty_corner_active_pending_order');
+      if (savedActive) {
+        setActivePendingOrderIdState(savedActive);
+      }
+      const savedPromo = sessionStorage.getItem('pretty_corner_applied_promo');
+      if (savedPromo) {
+        setAppliedPromoState(JSON.parse(savedPromo));
+      }
+    } catch {}
+  }, []);
 
   const setAppliedPromo = useCallback((promo: Promotion | null) => {
     setAppliedPromoState(promo);
