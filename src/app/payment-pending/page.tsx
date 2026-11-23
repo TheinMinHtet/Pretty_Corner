@@ -391,7 +391,7 @@ function PaymentPendingContent() {
     clearPaymentSession();
     cancelOrder(cleanId);
     setShowCancelModal(false);
-    router.push('/checkout');
+    router.push('/shop');
   };
 
   if (!isMounted || remoteLoading) {
@@ -411,8 +411,8 @@ function PaymentPendingContent() {
         <p className="text-[13px] text-[#7a6870] mb-6">
           {language === 'my' ? 'ကျေးဇူးပြု၍ ပစ္စည်းများ ရွေးချယ်ပြီး အမှာစာ အသစ်ပြုလုပ်ပေးပါရန်။' : 'Please select products and checkout to initiate payment.'}
         </p>
-        <Link href="/bag" className="inline-flex h-[44px] px-6 bg-[#b73d67] text-white rounded-lg items-center font-bold text-[14px] hover:bg-[#a33259] transition-colors">
-          {t.viewBag}
+        <Link href="/shop" className="inline-flex h-[44px] px-6 bg-[#b73d67] text-white rounded-lg items-center font-bold text-[14px] hover:bg-[#a33259] transition-colors">
+          {t.startShopping}
         </Link>
       </div>
     );
@@ -436,8 +436,8 @@ function PaymentPendingContent() {
             ? `အမှာစာနံပါတ် ${cleanId} ကို ပယ်ဖျက်ထားပါသည်။ ပစ္စည်းများ ပြန်လည်ရွေးချယ်ပြီး အသစ်မှာယူနိုင်ပါသည်။`
             : `Order #${cleanId} has been cancelled. You can edit your bag or start a new order.`}
         </p>
-        <Link href="/checkout" className="inline-flex h-[44px] px-6 bg-[#b73d67] text-white rounded-lg items-center font-bold text-[14px] hover:bg-[#a33259] transition-colors">
-          {language === 'my' ? 'အမှာစာ အသစ်ပြုလုပ်ရန်' : 'Start New Order'}
+        <Link href="/shop" className="inline-flex h-[44px] px-6 bg-[#b73d67] text-white rounded-lg items-center font-bold text-[14px] hover:bg-[#a33259] transition-colors">
+          {language === 'my' ? 'ပစ္စည်းများ ကြည့်ရှုဝယ်ယူရန်' : 'Start New Order'}
         </Link>
       </div>
     );

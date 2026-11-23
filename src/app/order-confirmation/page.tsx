@@ -441,10 +441,10 @@ function OrderConfirmationContent() {
               {language === 'my' ? 'ဤအမှာစာကို ပယ်ဖျက်ထားပါသည်။' : 'This order has been cancelled.'}
             </span>
             <Link
-              href="/checkout"
+              href="/shop"
               className="px-3.5 py-1.5 bg-[#b73d67] text-white text-[12px] font-bold rounded-lg hover:bg-[#a33259] transition-colors shrink-0 shadow-2xs"
             >
-              {language === 'my' ? 'အမှာစာ အသစ်ပြုလုပ်ရန်' : 'Start New Order'}
+              {language === 'my' ? 'ပစ္စည်းများ ကြည့်ရှုဝယ်ယူရန်' : 'Start New Order'}
             </Link>
           </div>
         )}
