@@ -1,0 +1,5 @@
+import { OrderCardSkeleton } from '@/components/Skeletons';
+
+export default function Loading() {
+  return <OrderCardSkeleton wide />;
+}

@@ -2,11 +2,11 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { Promotion, Product } from '@/lib/types';
+import LazyImage from '@/components/LazyImage';
 
 const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper'), {
   ssr: false,
@@ -271,7 +271,7 @@ export default function PromotionHubPage() {
                 >
                   <div className="relative w-full h-[155px] sm:h-[240px] bg-[#f9f5f7] rounded-[10px] sm:rounded-[18px] overflow-hidden">
                     <Link href={`/product/${product.slug || product.id}`} className="block relative w-full h-full">
-                      <Image
+                      <LazyImage
                         src={product.image}
                         alt={product.name}
                         fill

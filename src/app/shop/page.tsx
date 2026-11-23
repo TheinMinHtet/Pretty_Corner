@@ -2,10 +2,14 @@
 
 import React, { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
+import LazyImage from '@/components/LazyImage';
+import { ProductGridSkeleton, ShopPageSkeleton } from '@/components/Skeletons';
+
+const CategoryModal = dynamic(() => import('@/components/CategoryModal'), { ssr: false });
+const ShopFilterModal = dynamic(() => import('@/components/ShopFilterModal'), { ssr: false });
 
 const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper'), {
   ssr: false,
@@ -18,7 +22,7 @@ const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper
 
 function ShopContent() {
   const searchParams = useSearchParams();
-  const { products, promotions, t, language } = useStore();
+  const { products, productsLoading, promotions, t, language } = useStore();
 
   const categoryParam = searchParams.get('category') || 'all';
   const queryParam = searchParams.get('q') || '';
@@ -571,14 +575,18 @@ function ShopContent() {
         </div>
 
         {/* Responsive Product Grid */}
-        {filteredProducts.length > 0 ? (
+        {productsLoading && products.length === 0 ? (
+          <div className="mt-4 sm:mt-6">
+            <ProductGridSkeleton count={8} />
+          </div>
+        ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 mt-4 sm:mt-6">
             {filteredProducts.map((product) => {
               return (
                 <div key={product.id} className="flex flex-col group">
                   <div className="relative w-full h-[160px] sm:h-[230px] md:h-[260px] lg:h-[280px] bg-[#f9f5f7] rounded-[10px] sm:rounded-[12px] overflow-hidden">
                     <Link href={`/product/${product.id}`} className="block relative w-full h-full">
-                      <Image
+                      <LazyImage
                         src={product.image}
                         alt={product.name}
                         fill
@@ -641,180 +649,53 @@ function ShopContent() {
 
       {/* 4. Filter Modal */}
       {showFilterModal && (
-        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-[#38262e]/50 backdrop-blur-xs transition-opacity"
-            onClick={() => setShowFilterModal(false)}
-          />
-
-          {/* Modal Content */}
-          <div className="relative w-full md:max-w-md bg-white rounded-t-[20px] md:rounded-2xl p-6 max-h-[90vh] overflow-y-auto shadow-2xl z-10 animate-in fade-in slide-in-from-bottom-6 md:zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-[#eedfe5]">
-              <h2 className="font-serif text-[24px] font-medium text-[#38262e]">
-                {t.filterAndSort}
-              </h2>
-              <button
-                onClick={() => setShowFilterModal(false)}
-                className="w-8 h-8 rounded-full bg-[#fceef2] flex items-center justify-center text-[#38262e] hover:bg-[#f6e1e8]"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="py-4 space-y-5">
-              {/* Categories */}
-              <div>
-                <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">
-                  {language === 'my' ? 'အမျိုးအစား' : 'Category'}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {categoriesList.map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => setActiveCategory(cat.id)}
-                      className={`h-[34px] px-3.5 rounded-[17px] text-[12px] transition-colors cursor-pointer ${
-                        activeCategory === cat.id
-                          ? 'bg-[#38262e] text-white font-medium'
-                          : 'bg-[#fceef2] text-[#38262e]'
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Price range */}
-              <div>
-                <div className="flex justify-between items-center text-[13px] font-bold text-[#38262e] mb-2">
-                  <span>{t.priceRange}</span>
-                  <span className="text-[#b73d67]">
-                    0 — {(userAdjustedPrice ? maxPrice : catalogMaxPrice).toLocaleString()} MMK
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="10000"
-                  max={catalogMaxPrice}
-                  step="5000"
-                  value={userAdjustedPrice ? maxPrice : catalogMaxPrice}
-                  onChange={(e) => {
-                    setMaxPrice(Number(e.target.value));
-                    setUserAdjustedPrice(true);
-                  }}
-                  className="w-full accent-[#b73d67] cursor-pointer"
-                />
-              </div>
-
-              {/* Availability */}
-              <div>
-                <p className="text-[13px] font-bold text-[#38262e] mb-2 uppercase tracking-wide">{t.availability}</p>
-                <label className="flex items-center gap-2.5 text-[13px] text-[#38262e] cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={inStockOnly}
-                    onChange={(e) => setInStockOnly(e.target.checked)}
-                    className="accent-[#b73d67]"
-                  />
-                  {t.onlyInStock}
-                </label>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="space-y-2 pt-2">
-                <button
-                  onClick={() => setShowFilterModal(false)}
-                  className="w-full h-[48px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] transition-colors cursor-pointer"
-                >
-                  {t.showMatchingProducts}
-                </button>
-
-                <button
-                  onClick={() => {
-                    setActiveCategory('all');
-                    setSearchFilter('');
-                    setMaxPrice(catalogMaxPrice);
-                    setUserAdjustedPrice(false);
-                    setInStockOnly(false);
-                    setSortBy('featured');
-                  }}
-                  className="w-full h-[44px] bg-[#fceef2] text-[#b73d67] rounded-[10px] font-bold text-[14px] hover:bg-[#f6e1e8] transition-colors cursor-pointer"
-                >
-                  {t.clearAll}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ShopFilterModal
+          title={t.filterAndSort}
+          categoryHeading={language === 'my' ? 'အမျိုးအစား' : 'Category'}
+          priceRangeLabel={t.priceRange}
+          availabilityLabel={t.availability}
+          onlyInStockLabel={t.onlyInStock}
+          showMatchingLabel={t.showMatchingProducts}
+          clearAllLabel={t.clearAll}
+          categories={categoriesList}
+          activeCategory={activeCategory}
+          onSelectCategory={setActiveCategory}
+          catalogMaxPrice={catalogMaxPrice}
+          maxPrice={maxPrice}
+          userAdjustedPrice={userAdjustedPrice}
+          onChangeMaxPrice={(price) => {
+            setMaxPrice(price);
+            setUserAdjustedPrice(true);
+          }}
+          inStockOnly={inStockOnly}
+          onToggleInStock={setInStockOnly}
+          onClearAll={() => {
+            setActiveCategory('all');
+            setSearchFilter('');
+            setMaxPrice(catalogMaxPrice);
+            setUserAdjustedPrice(false);
+            setInStockOnly(false);
+            setSortBy('featured');
+          }}
+          onClose={() => setShowFilterModal(false)}
+        />
       )}
 
       {/* Category Popup Modal ("+ Others") */}
       {showCategoryModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div
-            className="fixed inset-0 bg-[#38262e]/45 backdrop-blur-xs transition-opacity"
-            onClick={() => setShowCategoryModal(false)}
-          />
-
-          <div className="relative w-full max-w-lg bg-white rounded-2xl p-5 sm:p-6 max-h-[80vh] overflow-y-auto shadow-2xl z-10 border border-[#eedfe5] animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-[#eedfe5]">
-              <div>
-                <h3 className="font-serif text-[22px] font-medium text-[#38262e]">
-                  {t.allCategories}
-                </h3>
-                <p className="text-[12px] text-[#7a6870] mt-0.5">
-                  {t.selectCategoryToView}
-                </p>
-              </div>
-              <button
-                onClick={() => setShowCategoryModal(false)}
-                className="w-8 h-8 rounded-full bg-[#fceef2] flex items-center justify-center text-[#38262e] hover:bg-[#f6e1e8] transition-colors cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="py-4 space-y-2.5">
-              {categoriesList.map((cat) => {
-                const isSelected = activeCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => {
-                      setActiveCategory(cat.id);
-                      setShowCategoryModal(false);
-                    }}
-                    className={`w-full text-left p-3.5 rounded-[12px] border transition-all cursor-pointer flex items-center justify-between gap-3 ${
-                      isSelected
-                        ? 'bg-[#fceef2] border-[#b73d67] shadow-xs'
-                        : 'bg-white border-[#eedfe5] hover:border-[#b73d67] hover:bg-[#faf7f8]'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className={`text-[14px] font-bold ${isSelected ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
-                          {cat.label}
-                        </span>
-                        {isSelected && (
-                          <span className="text-[10px] bg-[#b73d67] text-white font-bold px-1.5 py-0.5 rounded-full">
-                            {t.active}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[12px] text-[#7a6870] mt-0.5 line-clamp-1">
-                        {cat.description}
-                      </p>
-                    </div>
-                    <span className="text-[12px] font-semibold text-[#7a6870] bg-[#faf7f8] px-2.5 py-1 rounded-full border border-[#eedfe5] shrink-0">
-                      {cat.count} {language === 'my' ? 'ခု' : 'items'}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        <CategoryModal
+          categories={categoriesList}
+          activeCategory={activeCategory}
+          title={t.allCategories}
+          subtitle={t.selectCategoryToView}
+          activeLabel={t.active}
+          itemsUnitLabel={language === 'my' ? 'ခု' : 'items'}
+          onSelect={(catId) => {
+            setActiveCategory(catId);
+            setShowCategoryModal(false);
+          }}
+          onClose={() => setShowCategoryModal(false)}
+        />
       )}
     </div>
   );
@@ -822,7 +703,7 @@ function ShopContent() {
 
 export default function ShopPage() {
   return (
-    <Suspense fallback={<div className="p-12 text-center text-[#7a6870]">Loading catalog...</div>}>
+    <Suspense fallback={<ShopPageSkeleton />}>
       <ShopContent />
     </Suspense>
   );

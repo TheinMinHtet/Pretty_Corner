@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { Product } from '@/lib/types';
+import LazyImage from '@/components/LazyImage';
 
 export default function ProductDetailView({ product }: { product: Product }) {
   const router = useRouter();
@@ -106,7 +107,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                       : 'border-transparent hover:border-[#eedfe5]'
                   }`}
                 >
-                  <Image
+                  <LazyImage
                     src={img}
                     alt={`${product.name} ${idx + 1}`}
                     fill

@@ -2,9 +2,10 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
+import LazyImage from '@/components/LazyImage';
+import { BagPageSkeleton } from '@/components/Skeletons';
 
 export default function ShoppingBagPage() {
   const router = useRouter();
@@ -32,16 +33,12 @@ export default function ShoppingBagPage() {
 
   const promoItemsCount = lineItemsPricing
     ? lineItemsPricing
-        .filter((lp) => lp.discountAmount > 0)
-        .reduce((sum, lp) => sum + lp.quantity, 0)
+      .filter((lp) => lp.discountAmount > 0)
+      .reduce((sum, lp) => sum + lp.quantity, 0)
     : 0;
 
   if (!isMounted) {
-    return (
-      <div className="w-full bg-white flex flex-col min-h-[60vh] items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-[#b73d67] border-t-transparent animate-spin" />
-      </div>
-    );
+    return <BagPageSkeleton />;
   }
 
   return (
@@ -67,11 +64,10 @@ export default function ShoppingBagPage() {
           </button>
         </div>
 
-        <h1 className={`font-serif font-medium text-[#38262e] ${
-          language === 'my'
+        <h1 className={`font-serif font-medium text-[#38262e] ${language === 'my'
             ? 'text-[24px] sm:text-[30px]'
             : 'text-[30px] sm:text-[38px]'
-        }`}>
+          }`}>
           {t.bagTitle}
         </h1>
         <p className="font-sans text-[13px] sm:text-[15px] text-[#7a6870] mt-1">
@@ -98,10 +94,11 @@ export default function ShoppingBagPage() {
                 return (
                   <div key={item.id} className="py-4 sm:py-5 flex gap-3 sm:gap-6 items-center">
                     <div className="relative w-[88px] sm:w-[120px] h-[108px] sm:h-[140px] bg-[#f9f5f7] rounded-[10px] overflow-hidden shrink-0">
-                      <Image
+                      <LazyImage
                         src={item.image}
                         alt={item.name}
                         fill
+                        sizes="(max-width: 640px) 88px, 120px"
                         className="object-cover"
                       />
                     </div>
@@ -114,7 +111,7 @@ export default function ShoppingBagPage() {
                         <p className="text-[12px] sm:text-[13px] text-[#7a6870] mt-0.5">
                           {item.size ? `${item.size} · ` : ''}{t.standardPackaging}
                         </p>
-                        
+
                         <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                           {isDiscounted ? (
                             <>
@@ -201,7 +198,7 @@ export default function ShoppingBagPage() {
                       <div key={item.id} className="py-2.5 flex items-center justify-between gap-3 text-[13px]">
                         <div className="flex items-center gap-2.5 min-w-0">
                           <div className="relative w-10 h-10 rounded-lg bg-white border border-[#eedfe5] overflow-hidden shrink-0">
-                            <Image src={item.image} alt={item.name} fill sizes="40px" className="object-cover" />
+                            <LazyImage src={item.image} alt={item.name} fill sizes="40px" className="object-cover" />
                           </div>
                           <div className="min-w-0 flex flex-col">
                             <div className="flex items-center">

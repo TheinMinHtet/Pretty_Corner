@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import OrderingStepBar from '@/components/OrderingStepBar';
 import { formatOrderDate } from '@/lib/order/OrderLifecycleService';
+import { OrderCardSkeleton } from '@/components/Skeletons';
 
 function OrderConfirmationContent() {
   const router = useRouter();
@@ -261,11 +262,7 @@ function OrderConfirmationContent() {
   };
 
   if (!isMounted || remoteLoading) {
-    return (
-      <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-16 flex items-center justify-center min-h-[50vh]">
-        <div className="w-8 h-8 rounded-full border-2 border-[#b73d67] border-t-transparent animate-spin" />
-      </div>
-    );
+    return <OrderCardSkeleton wide />;
   }
 
   if (!order) {
@@ -594,7 +591,7 @@ function OrderConfirmationContent() {
 
 export default function OrderConfirmationPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-[#7a6870]">Loading confirmation...</div>}>
+    <Suspense fallback={<OrderCardSkeleton wide />}>
       <OrderConfirmationContent />
     </Suspense>
   );

@@ -3,6 +3,7 @@ import { Cormorant_Garamond, DM_Sans } from 'next/font/google';
 import './globals.css';
 import { StoreProvider } from '@/context/StoreContext';
 import MobileShell from '@/components/MobileShell';
+import { PageShellSkeleton } from '@/components/Skeletons';
 import { Suspense } from 'react';
 
 const cormorant = Cormorant_Garamond({
@@ -33,7 +34,7 @@ export default function RootLayout({
     <html lang="en" className={`${cormorant.variable} ${dmSans.variable}`}>
       <body className="font-sans min-h-screen bg-white text-[#38262e] selection:bg-[#fceef2] selection:text-[#b73d67]">
         <StoreProvider>
-          <Suspense fallback={<div className="p-8 text-center text-[#7a6870]">Loading Pretty Corner...</div>}>
+          <Suspense fallback={<PageShellSkeleton />}>
             <MobileShell>{children}</MobileShell>
           </Suspense>
         </StoreProvider>

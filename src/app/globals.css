@@ -75,6 +75,25 @@
   .animate-hero-progress {
     animation-duration: 0.01ms !important;
   }
+  .skeleton-shimmer {
+    animation: none !important;
+  }
+}
+
+/* Luxury rose-cream skeleton shimmer */
+@keyframes prettyShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #f6eef1 25%, #fdfafb 50%, #f6eef1 75%);
+  background-size: 200% 100%;
+  animation: prettyShimmer 1.6s ease-in-out infinite;
 }
 
 @media print {

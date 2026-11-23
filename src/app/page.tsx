@@ -2,11 +2,14 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import HeroBannerSlider from '@/components/HeroBannerSlider';
+import LazyImage from '@/components/LazyImage';
+import { ProductGridSkeleton } from '@/components/Skeletons';
+
+const CategoryModal = dynamic(() => import('@/components/CategoryModal'), { ssr: false });
 
 const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper'), {
   ssr: false,
@@ -19,7 +22,7 @@ const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper
 
 export default function HomePage() {
   const router = useRouter();
-  const { products, t, language } = useStore();
+  const { products, productsLoading, t, language } = useStore();
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
 
@@ -154,13 +157,16 @@ export default function HomePage() {
         </div>
 
         {/* Responsive Product Grid: 2 cols on mobile, 3 cols on tablet, 4 cols on desktop */}
+        {productsLoading && products.length === 0 ? (
+          <ProductGridSkeleton count={8} />
+        ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
           {displayedProducts.map((product) => {
             return (
               <div key={product.id} className="flex flex-col group">
                 <div className="relative w-full h-[160px] sm:h-[230px] md:h-[260px] lg:h-[280px] bg-[#f9f5f7] rounded-[10px] sm:rounded-[12px] overflow-hidden">
                   <Link href={`/product/${product.slug || product.id}`} className="block relative w-full h-full">
-                    <Image
+                    <LazyImage
                       src={product.image}
                       alt={product.name}
                       fill
@@ -200,6 +206,7 @@ export default function HomePage() {
             );
           })}
         </div>
+        )}
 
         {/* Full catalog CTA button beneath the preview grid */}
         <div className="mt-8 mb-4 sm:mt-10 sm:mb-6 text-center">
@@ -217,7 +224,7 @@ export default function HomePage() {
         <div className="bg-[#fceef2] rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-[#eedfe5]">
           {/* Address Card Image */}
           <div className="w-full md:max-w-2xl bg-white rounded-xl shadow-xs overflow-hidden border border-[#eedfe5]/80">
-            <Image
+            <LazyImage
               src="/assets/address-card-demo.png"
               alt="Pretty Corner Address Card"
               width={700}
@@ -246,76 +253,23 @@ export default function HomePage() {
 
       {/* 7. Category Popup Modal ("+ Others") */}
       {showCategoryModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-[#38262e]/45 backdrop-blur-xs transition-opacity"
-            onClick={() => setShowCategoryModal(false)}
-          />
-
-          {/* Dialog - Centered on screen */}
-          <div className="relative w-full max-w-lg bg-white rounded-2xl p-5 sm:p-6 max-h-[80vh] overflow-y-auto shadow-2xl z-10 border border-[#eedfe5] animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-[#eedfe5]">
-              <div>
-                <h3 className="font-serif text-[22px] font-medium text-[#38262e]">
-                  {t.allCategories}
-                </h3>
-                <p className="text-[12px] text-[#7a6870] mt-0.5">
-                  {t.selectCategoryToView}
-                </p>
-              </div>
-              <button
-                onClick={() => setShowCategoryModal(false)}
-                className="w-8 h-8 rounded-full bg-[#fceef2] flex items-center justify-center text-[#38262e] hover:bg-[#f6e1e8] transition-colors cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="py-4 space-y-2.5">
-              {categoriesList.map((cat) => {
-                const isSelected = activeCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => {
-                      setShowCategoryModal(false);
-                      if (cat.id === 'all') {
-                        router.push('/shop');
-                      } else {
-                        router.push(`/shop?category=${cat.id}`);
-                      }
-                    }}
-                    className={`w-full text-left p-3.5 rounded-[12px] border transition-all cursor-pointer flex items-center justify-between gap-3 ${
-                      isSelected
-                        ? 'bg-[#fceef2] border-[#b73d67] shadow-xs'
-                        : 'bg-white border-[#eedfe5] hover:border-[#b73d67] hover:bg-[#faf7f8]'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className={`text-[14px] font-bold ${isSelected ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
-                          {cat.label}
-                        </span>
-                        {isSelected && (
-                          <span className="text-[10px] bg-[#b73d67] text-white font-bold px-1.5 py-0.5 rounded-full">
-                            Active
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[12px] text-[#7a6870] mt-0.5 line-clamp-1">
-                        {cat.description}
-                      </p>
-                    </div>
-                    <span className="text-[12px] font-semibold text-[#7a6870] bg-[#faf7f8] px-2.5 py-1 rounded-full border border-[#eedfe5] shrink-0">
-                      {cat.count} items
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        <CategoryModal
+          categories={categoriesList}
+          activeCategory={activeCategory}
+          title={t.allCategories}
+          subtitle={t.selectCategoryToView}
+          activeLabel="Active"
+          itemsUnitLabel="items"
+          onSelect={(catId) => {
+            setShowCategoryModal(false);
+            if (catId === 'all') {
+              router.push('/shop');
+            } else {
+              router.push(`/shop?category=${catId}`);
+            }
+          }}
+          onClose={() => setShowCategoryModal(false)}
+        />
       )}
     </div>
   );

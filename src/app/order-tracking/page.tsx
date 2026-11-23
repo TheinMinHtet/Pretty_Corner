@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { formatOrderDate } from '@/lib/order/OrderLifecycleService';
+import { OrderCardSkeleton } from '@/components/Skeletons';
 
 function OrderReceiptContent() {
   const searchParams = useSearchParams();
@@ -36,11 +37,7 @@ function OrderReceiptContent() {
   const activeOrder = order || remoteOrder;
 
   if (!isMounted || remoteLoading) {
-    return (
-      <div className="w-full max-w-xl mx-auto px-4 sm:px-6 py-16 flex items-center justify-center min-h-[50vh]">
-        <div className="w-8 h-8 rounded-full border-2 border-[#b73d67] border-t-transparent animate-spin" />
-      </div>
-    );
+    return <OrderCardSkeleton />;
   }
 
   if (!activeOrder) {
@@ -264,7 +261,7 @@ function OrderReceiptContent() {
 
 export default function OrderTrackingPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-[#7a6870]">Loading order receipt...</div>}>
+    <Suspense fallback={<OrderCardSkeleton />}>
       <OrderReceiptContent />
     </Suspense>
   );

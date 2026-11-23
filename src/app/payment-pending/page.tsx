@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import QRCode from 'qrcode';
 import { useStore } from '@/context/StoreContext';
 import OrderingStepBar from '@/components/OrderingStepBar';
+import { OrderCardSkeleton } from '@/components/Skeletons';
 
 if (typeof window !== 'undefined') {
   (window as any).QRCode = QRCode;
@@ -415,11 +416,7 @@ function PaymentPendingContent() {
   };
 
   if (!isMounted || remoteLoading) {
-    return (
-      <div className="w-full max-w-2xl mx-auto px-4 sm:px-6 py-16 flex items-center justify-center min-h-[50vh]">
-        <div className="w-8 h-8 rounded-full border-2 border-[#b73d67] border-t-transparent animate-spin" />
-      </div>
-    );
+    return <OrderCardSkeleton wide />;
   }
 
   if (!cleanId && !activeOrder) {
@@ -702,7 +699,7 @@ function PaymentPendingContent() {
 
 export default function PaymentPendingPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-[#7a6870]">Loading payment status...</div>}>
+    <Suspense fallback={<OrderCardSkeleton wide />}>
       <PaymentPendingContent />
     </Suspense>
   );

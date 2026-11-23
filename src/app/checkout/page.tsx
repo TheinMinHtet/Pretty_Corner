@@ -7,17 +7,15 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import OrderingStepBar from '@/components/OrderingStepBar';
-import SlideToConfirm from '@/components/SlideToConfirm';
+
+const SlideToConfirm = dynamic(() => import('@/components/SlideToConfirm'), { ssr: false });
 import { validatePhoneNumber } from '@/lib/validation';
 import { getAddressResolver } from '@/lib/location/MyanmarAddressResolver';
+import { CheckoutMapSkeleton, CheckoutPageSkeleton } from '@/components/Skeletons';
 
 const DeliveryMapPicker = dynamic(() => import('@/components/DeliveryMapPicker'), {
   ssr: false,
-  loading: () => (
-    <div className="w-full h-[220px] bg-[#fcf9fa] border border-[#eedfe5] rounded-xl flex items-center justify-center mt-2">
-      <div className="w-6 h-6 border-2 border-[#b73d67] border-t-transparent rounded-full animate-spin" />
-    </div>
-  ),
+  loading: () => <CheckoutMapSkeleton />,
 });
 
 export default function CheckoutPage() {
@@ -201,11 +199,7 @@ export default function CheckoutPage() {
   };
 
   if (!isMounted) {
-    return (
-      <div className="w-full bg-white flex flex-col min-h-[60vh] items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-[#b73d67] border-t-transparent animate-spin" />
-      </div>
-    );
+    return <CheckoutPageSkeleton />;
   }
 
   return (
