@@ -1,10 +1,15 @@
 'use client';
 
-import React, { useState, useEffect, Suspense, useCallback } from 'react';
+import React, { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import QRCode from 'qrcode';
 import { useStore } from '@/context/StoreContext';
 import OrderingStepBar from '@/components/OrderingStepBar';
+
+if (typeof window !== 'undefined') {
+  (window as any).QRCode = QRCode;
+}
 
 function PaymentPendingContent() {
   const router = useRouter();
@@ -68,11 +73,13 @@ function PaymentPendingContent() {
     }
   }, [cleanId]);
 
+  const autoResumedRef = useRef(false);
+
   // 02: State Caching - Auto-resume active QR and continuing countdown on page refresh
   useEffect(() => {
     if (typeof window === 'undefined' || !cleanId || activeOrder?.paymentStatus === 'paid' || activeOrder?.paymentStatus === 'cancelled') return;
     const pubKey = process.env.NEXT_PUBLIC_MMPAY_PUBLISHABLE_KEY;
-    if (!pubKey) return;
+    if (!pubKey || autoResumedRef.current) return;
 
     try {
       const cachedTx = localStorage.getItem('mmpay_pending_tx');
@@ -82,8 +89,12 @@ function PaymentPendingContent() {
         const isStillValid = Date.now() < (parsed.expireAt || 0);
 
         if (isCurrentOrder && isStillValid) {
+          autoResumedRef.current = true;
           void (async () => {
             try {
+              (window as any).QRCode = QRCode;
+              document.querySelectorAll('#mmpay-full-modal').forEach((el) => el.remove());
+
               const { MMPaySDK } = await import('mmpay-browser-sdk');
               const mmpay = new MMPaySDK(pubKey, {
                 merchantName: 'Pretty Corner',
@@ -94,7 +105,7 @@ function PaymentPendingContent() {
                 },
               });
 
-              await mmpay.pay(cleanId, (result: any) => {
+              (mmpay as any).onCompleteCallback = (result: any) => {
                 if (result.success) {
                   try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
                   clearPaymentSession();
@@ -107,7 +118,30 @@ function PaymentPendingContent() {
                 } else if (result.expired) {
                   try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
                 }
-              });
+              };
+
+              // Reinforce: sync visible timer and QR canvas immediately
+              setTimeout(async () => {
+                const timerEl = document.getElementById('mmpay-countdown-text');
+                if (timerEl && parsed.expireAt) {
+                  const remaining = Math.max(0, Math.floor((parsed.expireAt - Date.now()) / 1000));
+                  const minutes = Math.floor(remaining / 60);
+                  const seconds = remaining % 60;
+                  timerEl.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }
+                const qrBox = document.getElementById('mmpayQrContainerBox');
+                if (qrBox && parsed.apiResponse?.qr && !qrBox.querySelector('canvas') && !qrBox.querySelector('img')) {
+                  qrBox.innerHTML = '';
+                  const canvas = document.createElement('canvas');
+                  qrBox.appendChild(canvas);
+                  await QRCode.toCanvas(canvas, parsed.apiResponse.qr, {
+                    width: 290,
+                    margin: 1,
+                    color: { dark: '#000000', light: '#ffffff' },
+                    errorCorrectionLevel: 'M',
+                  });
+                }
+              }, 100);
             } catch (err) {
               console.warn('Failed to auto-resume pending payment modal:', err);
             }
@@ -203,7 +237,26 @@ function PaymentPendingContent() {
     if (pubKey && typeof window !== 'undefined') {
       try {
         setIsInitializingPayment(true);
+        (window as any).QRCode = QRCode;
+        document.querySelectorAll('#mmpay-full-modal').forEach((el) => el.remove());
+
         const { MMPaySDK } = await import('mmpay-browser-sdk');
+
+        // Rule 02 & 03: Check if valid unexpired transaction instance exists to prevent duplicate request
+        const cachedRaw = localStorage.getItem('mmpay_pending_tx');
+        let activeCache: any = null;
+        if (cachedRaw) {
+          try {
+            const parsed = JSON.parse(cachedRaw);
+            if (
+              parsed.payload?.orderId?.trim().toUpperCase() === targetId.trim().toUpperCase() &&
+              Date.now() < (parsed.expireAt || 0)
+            ) {
+              activeCache = parsed;
+            }
+          } catch {}
+        }
+
         const mmpay = new MMPaySDK(pubKey, {
           merchantName: 'Pretty Corner',
           environment: 'sandbox',
@@ -250,23 +303,31 @@ function PaymentPendingContent() {
           }
         };
 
-        // Rule 02 & 03: Check if valid unexpired transaction instance exists to prevent duplicate request
-        const cachedRaw = localStorage.getItem('mmpay_pending_tx');
-        let hasActiveCache = false;
-        if (cachedRaw) {
-          try {
-            const parsed = JSON.parse(cachedRaw);
-            if (
-              parsed.payload?.orderId?.trim().toUpperCase() === targetId.trim().toUpperCase() &&
-              Date.now() < (parsed.expireAt || 0)
-            ) {
-              hasActiveCache = true;
-            }
-          } catch {}
-        }
+        (mmpay as any).onCompleteCallback = handleSDKResult;
 
-        if (hasActiveCache) {
-          await mmpay.pay(targetId, handleSDKResult);
+        if (activeCache) {
+          // Constructor already auto-resumes cached modal. Sync display immediately:
+          setTimeout(async () => {
+            const timerEl = document.getElementById('mmpay-countdown-text');
+            if (timerEl && activeCache.expireAt) {
+              const remaining = Math.max(0, Math.floor((activeCache.expireAt - Date.now()) / 1000));
+              const minutes = Math.floor(remaining / 60);
+              const seconds = remaining % 60;
+              timerEl.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            const qrBox = document.getElementById('mmpayQrContainerBox');
+            if (qrBox && activeCache.apiResponse?.qr && !qrBox.querySelector('canvas') && !qrBox.querySelector('img')) {
+              qrBox.innerHTML = '';
+              const canvas = document.createElement('canvas');
+              qrBox.appendChild(canvas);
+              await QRCode.toCanvas(canvas, activeCache.apiResponse.qr, {
+                width: 290,
+                margin: 1,
+                color: { dark: '#000000', light: '#ffffff' },
+                errorCorrectionLevel: 'M',
+              });
+            }
+          }, 100);
         } else {
           await mmpay.showPaymentModal(
             {
