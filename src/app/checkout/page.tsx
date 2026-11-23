@@ -172,6 +172,7 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     const activeEl = typeof document !== 'undefined' ? (document.activeElement as HTMLElement) : null;
     if (activeEl?.getAttribute('data-no-submit') === 'true') {
       return;

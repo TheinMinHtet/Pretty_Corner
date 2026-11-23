@@ -285,9 +285,9 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Generate Order Ref & Persist
-    const orderId = customOrderId || `PC-${Date.now().toString().slice(-8)}`;
+    let orderId = customOrderId || `PC-${Date.now().toString().slice(-8)}`;
 
-    const { data: insertedOrder, error: orderErr } = await client
+    let { data: insertedOrder, error: orderErr } = await client
       .from('orders')
       .insert({
         id: orderId,
@@ -305,6 +305,45 @@ export async function POST(request: NextRequest) {
       })
       .select()
       .single();
+
+    // Auto-retry with fresh unique ID if duplicate key collision occurs
+    if (
+      orderErr &&
+      (orderErr.code === '23505' ||
+        orderErr.message?.includes('duplicate key') ||
+        orderErr.message?.includes('orders_pkey'))
+    ) {
+      console.warn(`Order primary key collision on ${orderId}. Auto-regenerating unique ID and retrying...`);
+      const date = new Date();
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const yearShort = date.getFullYear().toString().slice(-2);
+      const timeFrag = Date.now().toString().slice(-4);
+      const randomSeq = Math.floor(1000 + Math.random() * 9000);
+      orderId = `PC-${yearShort}${month}${day}-${timeFrag}${randomSeq}`;
+
+      const retryRes = await client
+        .from('orders')
+        .insert({
+          id: orderId,
+          customer_name: customerName.trim(),
+          phone: phone.trim(),
+          delivery_address: deliveryAddress.trim(),
+          landmark_note: landmarkNote?.trim() || null,
+          total_amount: finalTotal,
+          payment_method: paymentMethod || 'Cash on Delivery',
+          payment_status: paymentStatus,
+          fulfillment_status: fulfillmentStatus,
+          payment_slip_url: null,
+          promo_code: matchedPromo?.code || null,
+          discount_amount: promoDiscount,
+        })
+        .select()
+        .single();
+
+      insertedOrder = retryRes.data;
+      orderErr = retryRes.error;
+    }
 
     if (orderErr) {
       console.error('Order insert error:', orderErr);
