@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { Product, CartItem, Order, TownshipOption, Promotion } from '@/lib/types';
+import { Product, CartItem, Order, TownshipOption, Promotion, SocialChannel, SocialLinksMap } from '@/lib/types';
 import { MOCK_TOWNSHIPS, DEFAULT_PROMOTIONS } from '@/lib/mockData';
 import { translations, Language, TranslationSchema } from '@/lib/translations';
 import { getStorefrontRepository } from '@/lib/repository/StorefrontRepository';
@@ -33,6 +33,9 @@ interface StoreContextType {
   promotions: Promotion[];
   promotionsLoading: boolean;
   refreshPromotions: () => Promise<void>;
+  socialLinks: SocialLinksMap;
+  socialChannels: SocialChannel[];
+  refreshSocialChannels: () => Promise<void>;
   cart: CartItem[];
   orders: Order[];
   selectedTownship: TownshipOption;
@@ -90,8 +93,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   });
   const [products, setProducts] = useState<Product[]>([]);
   const [productsLoading, setProductsLoading] = useState(true);
-  const [promotions, setPromotions] = useState<Promotion[]>(DEFAULT_PROMOTIONS);
-  const [promotionsLoading, setPromotionsLoading] = useState(false);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [promotionsLoading, setPromotionsLoading] = useState(true);
+  const [socialChannels, setSocialChannels] = useState<SocialChannel[]>([]);
+  const [socialLinks, setSocialLinks] = useState<SocialLinksMap>({
+    facebook: 'https://facebook.com/prettycornermm',
+    tiktok: 'https://www.tiktok.com/@prettycorner',
+  });
   const [cart, setCart] = useState<CartItem[]>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -196,6 +204,27 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
   }, [repo]);
 
+  const refreshSocialChannels = useCallback(async () => {
+    try {
+      const channels = await repo.getSocialChannels();
+      if (Array.isArray(channels) && channels.length > 0) {
+        setSocialChannels(channels);
+        const fb = channels.find(
+          (c) => c.id === 'facebook' || c.platform.toLowerCase() === 'facebook'
+        );
+        const tt = channels.find(
+          (c) => c.id === 'tiktok' || c.platform.toLowerCase() === 'tiktok'
+        );
+        setSocialLinks({
+          facebook: fb?.url || 'https://facebook.com/prettycornermm',
+          tiktok: tt?.url || 'https://www.tiktok.com/@prettycorner',
+        });
+      }
+    } catch (err) {
+      console.warn('Failed to refresh social channels:', err);
+    }
+  }, [repo]);
+
   useEffect(() => {
     let ignore = false;
     repo.getProducts()
@@ -220,6 +249,26 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       .catch((err) => {
         console.warn('Failed to load promotions:', err);
         if (!ignore) setPromotionsLoading(false);
+      });
+
+    repo.getSocialChannels()
+      .then((channels) => {
+        if (!ignore && Array.isArray(channels) && channels.length > 0) {
+          setSocialChannels(channels);
+          const fb = channels.find(
+            (c) => c.id === 'facebook' || c.platform.toLowerCase() === 'facebook'
+          );
+          const tt = channels.find(
+            (c) => c.id === 'tiktok' || c.platform.toLowerCase() === 'tiktok'
+          );
+          setSocialLinks({
+            facebook: fb?.url || 'https://facebook.com/prettycornermm',
+            tiktok: tt?.url || 'https://www.tiktok.com/@prettycorner',
+          });
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to load social channels:', err);
       });
 
     return () => {
@@ -503,6 +552,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         promotions,
         promotionsLoading,
         refreshPromotions,
+        socialLinks,
+        socialChannels,
+        refreshSocialChannels,
         cart,
         orders,
         selectedTownship,

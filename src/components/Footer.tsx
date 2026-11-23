@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { useStore } from '@/context/StoreContext';
 
 export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolean }) {
-  const { t } = useStore();
+  const { t, socialLinks } = useStore();
+  const facebookUrl = socialLinks?.facebook || 'https://facebook.com/prettycornermm';
+  const tiktokUrl = socialLinks?.tiktok || 'https://www.tiktok.com/@prettycorner';
 
   return (
     <footer className="w-full bg-[#fdfafb] border-t border-[#eedfe5] mt-auto">
@@ -76,7 +78,7 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
             </p>
             <div className="flex items-center gap-2 text-[11.5px] sm:text-[12px] font-medium text-[#38262e]">
               <a
-                href="https://facebook.com"
+                href={facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white border border-[#eedfe5] hover:border-[#1877f2] hover:text-[#1877f2] px-2.5 py-1 rounded-[6px] shadow-2xs inline-flex items-center gap-1.5 transition-all cursor-pointer group"
@@ -89,7 +91,7 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
               </a>
 
               <a
-                href="https://tiktok.com"
+                href={tiktokUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white border border-[#eedfe5] hover:border-[#000000] hover:text-[#000000] px-2.5 py-1 rounded-[6px] shadow-2xs inline-flex items-center gap-1.5 transition-all cursor-pointer group"

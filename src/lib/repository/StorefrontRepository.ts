@@ -1,4 +1,4 @@
-import { Product, Order, Promotion, CartItem } from '../types';
+import { Product, Order, Promotion, CartItem, SocialChannel } from '../types';
 import { supabase } from '../supabase';
 import { DEFAULT_PROMOTIONS } from '../mockData';
 import { normalizeMyanmarDigits } from '../validation';
@@ -7,6 +7,7 @@ export interface StorefrontRepository {
   getProducts(): Promise<Product[]>;
   getProduct(slugOrId: string): Promise<Product | null>;
   getPromotions(): Promise<Promotion[]>;
+  getSocialChannels(): Promise<SocialChannel[]>;
   findOrder(refOrPhone: string): Promise<Order | null>;
   createOrder(
     submission: Omit<Order, 'id' | 'createdAt'> & { promoCode?: string; appliedPromotionId?: string },
@@ -274,7 +275,7 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
           .eq('is_active', true)
           .order('created_at', { ascending: false });
 
-        if (!error && data && data.length > 0) {
+        if (!error && Array.isArray(data)) {
           const rows = data as unknown as SupabasePromotionRow[];
           return rows.map((row) => ({
             id: row.id,
@@ -314,13 +315,57 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
       const res = await fetch(`${baseUrl}/api/promotions`, { cache: 'no-store' });
       if (res.ok) {
         const json = await res.json();
-        if (Array.isArray(json.promotions) && json.promotions.length > 0) {
+        if (Array.isArray(json.promotions)) {
           return json.promotions.filter((p: Promotion) => p.active !== false);
         }
       }
     } catch {}
 
-    return DEFAULT_PROMOTIONS;
+    // Only fallback to hardcoded mock promotions if Supabase client is unconfigured (offline / test mode)
+    return supabase ? [] : DEFAULT_PROMOTIONS;
+  }
+
+  async getSocialChannels(): Promise<SocialChannel[]> {
+    const defaultChannels: SocialChannel[] = [
+      {
+        id: 'facebook',
+        platform: 'Facebook',
+        url: 'https://facebook.com/prettycornermm',
+        isActive: true,
+        displayOrder: 1,
+      },
+      {
+        id: 'tiktok',
+        platform: 'TikTok',
+        url: 'https://www.tiktok.com/@prettycorner',
+        isActive: true,
+        displayOrder: 2,
+      },
+    ];
+
+    try {
+      if (supabase) {
+        const { data, error } = await supabase
+          .from('social_channels')
+          .select('*')
+          .eq('is_active', true)
+          .order('display_order', { ascending: true });
+
+        if (!error && Array.isArray(data) && data.length > 0) {
+          return data.map((row) => ({
+            id: row.id,
+            platform: row.platform,
+            url: row.url,
+            isActive: row.is_active ?? true,
+            displayOrder: row.display_order ?? 1,
+          }));
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to query social_channels from Supabase:', err);
+    }
+
+    return defaultChannels;
   }
 
   async findOrder(refOrPhone: string): Promise<Order | null> {
@@ -470,6 +515,25 @@ export class InMemoryStorefrontRepository implements StorefrontRepository {
 
   async getPromotions(): Promise<Promotion[]> {
     return [...this.promotions];
+  }
+
+  async getSocialChannels(): Promise<SocialChannel[]> {
+    return [
+      {
+        id: 'facebook',
+        platform: 'Facebook',
+        url: 'https://facebook.com/prettycornermm',
+        isActive: true,
+        displayOrder: 1,
+      },
+      {
+        id: 'tiktok',
+        platform: 'TikTok',
+        url: 'https://www.tiktok.com/@prettycorner',
+        isActive: true,
+        displayOrder: 2,
+      },
+    ];
   }
 
   async findOrder(refOrPhone: string): Promise<Order | null> {
