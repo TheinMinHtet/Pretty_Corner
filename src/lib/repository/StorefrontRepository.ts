@@ -437,6 +437,7 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
         pending: 'Pending',
         failed: 'Failed',
         expired: 'Expired',
+        cancelled: 'Cancelled',
       };
       await fetch(`${baseUrl}/api/orders/${encodeURIComponent(cleanId)}`, {
         method: 'PATCH',

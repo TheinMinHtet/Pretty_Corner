@@ -56,6 +56,9 @@ interface StoreContextType {
   getOrder: (id: string, phone?: string) => Order | undefined;
   fetchOrderById: (id: string) => Promise<Order | undefined>;
   updatePaymentStatus: (orderId: string, status: Order['paymentStatus']) => void;
+  activePendingOrderId: string | null;
+  setActivePendingOrderId: (orderId: string | null) => void;
+  cancelOrder: (orderId: string) => void;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -114,6 +117,27 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
   const [selectedTownship, setSelectedTownship] = useState<TownshipOption>(MOCK_TOWNSHIPS[0]);
+  const [activePendingOrderId, setActivePendingOrderIdState] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return localStorage.getItem('pretty_corner_active_pending_order') || null;
+      } catch {}
+    }
+    return null;
+  });
+
+  const setActivePendingOrderId = useCallback((id: string | null) => {
+    setActivePendingOrderIdState(id);
+    if (typeof window !== 'undefined') {
+      try {
+        if (id) {
+          localStorage.setItem('pretty_corner_active_pending_order', id);
+        } else {
+          localStorage.removeItem('pretty_corner_active_pending_order');
+        }
+      } catch {}
+    }
+  }, []);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [manualDiscount, setManualDiscount] = useState<number>(0);
   const [appliedPromo, setAppliedPromo] = useState<Promotion | null>(null);
@@ -288,8 +312,40 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
+    if (orderData.paymentMethod !== 'Cash on Delivery') {
+      setActivePendingOrderId(orderId);
+    }
+
     return newOrder;
   };
+
+  const cancelOrder = useCallback((orderId: string) => {
+    const cleanId = orderId.trim().toUpperCase();
+    setOrders((prev) =>
+      prev.map((o) => {
+        if (o.id.toUpperCase() === cleanId) {
+          return {
+            ...o,
+            paymentStatus: 'cancelled',
+            fulfillmentStatus: 'cancelled',
+          };
+        }
+        return o;
+      })
+    );
+    setActivePendingOrderIdState((current) => {
+      if (current?.toUpperCase() === cleanId) {
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.removeItem('pretty_corner_active_pending_order');
+          } catch {}
+        }
+        return null;
+      }
+      return current;
+    });
+    void repo.updatePaymentStatus(cleanId, 'cancelled');
+  }, [repo, setOrders]);
 
   const getOrder = (id: string, phone?: string): Order | undefined => {
     const cleanId = id.trim().toUpperCase();
@@ -330,6 +386,20 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         return o;
       })
     );
+
+    if (status === 'paid' || status === 'cancelled') {
+      setActivePendingOrderIdState((current) => {
+        if (current?.toUpperCase() === cleanId) {
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.removeItem('pretty_corner_active_pending_order');
+            } catch {}
+          }
+          return null;
+        }
+        return current;
+      });
+    }
 
     if (status === 'paid') {
       clearCart();
@@ -377,6 +447,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         getOrder,
         fetchOrderById,
         updatePaymentStatus,
+        activePendingOrderId,
+        setActivePendingOrderId,
+        cancelOrder,
       }}
     >
       {children}

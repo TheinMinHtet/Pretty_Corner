@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerMMPaySdk, getMMPayConfig } from '@/lib/mmpay';
 
+// In-memory idempotency cache for active payment requests (orderId -> response, expires in 15 mins)
+const idempotencyCache = new Map<string, { timestamp: number; response: unknown }>();
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -11,6 +14,19 @@ export async function POST(req: NextRequest) {
         { error: 'Missing orderId or amount' },
         { status: 400 }
       );
+    }
+
+    const cleanId = String(orderId).trim().toUpperCase();
+
+    // Rule 04: Duplicate Prevention & Idempotency check
+    const cached = idempotencyCache.get(cleanId);
+    if (cached && Date.now() - cached.timestamp < 15 * 60 * 1000) {
+      return NextResponse.json({
+        success: true,
+        isConfigured: true,
+        isIdempotentReplay: true,
+        data: cached.response,
+      });
     }
 
     const config = getMMPayConfig();
@@ -44,6 +60,11 @@ export async function POST(req: NextRequest) {
             quantity: it.quantity || 1,
           }))
         : undefined,
+    });
+
+    idempotencyCache.set(cleanId, {
+      timestamp: Date.now(),
+      response: payResponse,
     });
 
     return NextResponse.json({

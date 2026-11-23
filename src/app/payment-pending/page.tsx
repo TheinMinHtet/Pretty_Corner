@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
@@ -9,7 +9,7 @@ import OrderingStepBar from '@/components/OrderingStepBar';
 function PaymentPendingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { orders, updatePaymentStatus, fetchOrderById, isMounted, t, language } = useStore();
+  const { orders, updatePaymentStatus, fetchOrderById, isMounted, t, language, cancelOrder } = useStore();
 
   const orderId = searchParams.get('orderId') || '';
   const cleanId = orderId.trim().toUpperCase();
@@ -39,11 +39,111 @@ function PaymentPendingContent() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [mockPaymentSuccess, setMockPaymentSuccess] = useState(false);
   const [isInitializingPayment, setIsInitializingPayment] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+
+  // 02: State Caching - cache payment session in sessionStorage
+  const cachePaymentSession = useCallback(() => {
+    if (typeof window !== 'undefined' && cleanId) {
+      try {
+        sessionStorage.setItem(
+          `pretty_corner_mmpay_active_${cleanId}`,
+          JSON.stringify({ active: true, orderId: cleanId, timestamp: Date.now() })
+        );
+      } catch {}
+    }
+  }, [cleanId]);
+
+  const clearPaymentSession = useCallback(() => {
+    if (typeof window !== 'undefined' && cleanId) {
+      try {
+        sessionStorage.removeItem(`pretty_corner_mmpay_active_${cleanId}`);
+      } catch {}
+    }
+  }, [cleanId]);
+
+  // 02: State Caching - auto-restore active payment modal on page refresh
+  useEffect(() => {
+    if (typeof window !== 'undefined' && cleanId && !showPaymentModal && activeOrder?.paymentStatus !== 'paid' && activeOrder?.paymentStatus !== 'cancelled') {
+      try {
+        const cached = sessionStorage.getItem(`pretty_corner_mmpay_active_${cleanId}`);
+        if (cached) {
+          const data = JSON.parse(cached);
+          if (data.active && Date.now() - data.timestamp < 15 * 60 * 1000) {
+            setShowPaymentModal(true);
+          }
+        }
+      } catch {}
+    }
+  }, [cleanId, showPaymentModal, activeOrder?.paymentStatus]);
+
+  // 01: Seamless Transitions - auto-detect payment upon returning from banking app & background polling
+  useEffect(() => {
+    if (!cleanId || activeOrder?.paymentStatus === 'paid' || activeOrder?.paymentStatus === 'cancelled') return;
+
+    let isPolling = true;
+
+    const checkPaymentStatus = async () => {
+      try {
+        const res = await fetch(`/api/payment/status?orderId=${encodeURIComponent(cleanId)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.paymentStatus === 'paid') {
+            updatePaymentStatus(cleanId, 'paid');
+            clearPaymentSession();
+            router.push(`/order-confirmation?orderId=${encodeURIComponent(cleanId)}`);
+            return true;
+          }
+        }
+      } catch {}
+      return false;
+    };
+
+    // Listen to tab visibility & window focus (when customer returns from mobile banking app)
+    const onVisibilityOrFocus = () => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        void checkPaymentStatus();
+      }
+    };
+
+    window.addEventListener('visibilitychange', onVisibilityOrFocus);
+    window.addEventListener('focus', onVisibilityOrFocus);
+
+    // Periodic gentle background poll every 3.5 seconds
+    const interval = setInterval(async () => {
+      if (!isPolling) return;
+      const done = await checkPaymentStatus();
+      if (done) {
+        isPolling = false;
+        clearInterval(interval);
+      }
+    }, 3500);
+
+    return () => {
+      isPolling = false;
+      clearInterval(interval);
+      window.removeEventListener('visibilitychange', onVisibilityOrFocus);
+      window.removeEventListener('focus', onVisibilityOrFocus);
+    };
+  }, [cleanId, router, updatePaymentStatus, clearPaymentSession, activeOrder?.paymentStatus]);
+
+  // 04: Duplicate Prevention - warning on accidental refresh during active payment initialization
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isInitializingPayment || showPaymentModal) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isInitializingPayment, showPaymentModal]);
 
   const handleOpenPaymentGateway = async () => {
     const pubKey = process.env.NEXT_PUBLIC_MMPAY_PUBLISHABLE_KEY;
     const targetId = activeOrder?.id || cleanId;
     const amountToPay = activeOrder?.total ?? 0;
+
+    cachePaymentSession();
 
     if (pubKey && typeof window !== 'undefined') {
       try {
@@ -67,6 +167,7 @@ function PaymentPendingContent() {
           },
           (result) => {
             if (result.success) {
+              clearPaymentSession();
               updatePaymentStatus(targetId, 'paid');
               router.push(`/order-confirmation?orderId=${targetId}`);
             }
@@ -88,10 +189,19 @@ function PaymentPendingContent() {
     setMockPaymentSuccess(true);
     setTimeout(() => {
       setShowPaymentModal(false);
+      clearPaymentSession();
       const targetId = activeOrder?.id || cleanId;
       updatePaymentStatus(targetId, 'paid');
       router.push(`/order-confirmation?orderId=${targetId}`);
     }, 1000);
+  };
+
+  // 03: Transaction Control - Explicit cancellation handler
+  const handleConfirmCancelOrder = () => {
+    clearPaymentSession();
+    cancelOrder(cleanId);
+    setShowCancelModal(false);
+    router.push('/checkout');
   };
 
   if (!isMounted || remoteLoading) {
@@ -113,6 +223,31 @@ function PaymentPendingContent() {
         </p>
         <Link href="/bag" className="inline-flex h-[44px] px-6 bg-[#b73d67] text-white rounded-lg items-center font-bold text-[14px] hover:bg-[#a33259] transition-colors">
           {t.viewBag}
+        </Link>
+      </div>
+    );
+  }
+
+  // Handle explicitly cancelled order view
+  if (activeOrder?.paymentStatus === 'cancelled') {
+    return (
+      <div className="w-full max-w-md mx-auto px-4 py-16 text-center">
+        <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-3">
+          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </div>
+        <h3 className="font-serif text-[22px] font-bold text-[#38262e] mb-2">
+          {language === 'my' ? 'အမှာစာ တောင်းဆိုမှု ပယ်ဖျက်ပြီးပါပြီ' : 'Order Request Cancelled'}
+        </h3>
+        <p className="text-[13px] text-[#7a6870] mb-6">
+          {language === 'my'
+            ? `အမှာစာနံပါတ် ${cleanId} ကို ပယ်ဖျက်ထားပါသည်။ ပစ္စည်းများ ပြန်လည်ရွေးချယ်ပြီး အသစ်မှာယူနိုင်ပါသည်။`
+            : `Order #${cleanId} has been cancelled. You can edit your bag or start a new order.`}
+        </p>
+        <Link href="/checkout" className="inline-flex h-[44px] px-6 bg-[#b73d67] text-white rounded-lg items-center font-bold text-[14px] hover:bg-[#a33259] transition-colors">
+          {language === 'my' ? 'အမှာစာ အသစ်ပြုလုပ်ရန်' : 'Start New Order'}
         </Link>
       </div>
     );
@@ -184,6 +319,16 @@ function PaymentPendingContent() {
           )}
         </button>
 
+        {/* 03: Transaction Control - Explicit Cancel Order Request Button */}
+        <div className="w-full mt-3 flex items-center justify-center">
+          <button
+            onClick={() => setShowCancelModal(true)}
+            className="text-[12px] text-[#7a6870] hover:text-red-700 underline font-medium transition-colors cursor-pointer py-1"
+          >
+            {language === 'my' ? 'ဤအမှာစာ တောင်းဆိုမှုကို ပယ်ဖျက်မည်' : 'Cancel this active order request'}
+          </button>
+        </div>
+
         {/* Help & Recovery */}
         <div className="w-full pt-5 border-t border-[#eedfe5]/70 flex flex-col items-center text-center mt-6">
           <p className="text-[12px] text-[#7a6870] leading-relaxed">
@@ -197,6 +342,43 @@ function PaymentPendingContent() {
           </Link>
         </div>
       </section>
+
+      {/* 03: Transaction Control - Confirmation Modal for Order Cancellation */}
+      {showCancelModal && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="w-full max-w-[360px] bg-white rounded-[20px] p-6 shadow-2xl flex flex-col text-center">
+            <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-3">
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+            </div>
+            <h3 className="font-serif text-[20px] font-bold text-[#38262e] mb-2">
+              {language === 'my' ? 'အမှာစာ ပယ်ဖျက်ရန် သေချာပါသလား?' : 'Cancel Active Order Request?'}
+            </h3>
+            <p className="text-[13px] text-[#7a6870] mb-5 leading-relaxed">
+              {language === 'my'
+                ? `အမှာစာ #${cleanId} ကို ပယ်ဖျက်ပြီး ပစ္စည်းများ ပြန်လည်ပြင်ဆင်နိုင်ရန် ပို့ဆောင်ပေးပါမည်။`
+                : `This will safely cancel order #${cleanId} and allow you to edit your bag or start a new order.`}
+            </p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={handleConfirmCancelOrder}
+                className="w-full h-[44px] bg-red-600 text-white rounded-[10px] font-bold text-[14px] hover:bg-red-700 transition-colors cursor-pointer"
+              >
+                {language === 'my' ? 'ဟုတ်ကဲ့၊ အမှာစာ ပယ်ဖျက်မည်' : 'Yes, Cancel Order Request'}
+              </button>
+              <button
+                onClick={() => setShowCancelModal(false)}
+                className="w-full h-[40px] text-[13px] text-[#7a6870] hover:text-[#38262e] font-semibold"
+              >
+                {language === 'my' ? 'မပယ်ဖျက်တော့ပါ' : 'Keep Order & Return'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Payment Gateway Simulation Modal */}
       {showPaymentModal && (
@@ -256,8 +438,11 @@ function PaymentPendingContent() {
 
             <button
               disabled={mockPaymentSuccess}
-              onClick={() => setShowPaymentModal(false)}
-              className="mt-3 text-[13px] text-[#7a6870] hover:text-[#38262e] font-medium disabled:opacity-50"
+              onClick={() => {
+                setShowPaymentModal(false);
+                clearPaymentSession();
+              }}
+              className="mt-3 text-[13px] text-[#7a6870] hover:text-[#38262e] font-medium disabled:opacity-50 cursor-pointer"
             >
               {language === 'my' ? 'မလုပ်တော့ပါ' : 'Cancel'}
             </button>
