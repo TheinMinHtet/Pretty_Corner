@@ -97,9 +97,12 @@ function OrderConfirmationContent() {
     ctx.fillStyle = '#7a6870';
     ctx.font = '14px sans-serif';
     const isPaid = order.paymentStatus === 'paid';
+    const isCancelled = order.paymentStatus === 'cancelled';
     const isCODOrder = order.paymentMethod === 'Cash on Delivery';
     const paymentLabel = isCODOrder ? 'Cash on Delivery' : 'MMQR';
-    const paymentStatusText = isPaid
+    const paymentStatusText = isCancelled
+      ? (language === 'my' ? 'ပယ်ဖျက်ပြီး' : 'Cancelled')
+      : isPaid
       ? t.paymentVerified
       : isCODOrder
       ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည်' : 'Pay on arrival')
@@ -295,7 +298,11 @@ function OrderConfirmationContent() {
         </h2>
 
         <p className="font-sans text-[14px] text-[#7a6870] mt-2 leading-relaxed max-w-[340px]">
-          {order.paymentMethod === 'Cash on Delivery'
+          {order.paymentStatus === 'cancelled'
+            ? (language === 'my'
+                ? `ဤအမှာစာ (${order.id}) ကို ပယ်ဖျက်ထားပါသည်။ ပစ္စည်းများ ပြန်လည်ရွေးချယ်ပြီး အသစ်မှာယူနိုင်ပါသည်။`
+                : `Order #${order.id} has been cancelled. You can edit your bag or start a new order.`)
+            : order.paymentMethod === 'Cash on Delivery'
             ? (language === 'my'
                 ? `ကျေးဇူးတင်ပါသည် ${order.customerName}။ သင့်အမှာစာ အတည်ပြုပြီးပါပြီ။ ပစ္စည်းရောက်ရှိချိန်တွင် ငွေအဆင်သင့် ထားရှိပေးပါခင်ဗျာ။`
                 : `Thank you, ${order.customerName}. Your order is confirmed! Please have cash ready when our courier arrives.`)
@@ -343,6 +350,8 @@ function OrderConfirmationContent() {
           <span className="font-bold text-[#38262e]">
             {order.paymentMethod === 'Cash on Delivery'
               ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည် (COD)' : 'Cash on Delivery · Pay on arrival')
+              : order.paymentStatus === 'cancelled'
+              ? (language === 'my' ? 'ပယ်ဖျက်ပြီး · MMQR' : 'Cancelled · MMQR')
               : order.paymentStatus === 'paid'
               ? (language === 'my' ? 'ငွေပေးချေပြီး · MMQR' : 'Paid · MMQR')
               : (language === 'my' ? 'ငွေမချေရသေးပါ · MMQR' : 'Unpaid · MMQR')}
@@ -352,16 +361,22 @@ function OrderConfirmationContent() {
         <div className="flex justify-between items-center text-[13px] py-1">
           <span className="text-[#7a6870]">{t.orderStatus}</span>
           <span className={`font-bold flex items-center gap-1.5 ${
-            order.paymentStatus === 'paid' || isCOD
+            order.paymentStatus === 'cancelled'
+              ? 'text-gray-600'
+              : order.paymentStatus === 'paid' || isCOD
               ? 'text-emerald-700'
               : 'text-amber-700'
           }`}>
             <span className={`w-2 h-2 rounded-full shrink-0 ${
-              order.paymentStatus === 'paid' || isCOD
+              order.paymentStatus === 'cancelled'
+                ? 'bg-gray-400'
+                : order.paymentStatus === 'paid' || isCOD
                 ? 'bg-emerald-500'
                 : 'bg-amber-500'
             }`} />
-            {order.paymentStatus === 'paid'
+            {order.paymentStatus === 'cancelled'
+              ? (language === 'my' ? 'အမှာစာ ပယ်ဖျက်ပြီး' : 'Cancelled')
+              : order.paymentStatus === 'paid'
               ? (language === 'my' ? 'အော်ဒါအတည်ပြုပြီး (ပြင်ဆင်နေပါသည်)' : 'Confirmed · Processing')
               : isCOD
               ? (language === 'my' ? 'အော်ဒါအတည်ပြုပြီး (COD)' : 'Confirmed · Pay on Delivery')
@@ -369,8 +384,8 @@ function OrderConfirmationContent() {
           </span>
         </div>
 
-        {/* If unpaid MMQR, show button to pay now */}
-        {!isCOD && order.paymentStatus !== 'paid' && (
+        {/* If unpaid MMQR and NOT cancelled, show button to pay now */}
+        {!isCOD && order.paymentStatus !== 'paid' && order.paymentStatus !== 'cancelled' && (
           <div className="mt-3 p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between gap-3">
             <span className="text-[12.5px] text-amber-900 font-medium">
               {language === 'my' ? 'ငွေပေးချေမှု မပြီးမြောက်သေးပါ။' : 'Payment has not been completed yet.'}
@@ -380,6 +395,21 @@ function OrderConfirmationContent() {
               className="px-3.5 py-1.5 bg-[#b73d67] text-white text-[12px] font-bold rounded-lg hover:bg-[#a33259] transition-colors shrink-0 shadow-2xs"
             >
               {language === 'my' ? 'ငွေပေးချေရန်' : 'Pay Now'}
+            </Link>
+          </div>
+        )}
+
+        {/* If order is explicitly cancelled */}
+        {order.paymentStatus === 'cancelled' && (
+          <div className="mt-3 p-3.5 bg-gray-50 border border-gray-200 rounded-xl flex items-center justify-between gap-3">
+            <span className="text-[12.5px] text-gray-700 font-medium">
+              {language === 'my' ? 'ဤအမှာစာကို ပယ်ဖျက်ထားပါသည်။' : 'This order has been cancelled.'}
+            </span>
+            <Link
+              href="/checkout"
+              className="px-3.5 py-1.5 bg-[#b73d67] text-white text-[12px] font-bold rounded-lg hover:bg-[#a33259] transition-colors shrink-0 shadow-2xs"
+            >
+              {language === 'my' ? 'အမှာစာ အသစ်ပြုလုပ်ရန်' : 'Start New Order'}
             </Link>
           </div>
         )}

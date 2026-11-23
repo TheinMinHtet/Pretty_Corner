@@ -407,7 +407,7 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
           .from('orders')
           .update({
             payment_status: status,
-            fulfillment_status: status === 'paid' ? 'confirmed' : undefined,
+            fulfillment_status: status === 'paid' ? 'confirmed' : status === 'cancelled' ? 'cancelled' : undefined,
             updated_at: new Date().toISOString(),
           })
           .eq('id', cleanId);

@@ -122,13 +122,17 @@ function OrderReceiptContent() {
             <div className="flex justify-between items-center text-[13px]">
               <span className="text-[#7a6870]">{t.orderStatus}</span>
               <span className={`font-bold px-2 py-0.5 rounded text-[11px] ${
-                isCOD
+                activeOrder.paymentStatus === 'cancelled'
+                  ? 'bg-gray-100 text-gray-700 border border-gray-200'
+                  : isCOD
                   ? 'bg-amber-50 text-amber-800 border border-amber-200'
                   : activeOrder.paymentStatus === 'paid'
                   ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                   : 'bg-rose-50 text-rose-800 border border-rose-200'
               }`}>
-                {isCOD
+                {activeOrder.paymentStatus === 'cancelled'
+                  ? (language === 'my' ? 'အမှာစာ ပယ်ဖျက်ပြီး' : 'Cancelled')
+                  : isCOD
                   ? (language === 'my' ? 'ပစ္စည်းရောက်မှ ငွေချေမည်' : 'Cash on Delivery (Pay on arrival)')
                   : activeOrder.paymentStatus === 'paid'
                   ? (language === 'my' ? 'ငွေပေးချေမှု အတည်ပြုပြီး' : 'Payment Verified')
@@ -206,7 +210,7 @@ function OrderReceiptContent() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-2.5 mt-2">
-            {!isCOD && activeOrder.paymentStatus !== 'paid' && (
+            {!isCOD && activeOrder.paymentStatus !== 'paid' && activeOrder.paymentStatus !== 'cancelled' && (
               <Link
                 href={`/payment-pending?orderId=${encodeURIComponent(activeOrder.id)}`}
                 className="w-full h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
@@ -224,7 +228,7 @@ function OrderReceiptContent() {
             <Link
               href="/shop"
               className={`w-full h-[48px] ${
-                !isCOD && activeOrder.paymentStatus !== 'paid'
+                !isCOD && activeOrder.paymentStatus !== 'paid' && activeOrder.paymentStatus !== 'cancelled'
                   ? 'bg-white border border-[#eedfe5] text-[#38262e] hover:bg-[#faf7f8]'
                   : 'bg-[#b73d67] text-white hover:bg-[#a33259]'
               } rounded-[10px] font-bold text-[14px] transition-all flex items-center justify-center shadow-xs cursor-pointer`}
