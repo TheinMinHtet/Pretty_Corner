@@ -112,61 +112,92 @@ function ShopContent() {
     };
   }, [showSortDropdown]);
 
-  // Filter Modal specific states
-  const [maxPrice, setMaxPrice] = useState<number>(60000);
-  const [inStockOnly, setInStockOnly] = useState<boolean>(true);
+  // Compute catalog maximum price dynamically so expensive items aren't excluded by default
+  const catalogMaxPrice = useMemo(() => {
+    if (!products || products.length === 0) return 100000;
+    const highest = Math.max(...products.map((p) => p.price || 0));
+    return Math.max(highest, 100000);
+  }, [products]);
 
-  const categoriesList = useMemo(() => [
-    {
-      id: 'all',
-      label: t.catAll,
-      description: language === 'my' ? 'အလှအပ၊ အီလက်ထရောနစ်နှင့် လူနေမှုအသုံးအဆောင် ပစ္စည်းအားလုံး' : 'Explore full catalog across beauty, tech & variety',
-      count: products.length,
-      aliases: ['all', 'everything', 'catalog', 'products', 'store', 'အားလုံး'],
-    },
-    {
-      id: 'electrical',
-      label: t.catElectrical,
-      description: language === 'my' ? 'အလှအပသုံး ပစ္စည်းများ၊ LED မှန်နှင့် စမတ်အသုံးအဆောင်များ' : 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
-      count: products.filter((p) => p.category === 'electrical').length,
-      aliases: ['electrical', 'electronics', 'gadget', 'gadgets', 'tech', 'device', 'devices', 'mirror', 'humidifier', 'sonic'],
-    },
-    {
-      id: 'skincare',
-      label: t.catSkincare,
-      description: language === 'my' ? 'အသားအရေကြည်လင် အစိုဓာတ်ထိန်း ဆီရမ်၊ ခရင်မ်နှင့် နေလောင်ကာ' : 'Gentle barrier serums, moisturizers & UV daily defense',
-      count: products.filter((p) => p.category === 'skincare').length,
-      aliases: ['skincare', 'skin', 'serum', 'cream', 'moisturizer', 'barrier', 'sunscreen', 'uv', 'cleanser'],
-    },
-    {
-      id: 'makeup',
-      label: t.catMakeup,
-      description: language === 'my' ? 'ပါးနီ၊ နှုတ်ခမ်းနီနှင့် နေ့စဉ်လိမ်း မိတ်ကပ်ပစ္စည်းများ' : 'Breathable cheek tints, lip glazes & complexion picks',
-      count: products.filter((p) => p.category === 'makeup').length,
-      aliases: ['makeup', 'cosmetics', 'tint', 'lip', 'blush', 'cheek', 'glaze', 'complexion'],
-    },
-    {
-      id: 'lifestyle',
-      label: t.catLifestyle,
-      description: language === 'my' ? 'ပိုးသားဆံပင်စည်းကြိုး၊ ရေဗူးနှင့် နေ့စဉ်လူနေမှုအသုံးအဆောင်များ' : 'Silk hair accessories, vacuum tumblers & daily finds',
-      count: products.filter((p) => p.category === 'lifestyle').length,
-      aliases: ['lifestyle', 'variety', 'tumbler', 'hair', 'scrunchie', 'accessories', 'everyday'],
-    },
-    {
-      id: 'lenses',
-      label: t.catLenses,
-      description: language === 'my' ? 'မျက်စိသက်တောင့်သက်သာရှိစေမည့် နေ့စဉ်နှင့် လစဉ်သုံး မျက်ကပ်မှန်များ' : 'Hydrated daily and monthly comfort beauty lenses',
-      count: products.filter((p) => p.category === 'lenses').length,
-      aliases: ['lenses', 'lens', 'contact lens', 'contact lenses', 'eyes', 'eye'],
-    },
-    {
-      id: 'more',
-      label: t.catMore,
-      description: language === 'my' ? 'ပိုးသားအသုံးအဆောင်နှင့် အလှပြင်ကိရိယာများ' : 'Pure silk ties, beauty tools & thoughtful additions',
-      count: products.filter((p) => p.category === 'more').length,
-      aliases: ['more', 'accessories', 'tools', 'silk', 'additions'],
-    },
-  ], [products, t, language]);
+  // Filter Modal specific states
+  const [maxPrice, setMaxPrice] = useState<number>(10000000);
+  const [userAdjustedPrice, setUserAdjustedPrice] = useState<boolean>(false);
+  const [inStockOnly, setInStockOnly] = useState<boolean>(false);
+
+  const categoriesList = useMemo(() => {
+    const staticCats = [
+      {
+        id: 'all',
+        label: t.catAll,
+        description: language === 'my' ? 'အလှအပ၊ အီလက်ထရောနစ်နှင့် လူနေမှုအသုံးအဆောင် ပစ္စည်းအားလုံး' : 'Explore full catalog across beauty, tech & variety',
+        count: products.length,
+        aliases: ['all', 'everything', 'catalog', 'products', 'store', 'အားလုံး'],
+      },
+      {
+        id: 'electrical',
+        label: t.catElectrical,
+        description: language === 'my' ? 'အလှအပသုံး ပစ္စည်းများ၊ LED မှန်နှင့် စမတ်အသုံးအဆောင်များ' : 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
+        count: products.filter((p) => p.category === 'electrical').length,
+        aliases: ['electrical', 'electronics', 'gadget', 'gadgets', 'tech', 'device', 'devices', 'mirror', 'humidifier', 'sonic'],
+      },
+      {
+        id: 'skincare',
+        label: t.catSkincare,
+        description: language === 'my' ? 'အသားအရေကြည်လင် အစိုဓာတ်ထိန်း ဆီရမ်၊ ခရင်မ်နှင့် နေလောင်ကာ' : 'Gentle barrier serums, moisturizers & UV daily defense',
+        count: products.filter((p) => p.category === 'skincare').length,
+        aliases: ['skincare', 'skin', 'serum', 'cream', 'moisturizer', 'barrier', 'sunscreen', 'uv', 'cleanser'],
+      },
+      {
+        id: 'makeup',
+        label: t.catMakeup,
+        description: language === 'my' ? 'ပါးနီ၊ နှုတ်ခမ်းနီနှင့် နေ့စဉ်လိမ်း မိတ်ကပ်ပစ္စည်းများ' : 'Breathable cheek tints, lip glazes & complexion picks',
+        count: products.filter((p) => p.category === 'makeup').length,
+        aliases: ['makeup', 'cosmetics', 'tint', 'lip', 'blush', 'cheek', 'glaze', 'complexion'],
+      },
+      {
+        id: 'lifestyle',
+        label: t.catLifestyle,
+        description: language === 'my' ? 'ပိုးသားဆံပင်စည်းကြိုး၊ ရေဗူးနှင့် နေ့စဉ်လူနေမှုအသုံးအဆောင်များ' : 'Silk hair accessories, vacuum tumblers & daily finds',
+        count: products.filter((p) => p.category === 'lifestyle').length,
+        aliases: ['lifestyle', 'variety', 'tumbler', 'hair', 'scrunchie', 'accessories', 'everyday'],
+      },
+      {
+        id: 'lenses',
+        label: t.catLenses,
+        description: language === 'my' ? 'မျက်စိသက်တောင့်သက်သာရှိစေမည့် နေ့စဉ်နှင့် လစဉ်သုံး မျက်ကပ်မှန်များ' : 'Hydrated daily and monthly comfort beauty lenses',
+        count: products.filter((p) => p.category === 'lenses').length,
+        aliases: ['lenses', 'lens', 'contact lens', 'contact lenses', 'eyes', 'eye'],
+      },
+      {
+        id: 'more',
+        label: t.catMore,
+        description: language === 'my' ? 'ပိုးသားအသုံးအဆောင်နှင့် အလှပြင်ကိရိယာများ' : 'Pure silk ties, beauty tools & thoughtful additions',
+        count: products.filter((p) => p.category === 'more').length,
+        aliases: ['more', 'accessories', 'tools', 'silk', 'additions'],
+      },
+    ];
+
+    // Discover any additional categories dynamically created by admin
+    const knownSlugs = new Set(staticCats.map((c) => c.id));
+    const dynamicCats: typeof staticCats = [];
+
+    products.forEach((p) => {
+      const catSlug = (p.category || '').trim().toLowerCase();
+      if (catSlug && !knownSlugs.has(catSlug)) {
+        knownSlugs.add(catSlug);
+        const displayName = p.subcategory || (catSlug.charAt(0).toUpperCase() + catSlug.slice(1));
+        dynamicCats.push({
+          id: catSlug,
+          label: displayName,
+          description: displayName,
+          count: products.filter((item) => (item.category || '').toLowerCase() === catSlug).length,
+          aliases: [catSlug, displayName.toLowerCase()],
+        });
+      }
+    });
+
+    return [...staticCats, ...dynamicCats];
+  }, [products, t, language]);
 
   const visibleCategories = useMemo(() => {
     const top5 = categoriesList.slice(0, 5);
@@ -284,7 +315,7 @@ function ShopContent() {
         if (inStockOnly && !p.inStock) {
           return false;
         }
-        if (p.price > maxPrice) {
+        if (userAdjustedPrice && p.price > maxPrice) {
           return false;
         }
         return true;
@@ -478,13 +509,13 @@ function ShopContent() {
             <button
               onClick={() => setShowFilterModal(true)}
               className={`flex items-center gap-2 border rounded-full text-[13px] px-4 h-[38px] cursor-pointer font-medium transition-all shadow-[0_2px_8px_rgba(56,38,46,0.02)] ${
-                maxPrice < 60000 || !inStockOnly || activeCategory !== 'all'
+                userAdjustedPrice || inStockOnly || activeCategory !== 'all'
                   ? 'bg-[#fcf7f9] border-[#b73d67] text-[#b73d67] ring-1 ring-[#b73d67]/20 font-semibold'
                   : 'bg-[#fdfbfa] hover:bg-[#fcf7f9] border-[#eedfe5] text-[#38262e] hover:border-[#b73d67]'
               }`}
             >
               <span>{t.filters}</span>
-              {(maxPrice < 60000 || !inStockOnly || activeCategory !== 'all') && (
+              {(userAdjustedPrice || inStockOnly || activeCategory !== 'all') && (
                 <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />
               )}
             </button>
@@ -593,7 +624,8 @@ function ShopContent() {
               onClick={() => {
                 setActiveCategory('all');
                 setSearchFilter('');
-                setMaxPrice(60000);
+                setMaxPrice(catalogMaxPrice);
+                setUserAdjustedPrice(false);
                 setInStockOnly(false);
                 setDismissedPromo(true);
               }}
@@ -655,15 +687,20 @@ function ShopContent() {
               <div>
                 <div className="flex justify-between items-center text-[13px] font-bold text-[#38262e] mb-2">
                   <span>{t.priceRange}</span>
-                  <span className="text-[#b73d67]">0 — {maxPrice.toLocaleString()} MMK</span>
+                  <span className="text-[#b73d67]">
+                    0 — {(userAdjustedPrice ? maxPrice : catalogMaxPrice).toLocaleString()} MMK
+                  </span>
                 </div>
                 <input
                   type="range"
                   min="10000"
-                  max="60000"
-                  step="2000"
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(Number(e.target.value))}
+                  max={catalogMaxPrice}
+                  step="5000"
+                  value={userAdjustedPrice ? maxPrice : catalogMaxPrice}
+                  onChange={(e) => {
+                    setMaxPrice(Number(e.target.value));
+                    setUserAdjustedPrice(true);
+                  }}
                   className="w-full accent-[#b73d67] cursor-pointer"
                 />
               </div>
@@ -695,8 +732,9 @@ function ShopContent() {
                   onClick={() => {
                     setActiveCategory('all');
                     setSearchFilter('');
-                    setMaxPrice(60000);
-                    setInStockOnly(true);
+                    setMaxPrice(catalogMaxPrice);
+                    setUserAdjustedPrice(false);
+                    setInStockOnly(false);
                     setSortBy('featured');
                   }}
                   className="w-full h-[44px] bg-[#fceef2] text-[#b73d67] rounded-[10px] font-bold text-[14px] hover:bg-[#f6e1e8] transition-colors cursor-pointer"

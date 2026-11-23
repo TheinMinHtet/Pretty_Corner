@@ -23,50 +23,71 @@ export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [showCategoryModal, setShowCategoryModal] = useState<boolean>(false);
 
-  const categoriesList = useMemo(() => [
-    {
-      id: 'all',
-      label: t.catAll,
-      description: language === 'my' ? 'ဆိုင်ရှိ ပစ္စည်းအားလုံးကို စုံလင်စွာ ကြည့်ရှုနိုင်ပါသည်' : 'Explore our complete variety of products',
-      count: products.length,
-    },
-    {
-      id: 'electrical',
-      label: t.catElectrical,
-      description: language === 'my' ? 'အလှအပသုံး စမတ်ကိရိယာများနှင့် ဂက်ဂျက်များ' : 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
-      count: products.filter((p) => p.category === 'electrical').length,
-    },
-    {
-      id: 'skincare',
-      label: t.catSkincare,
-      description: language === 'my' ? 'နူးညံ့ထိရောက်သော အသားအရေထိန်း ပစ္စည်းများ' : 'Gentle barrier serums, moisturizers & UV daily defense',
-      count: products.filter((p) => p.category === 'skincare').length,
-    },
-    {
-      id: 'makeup',
-      label: t.catMakeup,
-      description: language === 'my' ? 'ပေါ့ပါးလန်းဆန်းသော မိတ်ကပ်နှင့် နှုတ်ခမ်းနီများ' : 'Breathable cheek tints, lip glazes & complexion picks',
-      count: products.filter((p) => p.category === 'makeup').length,
-    },
-    {
-      id: 'lifestyle',
-      label: t.catLifestyle,
-      description: language === 'my' ? 'ခေတ်မီ လူနေမှုဘဝနှင့် နေ့စဉ်သုံးပစ္စည်းများ' : 'Silk hair accessories, vacuum tumblers & daily finds',
-      count: products.filter((p) => p.category === 'lifestyle').length,
-    },
-    {
-      id: 'lenses',
-      label: t.catLenses,
-      description: language === 'my' ? 'မျက်လုံးအေးမြ သက်တောင့်သက်သာရှိသော မျက်ကပ်မှန်များ' : 'Hydrated daily and monthly comfort beauty lenses',
-      count: products.filter((p) => p.category === 'lenses').length,
-    },
-    {
-      id: 'more',
-      label: t.catMore,
-      description: language === 'my' ? 'အခြား အလှအပနှင့် အသုံးအဆောင်ပစ္စည်းများ' : 'Pure silk ties, beauty tools & thoughtful additions',
-      count: products.filter((p) => p.category === 'more').length,
-    },
-  ], [products, t, language]);
+  const categoriesList = useMemo(() => {
+    const staticCats = [
+      {
+        id: 'all',
+        label: t.catAll,
+        description: language === 'my' ? 'ဆိုင်ရှိ ပစ္စည်းအားလုံးကို စုံလင်စွာ ကြည့်ရှုနိုင်ပါသည်' : 'Explore our complete variety of products',
+        count: products.length,
+      },
+      {
+        id: 'electrical',
+        label: t.catElectrical,
+        description: language === 'my' ? 'အလှအပသုံး စမတ်ကိရိယာများနှင့် ဂက်ဂျက်များ' : 'Sonic beauty tech, touch LED mirrors & smart humidifiers',
+        count: products.filter((p) => p.category === 'electrical').length,
+      },
+      {
+        id: 'skincare',
+        label: t.catSkincare,
+        description: language === 'my' ? 'နူးညံ့ထိရောက်သော အသားအရေထိန်း ပစ္စည်းများ' : 'Gentle barrier serums, moisturizers & UV daily defense',
+        count: products.filter((p) => p.category === 'skincare').length,
+      },
+      {
+        id: 'makeup',
+        label: t.catMakeup,
+        description: language === 'my' ? 'ပေါ့ပါးလန်းဆန်းသော မိတ်ကပ်နှင့် နှုတ်ခမ်းနီများ' : 'Breathable cheek tints, lip glazes & complexion picks',
+        count: products.filter((p) => p.category === 'makeup').length,
+      },
+      {
+        id: 'lifestyle',
+        label: t.catLifestyle,
+        description: language === 'my' ? 'ခေတ်မီ လူနေမှုဘဝနှင့် နေ့စဉ်သုံးပစ္စည်းများ' : 'Silk hair accessories, vacuum tumblers & daily finds',
+        count: products.filter((p) => p.category === 'lifestyle').length,
+      },
+      {
+        id: 'lenses',
+        label: t.catLenses,
+        description: language === 'my' ? 'မျက်လုံးအေးမြ သက်တောင့်သက်သာရှိသော မျက်ကပ်မှန်များ' : 'Hydrated daily and monthly comfort beauty lenses',
+        count: products.filter((p) => p.category === 'lenses').length,
+      },
+      {
+        id: 'more',
+        label: t.catMore,
+        description: language === 'my' ? 'အခြား အလှအပနှင့် အသုံးအဆောင်ပစ္စည်းများ' : 'Pure silk ties, beauty tools & thoughtful additions',
+        count: products.filter((p) => p.category === 'more').length,
+      },
+    ];
+
+    const knownSlugs = new Set(staticCats.map((c) => c.id));
+    const dynamicCats: typeof staticCats = [];
+
+    products.forEach((p) => {
+      const catSlug = (p.category || '').trim().toLowerCase();
+      if (catSlug && !knownSlugs.has(catSlug)) {
+        knownSlugs.add(catSlug);
+        const displayName = p.subcategory || (catSlug.charAt(0).toUpperCase() + catSlug.slice(1));
+        dynamicCats.push({
+          id: catSlug,
+          label: displayName,
+          description: displayName,
+          count: products.filter((item) => (item.category || '').toLowerCase() === catSlug).length,
+        });
+      }
+    });
+
+    return [...staticCats, ...dynamicCats];
+  }, [products, t, language]);
 
   // Matching products for the selected category
   const matchingProducts = useMemo(() => {
@@ -75,9 +96,9 @@ export default function HomePage() {
       : products.filter((p) => p.category === activeCategory);
   }, [products, activeCategory]);
 
-  // Show top 4 curated highlights as preview
+  // Show top curated highlights as preview (up to 8 products)
   const displayedProducts = useMemo(() => {
-    return matchingProducts.slice(0, 4);
+    return matchingProducts.slice(0, 8);
   }, [matchingProducts]);
 
   return (
