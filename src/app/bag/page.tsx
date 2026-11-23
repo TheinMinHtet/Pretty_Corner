@@ -19,6 +19,9 @@ export default function ShoppingBagPage() {
     appliedPromo,
     applyPromoCode,
     removePromoCode,
+    lineItemsPricing,
+    promoSubtotal,
+    nonPromoSubtotal,
     isMounted,
     t,
     language,
@@ -80,62 +83,93 @@ export default function ShoppingBagPage() {
           <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-start">
             {/* Left Column: Bag Line Items (col-span-12 on mobile, col-span-7 or 8 on desktop) */}
             <div className="md:col-span-7 lg:col-span-8 divide-y divide-[#eedfe5]">
-              {cart.map((item) => (
-                <div key={item.id} className="py-5 flex gap-4 sm:gap-6 items-center">
-                  <div className="relative w-[104px] sm:w-[120px] h-[126px] sm:h-[140px] bg-[#f9f5f7] rounded-[10px] overflow-hidden shrink-0">
-                    <Image
-                      src={item.image}
-                      alt={item.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
+              {cart.map((item) => {
+                const itemPricing = lineItemsPricing?.find((lp) => lp.itemId === item.id);
+                const isDiscounted = Boolean(itemPricing && itemPricing.discountAmount > 0);
+                const unitDiscount = isDiscounted ? Math.round(itemPricing!.discountAmount / item.quantity) : 0;
+                const finalUnitPrice = isDiscounted ? item.price - unitDiscount : item.price;
 
-                  <div className="flex-1 flex flex-col justify-between h-[126px] sm:h-[140px] py-1">
-                    <div>
-                      <h3 className="font-sans text-[16px] sm:text-[18px] font-bold text-[#38262e] leading-snug line-clamp-1">
-                        {item.name}
-                      </h3>
-                      <p className="text-[12px] sm:text-[13px] text-[#7a6870] mt-0.5">
-                        {item.size ? `${item.size} · ` : ''}{t.standardPackaging}
-                      </p>
-                      <p className="text-[15px] sm:text-[16px] font-bold text-[#b73d67] mt-1.5">
-                        {item.price.toLocaleString()} MMK
-                      </p>
+                return (
+                  <div key={item.id} className="py-5 flex gap-4 sm:gap-6 items-center">
+                    <div className="relative w-[104px] sm:w-[120px] h-[126px] sm:h-[140px] bg-[#f9f5f7] rounded-[10px] overflow-hidden shrink-0">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                      />
                     </div>
 
-                    <div className="flex items-center justify-between mt-2">
-                      {/* Quantity control */}
-                      <div className="h-[36px] w-[108px] bg-white border border-[#eedfe5] rounded-[8px] flex items-center justify-between px-2.5 text-[#38262e]">
-                        <button
-                          onClick={() => updateCartQuantity(item.id, -1)}
-                          className="px-1 text-[18px] font-medium hover:text-[#b73d67] cursor-pointer"
-                        >
-                          −
-                        </button>
-                        <span className="text-[14px] font-semibold">{item.quantity}</span>
-                        <button
-                          onClick={() => updateCartQuantity(item.id, 1)}
-                          className="px-1 text-[18px] font-medium hover:text-[#b73d67] cursor-pointer"
-                        >
-                          +
-                        </button>
+                    <div className="flex-1 flex flex-col justify-between h-[126px] sm:h-[140px] py-1">
+                      <div>
+                        <h3 className="font-sans text-[16px] sm:text-[18px] font-bold text-[#38262e] leading-snug line-clamp-1">
+                          {item.name}
+                        </h3>
+                        <p className="text-[12px] sm:text-[13px] text-[#7a6870] mt-0.5">
+                          {item.size ? `${item.size} · ` : ''}{t.standardPackaging}
+                        </p>
+                        
+                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                          {isDiscounted ? (
+                            <>
+                              <span className="text-[15px] sm:text-[16px] font-bold text-[#b73d67]">
+                                {finalUnitPrice.toLocaleString()} MMK
+                              </span>
+                              <span className="text-[12px] text-[#7a6870] line-through">
+                                {item.price.toLocaleString()} MMK
+                              </span>
+                              <span className="inline-flex items-center text-[10px] sm:text-[11px] font-bold text-[#b73d67] bg-[#fceef2] px-2 py-0.5 rounded-full border border-[#f5d9e3]">
+                                ✨ {appliedPromo?.code} (-{appliedPromo?.discountPercentage}%)
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-[15px] sm:text-[16px] font-bold text-[#38262e]">
+                                {item.price.toLocaleString()} MMK
+                              </span>
+                              {appliedPromo && (
+                                <span className="inline-flex items-center text-[10px] sm:text-[11px] font-medium text-[#7a6870] bg-[#f7f4f5] px-2 py-0.5 rounded-full border border-[#eedfe5]">
+                                  Regular Item
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </div>
                       </div>
 
-                      {/* Trash removal */}
-                      <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="p-2 text-[#7a6870] hover:text-[#b73d67] hover:bg-[#fceef2] rounded-full transition-colors cursor-pointer"
-                        aria-label="Remove item"
-                      >
-                        <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                        </svg>
-                      </button>
+                      <div className="flex items-center justify-between mt-2">
+                        {/* Quantity control */}
+                        <div className="h-[36px] w-[108px] bg-white border border-[#eedfe5] rounded-[8px] flex items-center justify-between px-2.5 text-[#38262e]">
+                          <button
+                            onClick={() => updateCartQuantity(item.id, -1)}
+                            className="px-1 text-[18px] font-medium hover:text-[#b73d67] cursor-pointer"
+                          >
+                            −
+                          </button>
+                          <span className="text-[14px] font-semibold">{item.quantity}</span>
+                          <button
+                            onClick={() => updateCartQuantity(item.id, 1)}
+                            className="px-1 text-[18px] font-medium hover:text-[#b73d67] cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        {/* Trash removal */}
+                        <button
+                          onClick={() => removeFromCart(item.id)}
+                          className="p-2 text-[#7a6870] hover:text-[#b73d67] hover:bg-[#fceef2] rounded-full transition-colors cursor-pointer"
+                          aria-label="Remove item"
+                        >
+                          <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Right Column: Order Summary Card (sticky on desktop) */}
@@ -238,9 +272,25 @@ export default function ShoppingBagPage() {
                     <span>{t.subTotal}</span>
                     <span className="font-semibold text-[#38262e]">{cartSubtotal.toLocaleString()} MMK</span>
                   </div>
+
+                  {discount > 0 && promoSubtotal > 0 && nonPromoSubtotal > 0 && (
+                    <>
+                      <div className="flex justify-between items-center text-xs text-[#7a6870] pl-2 border-l-2 border-[#eedfe5]">
+                        <span>Promo Items Subtotal</span>
+                        <span>{promoSubtotal.toLocaleString()} MMK</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs text-[#7a6870] pl-2 border-l-2 border-[#eedfe5]">
+                        <span>Regular Items Subtotal</span>
+                        <span>{nonPromoSubtotal.toLocaleString()} MMK</span>
+                      </div>
+                    </>
+                  )}
+
                   {discount > 0 && (
                     <div className="flex justify-between items-center text-[#b73d67]">
-                      <span>{t.discount} {appliedPromo ? `(${appliedPromo.discountPercentage}%)` : ''}</span>
+                      <span>
+                        {t.discount} {appliedPromo ? `(${appliedPromo.code} · ${appliedPromo.discountPercentage}%)` : ''}
+                      </span>
                       <span className="font-bold">-{discount.toLocaleString()} MMK</span>
                     </div>
                   )}

@@ -12,6 +12,8 @@ import {
   getItemQuantity,
   calculatePricing,
   validatePromoCode,
+  LineItemPricing,
+  CartPricingSummary,
 } from '@/lib/cart/CartEngine';
 import {
   generateOrderId,
@@ -49,10 +51,14 @@ interface StoreContextType {
   applyPromoCode: (code: string) => { success: boolean; message: string };
   removePromoCode: () => void;
   cartTotal: number;
+  pricing: CartPricingSummary;
+  lineItemsPricing: LineItemPricing[];
+  promoSubtotal: number;
+  nonPromoSubtotal: number;
   getProductQuantity: (productId: string, sizeName?: string) => number;
   incrementProduct: (productId: string, sizeName?: string) => void;
   decrementProduct: (productId: string, sizeName?: string) => void;
-  createOrder: (orderData: Omit<Order, 'id' | 'createdAt'>) => Order;
+  createOrder: (orderData: Omit<Order, 'id' | 'createdAt'>) => Promise<Order>;
   getOrder: (id: string, phone?: string) => Order | undefined;
   fetchOrderById: (id: string) => Promise<Order | undefined>;
   updatePaymentStatus: (orderId: string, status: Order['paymentStatus']) => void;
@@ -116,7 +122,28 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [selectedTownship, setSelectedTownship] = useState<TownshipOption>(MOCK_TOWNSHIPS[0]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [manualDiscount, setManualDiscount] = useState<number>(0);
-  const [appliedPromo, setAppliedPromo] = useState<Promotion | null>(null);
+  const [appliedPromo, setAppliedPromoState] = useState<Promotion | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = sessionStorage.getItem('pretty_corner_applied_promo');
+        if (saved) return JSON.parse(saved);
+      } catch {}
+    }
+    return null;
+  });
+
+  const setAppliedPromo = useCallback((promo: Promotion | null) => {
+    setAppliedPromoState(promo);
+    if (typeof window !== 'undefined') {
+      try {
+        if (promo) {
+          sessionStorage.setItem('pretty_corner_applied_promo', JSON.stringify(promo));
+        } else {
+          sessionStorage.removeItem('pretty_corner_applied_promo');
+        }
+      } catch {}
+    }
+  }, []);
 
   const repo = useMemo(() => getStorefrontRepository(), []);
   const t = translations[language];
@@ -236,18 +263,46 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     updateCartQuantity(itemId, -1);
   };
 
-  // Pricing calculations delegated to pure CartEngine
+  // Pricing calculations delegated to pure CartEngine with catalog product awareness
   const pricing = useMemo(() => {
-    return calculatePricing(cart, appliedPromo, 0, manualDiscount);
-  }, [cart, appliedPromo, manualDiscount]);
+    return calculatePricing(cart, appliedPromo, 0, manualDiscount, products);
+  }, [cart, appliedPromo, manualDiscount, products]);
 
   const cartCount = isMounted ? pricing.itemCount : 0;
   const cartSubtotal = pricing.subtotal;
   const discount = pricing.discountAmount;
   const cartTotal = pricing.grandTotal;
+  const lineItemsPricing = pricing.lineItems;
+  const promoSubtotal = pricing.promoSubtotal;
+  const nonPromoSubtotal = pricing.nonPromoSubtotal;
+
+  // Auto-ingest coupon from URL query param ?promo=CODE
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const search = window.location.search;
+      if (!search) return;
+      const params = new URLSearchParams(search);
+      const codeParam = params.get('promo');
+      if (codeParam && codeParam.trim()) {
+        const cleanCode = codeParam.trim().toUpperCase();
+        if (!appliedPromo || appliedPromo.code.toUpperCase() !== cleanCode) {
+          const match = promotions.find(
+            (p) =>
+              p.active !== false &&
+              p.isOutOfStock !== true &&
+              p.code.trim().toUpperCase() === cleanCode
+          );
+          if (match) {
+            setAppliedPromo(match);
+          }
+        }
+      }
+    } catch {}
+  }, [promotions, appliedPromo, setAppliedPromo]);
 
   const applyPromoCode = (code: string): { success: boolean; message: string } => {
-    const res = validatePromoCode(code, promotions, language);
+    const res = validatePromoCode(code, promotions, language, cart, products);
     if (res.success && res.promo) {
       setAppliedPromo(res.promo);
     }
@@ -259,36 +314,34 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setManualDiscount(0);
   };
 
-  const createOrder = (orderData: Omit<Order, 'id' | 'createdAt'>): Order => {
+  const createOrder = async (orderData: Omit<Order, 'id' | 'createdAt'>): Promise<Order> => {
     const orderId = generateOrderId();
     const formattedDate = formatOrderDate();
 
-    const newOrder: Order = {
+    const orderSubmissionWithPromo = {
       ...orderData,
-      id: orderId,
-      createdAt: formattedDate,
+      promoCode: appliedPromo?.code,
+      appliedPromotionId: appliedPromo?.id,
     };
 
+    // Authoritative Ingress: await server persistence before confirming
+    const saved = await repo.createOrder(orderSubmissionWithPromo, orderId, formattedDate);
+
     setOrders((prev) => [
-      newOrder,
-      ...prev.filter((o) => o.id.toUpperCase() !== orderId.toUpperCase()),
+      saved,
+      ...prev.filter(
+        (o) =>
+          o.id.toUpperCase() !== orderId.toUpperCase() &&
+          o.id.toUpperCase() !== saved.id.toUpperCase()
+      ),
     ]);
 
-    // Persist via repository
-    void repo.createOrder(orderData, orderId, formattedDate).then((saved) => {
-      if (saved) {
-        setOrders((prev) => [
-          saved,
-          ...prev.filter(
-            (o) =>
-              o.id.toUpperCase() !== orderId.toUpperCase() &&
-              o.id.toUpperCase() !== saved.id.toUpperCase()
-          ),
-        ]);
-      }
-    });
+    // If Cash on Delivery, clear the cart immediately upon verified order creation
+    if (orderData.paymentMethod === 'Cash on Delivery') {
+      clearCart();
+    }
 
-    return newOrder;
+    return saved;
   };
 
   const getOrder = (id: string, phone?: string): Order | undefined => {
@@ -370,6 +423,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         applyPromoCode,
         removePromoCode,
         cartTotal,
+        pricing,
+        lineItemsPricing,
+        promoSubtotal,
+        nonPromoSubtotal,
         getProductQuantity,
         incrementProduct,
         decrementProduct,

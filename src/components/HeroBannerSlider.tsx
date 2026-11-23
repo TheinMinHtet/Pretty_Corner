@@ -4,9 +4,10 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useStore } from '@/context/StoreContext';
+import { resolvePromotionDestination } from '@/lib/promotion/resolvePromotionDestination';
 
 export default function HeroBannerSlider() {
-  const { promotions, t, language } = useStore();
+  const { promotions, t, language, applyPromoCode } = useStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cycleCount, setCycleCount] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -14,8 +15,16 @@ export default function HeroBannerSlider() {
 
   const touchStartX = useRef<number | null>(null);
 
-  // Filter only active promotions
-  const activePromos = promotions.filter((p) => p.active !== false);
+  // Filter only active, in-stock, non-expired, and non-exhausted promotions
+  const now = new Date();
+  const activePromos = promotions.filter((p) => {
+    if (p.active === false || p.isOutOfStock === true) return false;
+    if (p.endDate && new Date(p.endDate) < now) return false;
+    if (p.usageLimit !== null && p.usageLimit !== undefined && (p.usageCount ?? 0) >= p.usageLimit) {
+      return false;
+    }
+    return true;
+  });
   const totalSlides = activePromos.length;
 
   const nextSlide = useCallback(() => {
@@ -142,7 +151,13 @@ export default function HeroBannerSlider() {
           const bannerImage = promo.imageUrl || '/assets/hero-banner.jpg';
           const badgeText = promo.bannerBadge || `${promo.discountPercentage}% OFF EXCLUSIVE`;
           const ctaLabel = promo.ctaText || t.heroCta;
-          const ctaDestination = promo.ctaLink || '/shop';
+          const ctaDestination = resolvePromotionDestination({
+            targetType: promo.targetType,
+            promotionSlug: promo.slug,
+            targetSlug: promo.targetSlug,
+            code: promo.code,
+            featuredProductIds: promo.featuredProductIds,
+          });
 
           return (
             <div
@@ -238,6 +253,11 @@ export default function HeroBannerSlider() {
                 >
                   <Link
                     href={ctaDestination}
+                    onClick={() => {
+                      if (promo.code) {
+                        applyPromoCode(promo.code);
+                      }
+                    }}
                     className="inline-flex items-center justify-center bg-[#b73d67] text-white text-[14px] sm:text-[15px] font-bold h-[48px] sm:h-[52px] px-7 sm:px-8 rounded-[14px] shadow-sm hover:bg-[#982f53] active:scale-[0.98] transition-all"
                   >
                     {ctaLabel}

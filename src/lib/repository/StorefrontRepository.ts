@@ -9,7 +9,7 @@ export interface StorefrontRepository {
   getPromotions(): Promise<Promotion[]>;
   findOrder(refOrPhone: string): Promise<Order | null>;
   createOrder(
-    submission: Omit<Order, 'id' | 'createdAt'>,
+    submission: Omit<Order, 'id' | 'createdAt'> & { promoCode?: string; appliedPromotionId?: string },
     customOrderId?: string,
     formattedDate?: string
   ): Promise<Order>;
@@ -70,6 +70,7 @@ interface SupabaseOrderRow {
 
 interface SupabasePromotionRow {
   id: string;
+  slug: string | null;
   code: string;
   title: string;
   subtitle: string | null;
@@ -77,12 +78,18 @@ interface SupabasePromotionRow {
   start_date: string;
   end_date: string;
   is_active: boolean;
+  target_type: Promotion['targetType'] | null;
+  target_slug: string | null;
+  redemption_method: Promotion['redemptionMethod'] | null;
+  usage_limit: number | null;
   usage_count: number;
+  minimum_order_amount: number | null;
   featured_product_ids: string[] | null;
   image_url: string | null;
   banner_badge: string | null;
   cta_text: string | null;
   cta_link: string | null;
+  is_out_of_stock: boolean | null;
 }
 
 function mapProductRow(row: SupabaseProductRow): Product {
@@ -94,8 +101,9 @@ function mapProductRow(row: SupabaseProductRow): Product {
     : [row.main_image];
 
   return {
-    id: row.slug || row.id,
-    slug: row.slug,
+    id: row.id,
+    databaseId: row.id,
+    slug: row.slug || row.id,
     name: row.name,
     category: categorySlug,
     subcategory: categoryName,
@@ -270,6 +278,7 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
           const rows = data as unknown as SupabasePromotionRow[];
           return rows.map((row) => ({
             id: row.id,
+            slug: row.slug || undefined,
             code: row.code,
             title: row.title,
             subtitle: row.subtitle || undefined,
@@ -277,8 +286,14 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
             startDate: row.start_date,
             endDate: row.end_date,
             active: Boolean(row.is_active),
-            bannerColor: '#FCEEF2',
+            targetType: row.target_type || 'ENTIRE_STORE',
+            targetSlug: row.target_slug || undefined,
+            redemptionMethod: row.redemption_method || 'CODE',
+            usageLimit: row.usage_limit ? Number(row.usage_limit) : undefined,
             usageCount: Number(row.usage_count) || 0,
+            minimumOrderAmount: row.minimum_order_amount ? Number(row.minimum_order_amount) : undefined,
+            isOutOfStock: Boolean(row.is_out_of_stock),
+            bannerColor: '#FCEEF2',
             featuredProductIds: Array.isArray(row.featured_product_ids)
               ? row.featured_product_ids
               : [],
@@ -343,7 +358,7 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
   }
 
   async createOrder(
-    submission: Omit<Order, 'id' | 'createdAt'>,
+    submission: Omit<Order, 'id' | 'createdAt'> & { promoCode?: string; appliedPromotionId?: string },
     customOrderId?: string,
     formattedDate?: string
   ): Promise<Order> {
@@ -356,55 +371,27 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
       createdAt,
     };
 
-    // 1. Try external API
-    try {
-      const baseUrl = getApiBaseUrl();
-      const res = await fetch(`${baseUrl}/api/orders`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(createdOrder),
-      });
-      if (res.ok) {
-        const json = (await res.json()) as { order?: Order };
-        if (json.order) return json.order;
-      }
-    } catch {}
+    // Authoritative Ingress: Post to /api/orders (ADR 0001)
+    const baseUrl = typeof window !== 'undefined' ? '' : getApiBaseUrl();
+    const endpoint = `${baseUrl}/api/orders`;
 
-    // 2. Persist to Supabase
-    if (supabase) {
-      try {
-        await supabase.from('orders').insert({
-          id: orderId,
-          customer_name: submission.customerName,
-          phone: submission.phone,
-          delivery_address: submission.deliveryAddress,
-          landmark_note: submission.landmarkNote || null,
-          total_amount: submission.total,
-          payment_method: submission.paymentMethod,
-          payment_status: submission.paymentStatus,
-          fulfillment_status: submission.fulfillmentStatus,
-          payment_slip_url: null,
-        });
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...createdOrder,
+        promoCode: submission.promoCode,
+        appliedPromotionId: submission.appliedPromotionId,
+      }),
+    });
 
-        if (submission.items && submission.items.length > 0) {
-          const itemsToInsert = submission.items.map((it) => ({
-            order_id: orderId,
-            product_id: it.productId.length === 36 ? it.productId : null,
-            product_name: it.name,
-            unit_price: it.price,
-            quantity: it.quantity,
-            item_total: it.price * it.quantity,
-            product_image: it.image || null,
-          }));
-
-          await supabase.from('order_items').insert(itemsToInsert);
-        }
-      } catch (err) {
-        console.warn('Failed to insert order into Supabase:', err);
-      }
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}));
+      throw new Error(json.error || `Order placement failed (HTTP ${res.status})`);
     }
 
-    return createdOrder;
+    const json = (await res.json()) as { order?: Order };
+    return json.order || createdOrder;
   }
 
   async updatePaymentStatus(

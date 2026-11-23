@@ -138,7 +138,7 @@ export default function HomePage() {
             return (
               <div key={product.id} className="flex flex-col group">
                 <div className="relative w-full h-[184px] sm:h-[230px] md:h-[260px] lg:h-[280px] bg-[#f9f5f7] rounded-[12px] overflow-hidden">
-                  <Link href={`/product/${product.id}`} className="block relative w-full h-full">
+                  <Link href={`/product/${product.slug || product.id}`} className="block relative w-full h-full">
                     <Image
                       src={product.image}
                       alt={product.name}
@@ -161,7 +161,7 @@ export default function HomePage() {
                   <p className="text-[10px] sm:text-[11px] font-medium tracking-wide text-[#7a6870] uppercase">
                     {product.category}
                   </p>
-                  <Link href={`/product/${product.id}`}>
+                  <Link href={`/product/${product.slug || product.id}`}>
                     <h4 className="text-[15px] sm:text-[16px] font-normal text-[#38262e] hover:text-[#b73d67] transition-colors line-clamp-1 mt-0.5">
                       {product.name}
                     </h4>

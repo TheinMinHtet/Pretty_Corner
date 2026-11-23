@@ -18,10 +18,24 @@ const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper
 
 function ShopContent() {
   const searchParams = useSearchParams();
-  const { products, t, language } = useStore();
+  const { products, promotions, t, language } = useStore();
 
   const categoryParam = searchParams.get('category') || 'all';
   const queryParam = searchParams.get('q') || '';
+  const promoParam = searchParams.get('promo') || '';
+  const dropParam = searchParams.get('drop') || '';
+  const productParam = searchParams.get('product') || '';
+  const productsParam = searchParams.get('products') || '';
+
+  const [dismissedPromo, setDismissedPromo] = useState(false);
+
+  // Sync dismissedPromo when URL filter parameters change
+  const currentPromoKey = `${dropParam}|${promoParam}|${productParam}|${productsParam}`;
+  const prevPromoKeyRef = useRef(currentPromoKey);
+  if (prevPromoKeyRef.current !== currentPromoKey) {
+    prevPromoKeyRef.current = currentPromoKey;
+    setDismissedPromo(false);
+  }
 
   const [prevCategoryParam, setPrevCategoryParam] = useState(categoryParam);
   const [activeCategory, setActiveCategory] = useState<string>(categoryParam);
@@ -36,6 +50,47 @@ function ShopContent() {
     setPrevQueryParam(queryParam);
     setSearchFilter(queryParam);
   }
+
+  const activePromoMatch = useMemo(() => {
+    if (dismissedPromo) return null;
+    if (!promotions || promotions.length === 0) return null;
+
+    if (promoParam) {
+      const clean = promoParam.trim().toUpperCase();
+      const match = promotions.find(
+        (p) => p.code && p.code.trim().toUpperCase() === clean
+      );
+      if (match) return match;
+    }
+
+    return null;
+  }, [promotions, promoParam, dismissedPromo]);
+
+  const isPromoFiltered = useMemo(() => {
+    if (dismissedPromo) return false;
+    if (productParam) return true;
+    if (activePromoMatch) {
+      return activePromoMatch.targetType === 'SINGLE_PRODUCT';
+    }
+    return false;
+  }, [dismissedPromo, productParam, activePromoMatch]);
+
+  const promoBadgeLabel = useMemo(() => {
+    if (activePromoMatch) {
+      return activePromoMatch.title;
+    }
+    if (productParam) {
+      const match = products.find(
+        (p) => p.slug === productParam || p.id === productParam || p.databaseId === productParam
+      );
+      return match ? match.name : productParam;
+    }
+    return '';
+  }, [activePromoMatch, productParam, products]);
+
+  const clearPromoFilter = () => {
+    setDismissedPromo(true);
+  };
 
   const [sortBy, setSortBy] = useState<'featured' | 'newest' | 'price-asc' | 'price-desc'>('featured');
   const [showSortDropdown, setShowSortDropdown] = useState<boolean>(false);
@@ -125,6 +180,18 @@ function ShopContent() {
   }, [categoriesList, activeCategory]);
 
   const getCategoryTitle = () => {
+    if (isPromoFiltered) {
+      if (activePromoMatch?.title) return activePromoMatch.title;
+      if (productParam) {
+        const match = products.find(
+          (p) => p.slug === productParam || p.id === productParam || p.databaseId === productParam
+        );
+        return match ? match.name : productParam;
+      }
+      if (productsParam) {
+        return language === 'my' ? 'သီးသန့် ရွေးချယ်မှု' : 'Curated Selection';
+      }
+    }
     switch (activeCategory) {
       case 'electrical':
         return language === 'my' ? 'အီလက်ထရောနစ်နှင့် စမတ်ဂက်ဂျက်များ' : 'Electrical & Smart Gadgets';
@@ -144,6 +211,12 @@ function ShopContent() {
   };
 
   const getCategorySubtitle = () => {
+    if (isPromoFiltered) {
+      if (activePromoMatch?.subtitle) return activePromoMatch.subtitle;
+      return language === 'my'
+        ? 'သီးသန့် ပရိုမိုးရှင်းပစ္စည်း အထူးကမ်းလှမ်းချက်'
+        : 'Exclusive promotional featured items';
+    }
     switch (activeCategory) {
       case 'electrical':
         return language === 'my' ? 'အလှအပသုံး စက်ပစ္စည်းများ၊ LED မှန်နှင့် စမတ်အသုံးအဆောင်များ' : 'Sonic beauty devices, touch LED mirrors, humidifiers & smart lifestyle tech.';
@@ -163,40 +236,78 @@ function ShopContent() {
   };
 
   const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      if (activeCategory !== 'all' && p.category !== activeCategory) {
-        return false;
-      }
-      if (searchFilter.trim()) {
-        const q = searchFilter.toLowerCase().trim();
-        const categoryObj = categoriesList.find((c) => c.id === p.category);
-        const matchesCategory =
-          p.category.toLowerCase().includes(q) ||
-          (categoryObj && (
-            categoryObj.label.toLowerCase().includes(q) ||
-            categoryObj.aliases.some((alias) => alias.includes(q) || q.includes(alias))
-          ));
-        const matchesQuery =
-          p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q) ||
-          matchesCategory;
-        if (!matchesQuery) return false;
-      }
-      if (inStockOnly && !p.inStock) {
-        return false;
-      }
-      if (p.price > maxPrice) {
-        return false;
-      }
-      return true;
-    }).sort((a, b) => {
-      if (sortBy === 'price-asc') return a.price - b.price;
-      if (sortBy === 'price-desc') return b.price - a.price;
-      if (sortBy === 'newest') return b.id.localeCompare(a.id);
-      return 0;
-    });
-  }, [products, activeCategory, searchFilter, inStockOnly, maxPrice, sortBy, categoriesList]);
+    return products
+      .filter((p) => {
+        // 1. Single Product Promotion Filter
+        if (isPromoFiltered) {
+          if (activePromoMatch?.targetType === 'SINGLE_PRODUCT') {
+            const target = activePromoMatch.targetSlug || productParam;
+            const matches =
+              target === p.id ||
+              target === p.slug ||
+              (p.databaseId && target === p.databaseId);
+            if (!matches) return false;
+          } else if (productParam) {
+            const matches =
+              productParam === p.id ||
+              productParam === p.slug ||
+              (p.databaseId && productParam === p.databaseId);
+            if (!matches) return false;
+          }
+        }
+
+        // 2. Category Filter
+        if (activeCategory !== 'all' && p.category !== activeCategory) {
+          return false;
+        }
+
+        // 3. Search Filter
+        if (searchFilter.trim()) {
+          const q = searchFilter.toLowerCase().trim();
+          const categoryObj = categoriesList.find((c) => c.id === p.category);
+          const matchesCategory =
+            p.category.toLowerCase().includes(q) ||
+            (categoryObj &&
+              (categoryObj.label.toLowerCase().includes(q) ||
+                categoryObj.aliases.some(
+                  (alias) => alias.includes(q) || q.includes(alias)
+                )));
+          const matchesQuery =
+            p.name.toLowerCase().includes(q) ||
+            p.category.toLowerCase().includes(q) ||
+            p.description.toLowerCase().includes(q) ||
+            matchesCategory;
+          if (!matchesQuery) return false;
+        }
+
+        // 4. In Stock and Max Price
+        if (inStockOnly && !p.inStock) {
+          return false;
+        }
+        if (p.price > maxPrice) {
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'price-asc') return a.price - b.price;
+        if (sortBy === 'price-desc') return b.price - a.price;
+        if (sortBy === 'newest') return b.id.localeCompare(a.id);
+        return 0;
+      });
+  }, [
+    products,
+    isPromoFiltered,
+    activePromoMatch,
+    productParam,
+    productsParam,
+    activeCategory,
+    searchFilter,
+    inStockOnly,
+    maxPrice,
+    sortBy,
+    categoriesList,
+  ]);
 
   return (
     <div className="w-full bg-white flex flex-col min-h-full">
@@ -206,9 +317,25 @@ function ShopContent() {
         <div className="flex items-center gap-2 text-[12px] text-[#7a6870] mb-2 sm:mb-3">
           <Link href="/" className="hover:text-[#38262e]">{t.navHome}</Link>
           <span>/</span>
-          <span className="text-[#38262e] font-medium capitalize">
-            {categoriesList.find((c) => c.id === activeCategory)?.label || activeCategory}
-          </span>
+          {isPromoFiltered ? (
+            <>
+              <button
+                type="button"
+                onClick={clearPromoFilter}
+                className="hover:text-[#38262e] cursor-pointer"
+              >
+                {language === 'my' ? 'ကုန်ပစ္စည်းများ' : 'Catalog'}
+              </button>
+              <span>/</span>
+              <span className="text-[#38262e] font-medium truncate max-w-[200px]">
+                {promoBadgeLabel}
+              </span>
+            </>
+          ) : (
+            <span className="text-[#38262e] font-medium capitalize">
+              {categoriesList.find((c) => c.id === activeCategory)?.label || activeCategory}
+            </span>
+          )}
         </div>
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
@@ -304,6 +431,20 @@ function ShopContent() {
             <span className="text-[13px] text-[#7a6870]">
               {t.showing} <strong className="text-[#38262e]">{filteredProducts.length}</strong> {filteredProducts.length === 1 ? t.productCountSingular : t.productsCount}
             </span>
+
+            {isPromoFiltered && (
+              <span className="inline-flex items-center gap-1.5 bg-[#fceef2] text-[#b73d67] text-[12px] font-bold px-3 py-1 rounded-full border border-[#f5d9e3] shadow-2xs">
+                <span>✨ {promoBadgeLabel} ({filteredProducts.length} {filteredProducts.length === 1 ? (t.productCountSingular || 'item') : (t.productsCount || 'items')})</span>
+                <button
+                  type="button"
+                  onClick={clearPromoFilter}
+                  className="hover:text-[#38262e] cursor-pointer ml-1 font-bold text-xs bg-white text-[#b73d67] hover:bg-[#fceef2] rounded-full w-4 h-4 flex items-center justify-center border border-[#f5d9e3]"
+                  title="Clear promo filter"
+                >
+                  ✕
+                </button>
+              </span>
+            )}
 
             {activeCategory !== 'all' && (
               <span className="inline-flex items-center gap-1.5 bg-[#fceef2] text-[#b73d67] text-[12px] font-semibold px-2.5 py-0.5 rounded-full border border-[#f5d9e3]">
@@ -454,6 +595,7 @@ function ShopContent() {
                 setSearchFilter('');
                 setMaxPrice(60000);
                 setInStockOnly(false);
+                setDismissedPromo(true);
               }}
               className="mt-5 px-6 py-2.5 bg-[#b73d67] text-white rounded-[10px] text-[13px] font-bold hover:bg-[#a33259] transition-colors"
             >

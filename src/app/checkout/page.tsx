@@ -29,6 +29,9 @@ export default function CheckoutPage() {
     appliedPromo,
     applyPromoCode,
     removePromoCode,
+    lineItemsPricing,
+    promoSubtotal,
+    nonPromoSubtotal,
     createOrder,
     clearCart,
     isMounted,
@@ -99,7 +102,7 @@ export default function CheckoutPage() {
     }
   };
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     const activeEl = typeof document !== 'undefined' ? (document.activeElement as HTMLElement) : null;
     if (activeEl?.getAttribute('data-no-submit') === 'true') {
@@ -120,31 +123,41 @@ export default function CheckoutPage() {
     }
 
     const isCOD = paymentMethod === 'Cash on Delivery';
-
     const completeAddress = streetAddress.trim();
 
-    const newOrder = createOrder({
-      customerName: customerName.trim(),
-      phone: phoneNumber.trim(),
-      deliveryAddress: completeAddress,
-      coordinates: pinCoords || { lat: 16.8302, lng: 96.1301 },
-      landmarkNote: landmarkNote.trim(),
-      items: cart,
-      subtotal: cartSubtotal,
-      discount,
-      deliveryFee: 0,
-      total: grandTotal,
-      paymentMethod,
-      paymentStatus: isCOD ? 'pending' : 'pending',
-      fulfillmentStatus: isCOD ? 'confirmed' : 'pending_review',
-    });
-
     setIsSubmitting(true);
+    setFormAlert(null);
 
-    if (isCOD) {
-      router.push(`/order-confirmation?orderId=${encodeURIComponent(newOrder.id)}`);
-    } else {
-      router.push(`/payment-pending?orderId=${encodeURIComponent(newOrder.id)}`);
+    try {
+      const newOrder = await createOrder({
+        customerName: customerName.trim(),
+        phone: phoneNumber.trim(),
+        deliveryAddress: completeAddress,
+        coordinates: pinCoords || { lat: 16.8302, lng: 96.1301 },
+        landmarkNote: landmarkNote.trim(),
+        items: cart,
+        subtotal: cartSubtotal,
+        discount,
+        deliveryFee: 0,
+        total: grandTotal,
+        paymentMethod,
+        paymentStatus: 'pending',
+        fulfillmentStatus: isCOD ? 'confirmed' : 'pending_review',
+      });
+
+      if (isCOD) {
+        clearCart();
+        router.push(`/order-confirmation?orderId=${encodeURIComponent(newOrder.id)}`);
+      } else {
+        router.push(`/payment-pending?orderId=${encodeURIComponent(newOrder.id)}`);
+      }
+    } catch (err: any) {
+      console.error('Order placement failed:', err);
+      setFormAlert(
+        err?.message ||
+        (language === 'my' ? 'အော်ဒါတင်ခြင်း မအောင်မြင်ပါ။ ထပ်မံကြိုးစားပေးပါ။' : 'Order placement failed. Please try again.')
+      );
+      setIsSubmitting(false);
     }
   };
 
@@ -430,25 +443,51 @@ export default function CheckoutPage() {
               </h2>
 
               {/* Items Miniature List */}
-              <div className="max-h-48 overflow-y-auto divide-y divide-[#eedfe5] mb-3.5 pr-1">
-                {cart.map((item) => (
-                  <div key={item.id} className="py-2.5 flex items-center justify-between text-[13px]">
-                    <div className="flex items-center gap-2.5 truncate mr-2">
-                      <div className="relative w-9 h-9 rounded bg-[#f9f5f7] overflow-hidden shrink-0">
-                        <Image src={item.image} alt={item.name} fill sizes="36px" className="object-cover" />
+              <div className="max-h-56 overflow-y-auto divide-y divide-[#eedfe5] mb-3.5 pr-1">
+                {cart.map((item) => {
+                  const itemPricing = lineItemsPricing?.find((lp) => lp.itemId === item.id);
+                  const isDiscounted = Boolean(itemPricing && itemPricing.discountAmount > 0);
+                  const finalLineTotal = itemPricing ? itemPricing.finalTotal : (item.price * item.quantity);
+
+                  return (
+                    <div key={item.id} className="py-2.5 flex items-center justify-between text-[13px]">
+                      <div className="flex items-center gap-2.5 truncate mr-2">
+                        <div className="relative w-9 h-9 rounded bg-[#f9f5f7] overflow-hidden shrink-0">
+                          <Image src={item.image} alt={item.name} fill sizes="36px" className="object-cover" />
+                        </div>
+                        <div className="truncate flex flex-col">
+                          <div className="flex items-center">
+                            <span className="font-medium text-[#38262e] truncate">{item.name}</span>
+                            <span className="inline-flex items-center font-bold text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-1.5 py-0.2 rounded text-[10px] ml-2 shrink-0">
+                              x{item.quantity}
+                            </span>
+                          </div>
+                          {isDiscounted ? (
+                            <span className="text-[10px] text-[#b73d67] font-semibold">
+                              ✨ Promo applied (-{appliedPromo?.discountPercentage}%)
+                            </span>
+                          ) : (
+                            appliedPromo && (
+                              <span className="text-[10px] text-[#7a6870]">
+                                Regular item
+                              </span>
+                            )
+                          )}
+                        </div>
                       </div>
-                      <div className="truncate flex items-center">
-                        <span className="font-medium text-[#38262e] truncate">{item.name}</span>
-                        <span className="inline-flex items-center font-bold text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-1.5 py-0.5 rounded text-[11px] ml-2 shrink-0">
-                          x{item.quantity}
+                      <div className="text-right shrink-0">
+                        <span className={`font-bold ${isDiscounted ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                          {finalLineTotal.toLocaleString()} MMK
                         </span>
+                        {isDiscounted && (
+                          <div className="text-[10px] text-[#7a6870] line-through">
+                            {(item.price * item.quantity).toLocaleString()} MMK
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <span className="font-bold text-[#38262e] shrink-0">
-                      {(item.price * item.quantity).toLocaleString()} MMK
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Promo Code Box in Checkout */}
@@ -514,9 +553,25 @@ export default function CheckoutPage() {
                   <span>{t.subTotal}</span>
                   <span className="font-semibold text-[#38262e]">{cartSubtotal.toLocaleString()} MMK</span>
                 </div>
+
+                {discount > 0 && promoSubtotal > 0 && nonPromoSubtotal > 0 && (
+                  <>
+                    <div className="flex justify-between items-center text-xs text-[#7a6870] pl-2 border-l-2 border-[#eedfe5]">
+                      <span>Promo Items Subtotal</span>
+                      <span>{promoSubtotal.toLocaleString()} MMK</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs text-[#7a6870] pl-2 border-l-2 border-[#eedfe5]">
+                      <span>Regular Items Subtotal</span>
+                      <span>{nonPromoSubtotal.toLocaleString()} MMK</span>
+                    </div>
+                  </>
+                )}
+
                 {discount > 0 && (
                   <div className="flex justify-between items-center text-[#b73d67]">
-                    <span>{t.discount} {appliedPromo ? `(${appliedPromo.discountPercentage}%)` : ''}</span>
+                    <span>
+                      {t.discount} {appliedPromo ? `(${appliedPromo.code} · ${appliedPromo.discountPercentage}%)` : ''}
+                    </span>
                     <span className="font-bold">-{discount.toLocaleString()} MMK</span>
                   </div>
                 )}
