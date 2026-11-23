@@ -80,6 +80,7 @@ export type TranslationSchema = Record<
   | 'orderSummary'
   | 'subTotal'
   | 'discount'
+  | 'discountTotal'
   | 'total'
   | 'delivery'
   | 'checkoutWithTotal'
@@ -288,6 +289,7 @@ export const translations: Record<Language, TranslationSchema> = {
     orderSummary: 'Order summary',
     subTotal: 'Sub Total',
     discount: 'Discount',
+    discountTotal: 'Discount Total',
     total: 'Total',
     delivery: 'Delivery',
     checkoutWithTotal: 'Checkout ·',
@@ -503,6 +505,7 @@ export const translations: Record<Language, TranslationSchema> = {
     orderSummary: 'အမှာစာ အကျဉ်းချုပ်',
     subTotal: 'စုစုပေါင်းကုန်ကျငွေ',
     discount: 'လျှော့စျေး',
+    discountTotal: 'စုစုပေါင်း လျှော့စျေး',
     total: 'ကျသင့်ငွေ စုစုပေါင်း',
     delivery: 'ပို့ဆောင်ခ',
     checkoutWithTotal: 'ငွေရှင်းမည် ·',
