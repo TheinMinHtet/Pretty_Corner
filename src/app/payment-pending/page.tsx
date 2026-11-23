@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import QRCode from 'qrcode';
 import { useStore } from '@/context/StoreContext';
 import OrderingStepBar from '@/components/OrderingStepBar';
+import SlideToConfirm from '@/components/SlideToConfirm';
 
 if (typeof window !== 'undefined') {
   (window as any).QRCode = QRCode;
@@ -42,9 +43,11 @@ function PaymentPendingContent() {
   const activeOrder = localOrder || remoteOrder;
 
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showSlideConfirmModal, setShowSlideConfirmModal] = useState(false);
   const [mockPaymentSuccess, setMockPaymentSuccess] = useState(false);
   const [isInitializingPayment, setIsInitializingPayment] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number>(300); // 5 minutes (300s)
 
   // 02: State Caching - cache payment session in sessionStorage & localStorage
   const cachePaymentSession = useCallback(() => {
@@ -74,6 +77,39 @@ function PaymentPendingContent() {
   }, [cleanId]);
 
   const autoResumedRef = useRef(false);
+
+  // 5-Minute MMQR Payment Countdown Timer
+  useEffect(() => {
+    if (!cleanId || activeOrder?.paymentStatus === 'paid' || activeOrder?.paymentStatus === 'cancelled' || activeOrder?.paymentStatus === 'expired') {
+      return;
+    }
+
+    let expireAt = Date.now() + 300000;
+    try {
+      const cachedTx = localStorage.getItem('mmpay_pending_tx');
+      if (cachedTx) {
+        const p = JSON.parse(cachedTx);
+        if (p.expireAt) expireAt = p.expireAt;
+      } else if (activeOrder?.createdAt) {
+        const createdMs = new Date(activeOrder.createdAt).getTime();
+        if (!isNaN(createdMs)) {
+          expireAt = createdMs + 300000;
+        }
+      }
+    } catch {}
+
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.floor((expireAt - Date.now()) / 1000));
+      setTimeLeft(remaining);
+      if (remaining <= 0) {
+        clearInterval(interval);
+        clearPaymentSession();
+        updatePaymentStatus(cleanId, 'expired');
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [cleanId, activeOrder?.paymentStatus, activeOrder?.createdAt, clearPaymentSession, updatePaymentStatus]);
 
   // 02: State Caching - Auto-resume active QR and continuing countdown on page refresh
   useEffect(() => {
@@ -118,6 +154,8 @@ function PaymentPendingContent() {
                   cancelOrder(cleanId);
                 } else if (result.expired) {
                   try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
+                  clearPaymentSession();
+                  updatePaymentStatus(cleanId, 'expired');
                 }
               };
 
@@ -304,6 +342,8 @@ function PaymentPendingContent() {
             cancelOrder(targetId);
           } else if (result.expired) {
             try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
+            clearPaymentSession();
+            updatePaymentStatus(targetId, 'expired');
           } else if (result.failed) {
             setIsInitializingPayment(false);
             setShowPaymentModal(true);
@@ -379,15 +419,8 @@ function PaymentPendingContent() {
   };
 
   const handleConfirmGatewayPayment = () => {
-    setMockPaymentSuccess(true);
-    setTimeout(() => {
-      setShowPaymentModal(false);
-      clearPaymentSession();
-      clearCart();
-      const targetId = activeOrder?.id || cleanId;
-      updatePaymentStatus(targetId, 'paid');
-      router.push(`/order-confirmation?orderId=${targetId}`);
-    }, 1000);
+    setShowPaymentModal(false);
+    setShowSlideConfirmModal(true);
   };
 
   // 03: Transaction Control - Explicit cancellation handler
@@ -463,6 +496,46 @@ function PaymentPendingContent() {
     );
   }
 
+  // Handle expired order view (5-minute timer elapsed)
+  if (activeOrder?.paymentStatus === 'expired') {
+    return (
+      <div className="w-full max-w-md mx-auto px-4 py-16 text-center">
+        <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-3">
+          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+        </div>
+        <h3 className="font-serif text-[22px] font-bold text-[#38262e] mb-2">
+          {language === 'my' ? 'အချိန်ပြည့် သက်တမ်းကုန်ဆုံးပါပြီ' : 'Payment Time Expired'}
+        </h3>
+        <p className="text-[13px] text-[#7a6870] mb-6">
+          {language === 'my'
+            ? `၅ မိနစ်အတွင်း ငွေပေးချေမှု မပြီးမြောက်ခဲ့သဖြင့် အမှာစာနံပါတ် ${cleanId} ၏ သက်တမ်းကုန်ဆုံးသွားပါသည်။`
+            : `The 5-minute payment window for order #${cleanId} has expired. Please place a new order.`}
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              clearCart();
+              router.push('/shop');
+            }}
+            className="w-full sm:w-auto inline-flex h-[44px] px-6 bg-[#b73d67] text-white rounded-lg items-center justify-center font-bold text-[14px] hover:bg-[#a33259] transition-colors cursor-pointer shadow-xs"
+          >
+            {language === 'my' ? 'ပစ္စည်းများ ပြန်လည်မှာယူရန်' : 'Start New Order'}
+          </button>
+          <Link
+            href="/bag"
+            className="w-full sm:w-auto inline-flex h-[44px] px-6 bg-white border border-[#eedfe5] text-[#38262e] rounded-lg items-center justify-center font-bold text-[14px] hover:bg-[#faf7f8] transition-colors cursor-pointer"
+          >
+            {language === 'my' ? 'စျေးဝယ်အိတ် ကြည့်ရှုမည်' : 'View Bag'}
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   const currentId = activeOrder?.id || cleanId;
   const paymentMethod = activeOrder?.paymentMethod || 'MMQR';
   const totalAmount = activeOrder?.total ?? 0;
@@ -512,6 +585,20 @@ function PaymentPendingContent() {
             {t.orderRef}: {currentId}
           </span>
 
+          {/* 5-minute Countdown Timer */}
+          <div className="mt-3 flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200/80 rounded-full text-amber-800 text-[12px] font-semibold">
+            <svg className="w-3.5 h-3.5 animate-pulse text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <span>
+              {language === 'my' ? 'ငွေပေးချေရန် ကျန်အချိန်:' : 'Time remaining:'}{' '}
+              <span className="font-mono font-bold">
+                {Math.floor(timeLeft / 60).toString().padStart(2, '0')}:{(timeLeft % 60).toString().padStart(2, '0')}
+              </span>
+            </span>
+          </div>
+
           <div className="mt-2.5 pt-2.5 border-t border-[#eedfe5]/70 w-full flex items-center justify-center gap-1.5 text-[11px] text-[#7a6870]">
             <svg className="w-3.5 h-3.5 text-[#b73d67] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
@@ -540,6 +627,18 @@ function PaymentPendingContent() {
           ) : (
             t.openPaymentPage
           )}
+        </button>
+
+        {/* Slide to Confirm Button for fast mobile confirmation */}
+        <button
+          type="button"
+          onClick={() => setShowSlideConfirmModal(true)}
+          className="w-full h-[46px] bg-[#38262e] text-white rounded-[10px] font-bold text-[13px] mt-2.5 hover:bg-[#281b21] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+          <span>{language === 'my' ? 'ငွေပေးချေပြီးကြောင်း အတည်ပြုမည်' : 'Slide to Confirm Payment'}</span>
         </button>
 
         {/* 03: Transaction Control - Explicit Cancel Order Request Button */}
@@ -671,6 +770,31 @@ function PaymentPendingContent() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Mobile-first draggable confirmation modal for MMQR */}
+      {showSlideConfirmModal && (
+        <SlideToConfirm
+          amount={totalAmount}
+          currency="MMK"
+          title="ORDER CONFIRMATION"
+          subtitle="Total amount"
+          promptText="Slide to confirm order"
+          cancelText="Cancel Order"
+          onConfirm={async () => {
+            clearPaymentSession();
+            clearCart();
+            const targetId = activeOrder?.id || cleanId;
+            updatePaymentStatus(targetId, 'paid');
+            setShowSlideConfirmModal(false);
+            router.push(`/order-confirmation?orderId=${encodeURIComponent(targetId)}`);
+          }}
+          onCancel={() => {
+            clearPaymentSession();
+            cancelOrder(cleanId);
+            setShowSlideConfirmModal(false);
+          }}
+        />
       )}
       </div>
     </div>
