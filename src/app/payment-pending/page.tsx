@@ -41,7 +41,7 @@ function PaymentPendingContent() {
   const [isInitializingPayment, setIsInitializingPayment] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
 
-  // 02: State Caching - cache payment session in sessionStorage
+  // 02: State Caching - cache payment session in sessionStorage & localStorage
   const cachePaymentSession = useCallback(() => {
     if (typeof window !== 'undefined' && cleanId) {
       try {
@@ -57,10 +57,67 @@ function PaymentPendingContent() {
     if (typeof window !== 'undefined' && cleanId) {
       try {
         sessionStorage.removeItem(`pretty_corner_mmpay_active_${cleanId}`);
+        const cachedTx = localStorage.getItem('mmpay_pending_tx');
+        if (cachedTx) {
+          const parsed = JSON.parse(cachedTx);
+          if (parsed.payload?.orderId?.trim().toUpperCase() === cleanId) {
+            localStorage.removeItem('mmpay_pending_tx');
+          }
+        }
       } catch {}
     }
   }, [cleanId]);
 
+  // 02: State Caching - Auto-resume active QR and continuing countdown on page refresh
+  useEffect(() => {
+    if (typeof window === 'undefined' || !cleanId || activeOrder?.paymentStatus === 'paid' || activeOrder?.paymentStatus === 'cancelled') return;
+    const pubKey = process.env.NEXT_PUBLIC_MMPAY_PUBLISHABLE_KEY;
+    if (!pubKey) return;
+
+    try {
+      const cachedTx = localStorage.getItem('mmpay_pending_tx');
+      if (cachedTx) {
+        const parsed = JSON.parse(cachedTx);
+        const isCurrentOrder = parsed.payload?.orderId?.trim().toUpperCase() === cleanId;
+        const isStillValid = Date.now() < (parsed.expireAt || 0);
+
+        if (isCurrentOrder && isStillValid) {
+          void (async () => {
+            try {
+              const { MMPaySDK } = await import('mmpay-browser-sdk');
+              const mmpay = new MMPaySDK(pubKey, {
+                merchantName: 'Pretty Corner',
+                environment: 'sandbox',
+                design: {
+                  mode: 'light',
+                  color: '#b73d67',
+                },
+              });
+
+              await mmpay.pay(cleanId, (result: any) => {
+                if (result.success) {
+                  try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
+                  clearPaymentSession();
+                  updatePaymentStatus(cleanId, 'paid');
+                  router.push(`/order-confirmation?orderId=${cleanId}`);
+                } else if (result.cancelled) {
+                  try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
+                  clearPaymentSession();
+                  cancelOrder(cleanId);
+                } else if (result.expired) {
+                  try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
+                }
+              });
+            } catch (err) {
+              console.warn('Failed to auto-resume pending payment modal:', err);
+            }
+          })();
+        } else if (isCurrentOrder && !isStillValid) {
+          localStorage.removeItem('mmpay_pending_tx');
+        }
+      }
+    } catch {}
+  }, [cleanId, activeOrder?.paymentStatus, clearPaymentSession, updatePaymentStatus, router, cancelOrder]);
 
   // 01: Seamless Transitions - auto-detect payment upon returning from banking app & background polling
   useEffect(() => {
@@ -115,14 +172,26 @@ function PaymentPendingContent() {
   // 04: Duplicate Prevention - warning on accidental refresh during active payment initialization
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (isInitializingPayment || showPaymentModal) {
+      let hasActivePending = false;
+      if (typeof window !== 'undefined') {
+        try {
+          const tx = localStorage.getItem('mmpay_pending_tx');
+          if (tx) {
+            const p = JSON.parse(tx);
+            if (p.payload?.orderId?.trim().toUpperCase() === cleanId && Date.now() < (p.expireAt || 0)) {
+              hasActivePending = true;
+            }
+          }
+        } catch {}
+      }
+      if (isInitializingPayment || showPaymentModal || hasActivePending) {
         e.preventDefault();
         e.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [isInitializingPayment, showPaymentModal]);
+  }, [cleanId, isInitializingPayment, showPaymentModal]);
 
   const handleOpenPaymentGateway = async () => {
     const pubKey = process.env.NEXT_PUBLIC_MMPAY_PUBLISHABLE_KEY;
@@ -144,24 +213,91 @@ function PaymentPendingContent() {
           },
         });
 
-        await mmpay.showPaymentModal(
-          {
-            orderId: targetId,
-            amount: amountToPay,
-            nonce: Date.now().toString(),
-            callbackUrl: 'https://pretty-corner.vercel.app/api/payment/webhook',
-          },
-          (result: any) => {
-            if (result.success) {
-              clearPaymentSession();
-              updatePaymentStatus(targetId, 'paid');
-              router.push(`/order-confirmation?orderId=${targetId}`);
-            } else if (result.failed) {
-              setIsInitializingPayment(false);
-              setShowPaymentModal(true);
-            }
+        const handleSDKResult = (result: any) => {
+          if (result.created) {
+            // Save state to localStorage for seamless refresh recovery (Rule 02)
+            try {
+              const pendingPayload = (mmpay as any).pendingPaymentPayload;
+              const pendingApiResponse = (mmpay as any).pendingApiResponse;
+              const token = (mmpay as any).api?.getToken();
+              if (pendingPayload && pendingApiResponse) {
+                localStorage.setItem(
+                  'mmpay_pending_tx',
+                  JSON.stringify({
+                    payload: pendingPayload,
+                    apiResponse: pendingApiResponse,
+                    expireAt: Date.now() + 300000,
+                    token: token,
+                    environment: (mmpay as any).environment || 'sandbox',
+                  })
+                );
+              }
+            } catch {}
+          } else if (result.success) {
+            try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
+            clearPaymentSession();
+            updatePaymentStatus(targetId, 'paid');
+            router.push(`/order-confirmation?orderId=${targetId}`);
+          } else if (result.cancelled) {
+            try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
+            clearPaymentSession();
+            cancelOrder(targetId);
+          } else if (result.expired) {
+            try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
+          } else if (result.failed) {
+            setIsInitializingPayment(false);
+            setShowPaymentModal(true);
           }
-        );
+        };
+
+        // Rule 02 & 03: Check if valid unexpired transaction instance exists to prevent duplicate request
+        const cachedRaw = localStorage.getItem('mmpay_pending_tx');
+        let hasActiveCache = false;
+        if (cachedRaw) {
+          try {
+            const parsed = JSON.parse(cachedRaw);
+            if (
+              parsed.payload?.orderId?.trim().toUpperCase() === targetId.trim().toUpperCase() &&
+              Date.now() < (parsed.expireAt || 0)
+            ) {
+              hasActiveCache = true;
+            }
+          } catch {}
+        }
+
+        if (hasActiveCache) {
+          await mmpay.pay(targetId, handleSDKResult);
+        } else {
+          await mmpay.showPaymentModal(
+            {
+              orderId: targetId,
+              amount: amountToPay,
+              nonce: Date.now().toString(),
+              callbackUrl: 'https://pretty-corner.vercel.app/api/payment/webhook',
+            },
+            handleSDKResult
+          );
+
+          // Safeguard: ensure created transaction is cached for continuous timer and refresh restoration
+          try {
+            const pendingPayload = (mmpay as any).pendingPaymentPayload;
+            const pendingApiResponse = (mmpay as any).pendingApiResponse;
+            const token = (mmpay as any).api?.getToken();
+            if (pendingPayload && pendingApiResponse) {
+              localStorage.setItem(
+                'mmpay_pending_tx',
+                JSON.stringify({
+                  payload: pendingPayload,
+                  apiResponse: pendingApiResponse,
+                  expireAt: Date.now() + 300000,
+                  token: token,
+                  environment: (mmpay as any).environment || 'sandbox',
+                })
+              );
+            }
+          } catch {}
+        }
+
         setIsInitializingPayment(false);
         return;
       } catch (err) {

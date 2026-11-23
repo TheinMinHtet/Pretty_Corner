@@ -3,8 +3,10 @@ declare module 'mmpay-browser-sdk' {
     constructor(key: string, options?: any);
     renderQR(options: any): Promise<any>;
     showPaymentModal(options: any, callback?: (result: any) => void): Promise<any>;
+    pay(orderId: string, callback?: (result: any) => void): Promise<any>;
     on(event: string, callback: (result: any) => void): void;
     close(): void;
+    [key: string]: any;
   }
 }
 

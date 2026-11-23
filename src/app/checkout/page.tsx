@@ -138,13 +138,6 @@ export default function CheckoutPage() {
     }
 
     const isCOD = paymentMethod === 'Cash on Delivery';
-    // Rule 03: Transaction Control - Do not create duplicate transaction if active order exists
-    if (activePendingOrder && !isCOD) {
-      setIsSubmitting(true);
-      router.push(`/payment-pending?orderId=${encodeURIComponent(activePendingOrder.id)}`);
-      return;
-    }
-
     const completeAddress = streetAddress.trim();
 
     setIsSubmitting(true);
