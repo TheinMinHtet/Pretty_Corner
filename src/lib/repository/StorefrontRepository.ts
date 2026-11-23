@@ -191,7 +191,7 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
             )
           `)
           .eq('is_active', true)
-          .order('created_at', { ascending: true });
+          .order('created_at', { ascending: false });
 
         if (!error && data && data.length > 0) {
           return (data as unknown as SupabaseProductRow[]).map(mapProductRow);

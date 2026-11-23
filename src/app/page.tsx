@@ -75,9 +75,9 @@ export default function HomePage() {
       : products.filter((p) => p.category === activeCategory);
   }, [products, activeCategory]);
 
-  // Show top 4 curated highlights as preview
+  // Show top curated highlights as preview (up to 8 products)
   const displayedProducts = useMemo(() => {
-    return matchingProducts.slice(0, 4);
+    return matchingProducts.slice(0, 8);
   }, [matchingProducts]);
 
   return (
