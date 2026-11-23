@@ -179,7 +179,7 @@ export default function SlideToConfirm({
 
             {/* Hint Text Inside Track */}
             <div
-              className="w-full text-center text-[13px] font-medium text-[#7a6870] pointer-events-none transition-opacity duration-150 flex items-center justify-center gap-1.5"
+              className="w-full pl-14 sm:pl-16 pr-3 text-center text-[12px] sm:text-[13px] font-medium text-[#7a6870] pointer-events-none transition-opacity duration-150 flex items-center justify-center gap-1.5 whitespace-nowrap"
               style={{ opacity: Math.max(0, 1 - dragProgress * 1.5) }}
             >
               {isSubmitting ? (
@@ -189,8 +189,8 @@ export default function SlideToConfirm({
                 </span>
               ) : (
                 <>
-                  <span>{promptText}</span>
-                  <svg className="w-3.5 h-3.5 text-[#b73d67]/70 animate-pulse hidden sm:inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <span className="whitespace-nowrap">{promptText}</span>
+                  <svg className="w-3.5 h-3.5 text-[#b73d67]/70 animate-pulse hidden sm:inline shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
                 </>

@@ -149,19 +149,19 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
             {/* Purchase Controls (Quantity + Add to Bag) */}
             <div className="mt-6 pt-6 border-t border-[#eedfe5]">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 {/* Quantity Selector */}
-                <div className="h-[52px] w-[120px] border border-[#eedfe5] rounded-[10px] flex items-center justify-between px-3 text-[#38262e] bg-white">
+                <div className="h-[46px] sm:h-[52px] w-[84px] sm:w-[110px] border border-[#eedfe5] rounded-[10px] flex items-center justify-between px-2 sm:px-3 text-[#38262e] bg-white shrink-0">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-1 hover:text-[#b73d67] text-[20px] font-medium cursor-pointer"
+                    className="p-1 hover:text-[#b73d67] text-[18px] sm:text-[20px] font-medium cursor-pointer"
                   >
                     −
                   </button>
-                  <span className="text-[16px] font-semibold">{quantity}</span>
+                  <span className="text-[14px] sm:text-[16px] font-semibold">{quantity}</span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="p-1 hover:text-[#b73d67] text-[20px] font-medium cursor-pointer"
+                    className="p-1 hover:text-[#b73d67] text-[18px] sm:text-[20px] font-medium cursor-pointer"
                   >
                     +
                   </button>
@@ -170,19 +170,22 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {/* Big Add to Bag Button */}
                 <button
                   onClick={handleAddToCart}
-                  className={`flex-1 h-[52px] ${
+                  className={`flex-1 min-w-0 h-[46px] sm:h-[52px] px-2.5 sm:px-4 ${
                     isAdded ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-[#b73d67] hover:bg-[#a33259]'
-                  } text-white rounded-[10px] font-bold text-[15px] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer`}
+                  } text-white rounded-[10px] font-bold text-[13px] sm:text-[15px] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer whitespace-nowrap`}
                 >
                   {isAdded ? (
                     <>
-                      <svg className="w-5 h-5 animate-in zoom-in-75 duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <path d="M20 6L9 17l-5-5" />
                       </svg>
-                      <span>{t.addedToBag}</span>
+                      <span className="whitespace-nowrap">{t.addedToBag}</span>
                     </>
                   ) : (
-                    `${t.addToBag} · ${totalPrice.toLocaleString()} MMK`
+                    <>
+                      <span className="whitespace-nowrap">{t.addToBag}</span>
+                      <span className="opacity-90 font-medium whitespace-nowrap text-[12px] sm:text-[14px]">· {totalPrice.toLocaleString()} MMK</span>
+                    </>
                   )}
                 </button>
               </div>
