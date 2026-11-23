@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase, getSupabaseAdmin } from '@/lib/supabase';
 import { Order, CartItem, Promotion } from '@/lib/types';
 import { calculatePricing } from '@/lib/cart/CartEngine';
+import { checkRateLimit } from '@/lib/rateLimit';
+import { normalizeMyanmarDigits } from '@/lib/validation';
 
 function isUuid(val?: string): boolean {
   return Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val));
@@ -15,54 +17,122 @@ function getAdminClient() {
   }
 }
 
-function corsHeaders() {
+function corsHeaders(req?: NextRequest) {
+  const origin = req?.headers.get('origin');
+  const allowedOrigin = process.env.NEXT_PUBLIC_SITE_URL || 'https://pretty-corner.vercel.app';
+  let allowOrigin = allowedOrigin;
+  if (origin && (origin === allowedOrigin || origin.startsWith('http://localhost:'))) {
+    allowOrigin = origin;
+  }
   return {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': allowOrigin,
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
 }
 
-export async function OPTIONS() {
+export async function OPTIONS(request: NextRequest) {
   return new NextResponse(null, {
     status: 204,
-    headers: corsHeaders(),
+    headers: corsHeaders(request),
   });
 }
 
 export async function GET(request: NextRequest) {
   try {
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      '127.0.0.1';
+    const rateCheck = checkRateLimit(`get_orders_${ip}`, 60, 10 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please wait a few moments before trying again.' },
+        { status: 429, headers: corsHeaders(request) }
+      );
+    }
+
     const client = getAdminClient();
     if (!client) {
-      return NextResponse.json({ error: 'Database client unavailable' }, { status: 503, headers: corsHeaders() });
+      return NextResponse.json({ error: 'Database client unavailable' }, { status: 503, headers: corsHeaders(request) });
     }
 
     const { searchParams } = new URL(request.url);
     const phone = searchParams.get('phone');
     const orderId = searchParams.get('orderId');
+    const authHeader = request.headers.get('authorization') || '';
+    const adminSecret = process.env.ADMIN_API_SECRET;
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+    const isAdmin = Boolean(adminSecret && token && token === adminSecret);
 
     let query = client
       .from('orders')
       .select('*, order_items(*)')
       .order('created_at', { ascending: false });
 
-    if (orderId) {
-      query = query.ilike('id', orderId.trim());
-    } else if (phone) {
-      query = query.ilike('phone', `%${phone.trim()}%`);
+    if (isAdmin) {
+      if (orderId) {
+        query = query.ilike('id', orderId.trim());
+      } else if (phone) {
+        query = query.ilike('phone', `%${phone.trim()}%`);
+      } else {
+        query = query.limit(25);
+      }
+      const { data, error } = await query;
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders(request) });
+      }
+      return NextResponse.json({ orders: data || [] }, { headers: corsHeaders(request) });
+    } else if (orderId && phone) {
+      const cleanOrderId = orderId.trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
+      const normalizedPhone = normalizeMyanmarDigits(phone.trim());
+      const cleanPhone = normalizedPhone.replace(/[^0-9]/g, '');
+
+      if (cleanPhone.length < 7) {
+        return NextResponse.json(
+          { error: 'Valid phone number with at least 7 digits is required for order lookup verification.' },
+          { status: 400, headers: corsHeaders(request) }
+        );
+      }
+
+      // Fetch the exact order by sanitized ID using server admin client
+      const { data: orderData, error: fetchErr } = await client
+        .from('orders')
+        .select('*, order_items(*)')
+        .eq('id', cleanOrderId)
+        .maybeSingle();
+
+      if (fetchErr) {
+        return NextResponse.json({ error: fetchErr.message }, { status: 500, headers: corsHeaders(request) });
+      }
+
+      if (!orderData) {
+        return NextResponse.json({ orders: [] }, { headers: corsHeaders(request) });
+      }
+
+      // Authoritative server-side phone number verification
+      const orderPhoneDigits = normalizeMyanmarDigits(orderData.phone || '').replace(/[^0-9]/g, '');
+      const isMatch =
+        orderPhoneDigits === cleanPhone ||
+        (cleanPhone.length >= 7 && (orderPhoneDigits.endsWith(cleanPhone) || cleanPhone.endsWith(orderPhoneDigits)));
+
+      if (!isMatch) {
+        return NextResponse.json(
+          { error: 'Unauthorized: Order ID and Phone Number do not match.' },
+          { status: 401, headers: corsHeaders(request) }
+        );
+      }
+
+      return NextResponse.json({ orders: [orderData] }, { headers: corsHeaders(request) });
     } else {
-      query = query.limit(25);
+      return NextResponse.json(
+        { error: 'Unauthorized: Admin authentication token or verified Order ID and Phone required.' },
+        { status: 401, headers: corsHeaders(request) }
+      );
     }
-
-    const { data, error } = await query;
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500, headers: corsHeaders() });
-    }
-
-    return NextResponse.json({ orders: data || [] }, { headers: corsHeaders() });
   } catch (error) {
     console.error('GET /api/orders error:', error);
-    return NextResponse.json({ error: 'Failed to retrieve orders' }, { status: 500, headers: corsHeaders() });
+    return NextResponse.json({ error: 'Failed to retrieve orders' }, { status: 500, headers: corsHeaders(request) });
   }
 }
 
@@ -71,8 +141,20 @@ export async function POST(request: NextRequest) {
   const client = getAdminClient();
 
   try {
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      '127.0.0.1';
+    const rateCheck = checkRateLimit(`post_orders_${ip}`, 10, 10 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: 'Order submission rate limit reached. Please wait a few minutes before submitting another order.' },
+        { status: 429, headers: corsHeaders(request) }
+      );
+    }
+
     if (!client) {
-      return NextResponse.json({ error: 'Database service unavailable' }, { status: 503, headers: corsHeaders() });
+      return NextResponse.json({ error: 'Database service unavailable' }, { status: 503, headers: corsHeaders(request) });
     }
 
     const body = await request.json();
@@ -95,27 +177,46 @@ export async function POST(request: NextRequest) {
     if (!customerName?.trim() || !phone?.trim() || !deliveryAddress?.trim()) {
       return NextResponse.json(
         { error: 'Customer name, phone number, and delivery address are required.' },
-        { status: 400, headers: corsHeaders() }
+        { status: 400, headers: corsHeaders(request) }
       );
     }
 
     if (!Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
         { error: 'Order must contain at least one item.' },
-        { status: 400, headers: corsHeaders() }
+        { status: 400, headers: corsHeaders(request) }
       );
     }
 
-    // 2. Normalize Line Items & Stock Availability Check
-    const normalizedItems: CartItem[] = items.map((it: any) => ({
-      id: it.id || it.productId,
-      productId: it.productId,
-      name: it.name,
-      size: it.size || '',
-      price: Number(it.price) || 0,
-      quantity: Number(it.quantity) || 1,
-      image: it.image || '',
-    }));
+    // 2. Normalize Line Items, Cap Max Quantity, & Stock Availability Check
+    const MAX_QUANTITY_PER_ITEM = 10;
+    const normalizedItems: CartItem[] = items.map((it: any) => {
+      const parsedQty = Math.floor(Number(it.quantity) || 1);
+      return {
+        id: it.id || it.productId,
+        productId: String(it.productId || ''),
+        name: String(it.name || ''),
+        size: String(it.size || ''),
+        price: Number(it.price) || 0,
+        quantity: Math.max(1, parsedQty),
+        image: String(it.image || ''),
+      };
+    });
+
+    for (const item of normalizedItems) {
+      if (!item.productId || item.quantity <= 0 || !Number.isFinite(item.quantity)) {
+        return NextResponse.json(
+          { error: 'All items must have a valid product ID and a positive quantity.' },
+          { status: 400, headers: corsHeaders(request) }
+        );
+      }
+      if (item.quantity > MAX_QUANTITY_PER_ITEM) {
+        return NextResponse.json(
+          { error: `Maximum quantity per item is limited to ${MAX_QUANTITY_PER_ITEM} units. Please adjust your bag quantity.` },
+          { status: 400, headers: corsHeaders(request) }
+        );
+      }
+    }
 
     for (const item of normalizedItems) {
       if (item.productId) {
@@ -123,7 +224,9 @@ export async function POST(request: NextRequest) {
         if (isUuid(item.productId)) {
           prodQuery = prodQuery.eq('id', item.productId);
         } else {
-          prodQuery = prodQuery.or(`slug.eq.${item.productId},name.eq.${item.name}`);
+          const safeId = item.productId.replace(/[^a-zA-Z0-9_-]/g, '');
+          const safeName = item.name.replace(/[,()]/g, '');
+          prodQuery = prodQuery.or(`slug.eq.${safeId},name.eq.${safeName}`);
         }
         const { data: prodData } = await prodQuery.maybeSingle();
         if (prodData && typeof prodData.stock_quantity === 'number') {
@@ -132,7 +235,7 @@ export async function POST(request: NextRequest) {
               {
                 error: `${prodData.name} only has ${prodData.stock_quantity} unit(s) remaining in stock. Please adjust your bag quantity.`,
               },
-              { status: 409, headers: corsHeaders() }
+              { status: 409, headers: corsHeaders(request) }
             );
           }
         }
@@ -256,6 +359,16 @@ export async function POST(request: NextRequest) {
         category: cat?.slug || undefined,
       };
     });
+
+    // Authoritative Price Overwrite: Never trust client-supplied prices
+    for (const item of normalizedItems) {
+      const matchedDb = catalogProducts.find(
+        (p) => p.id === item.productId || p.slug === item.productId || p.name === item.name
+      );
+      if (matchedDb && typeof matchedDb.price === 'number') {
+        item.price = matchedDb.price;
+      }
+    }
 
     const pricing = calculatePricing(normalizedItems, matchedPromo, 0, 0, catalogProducts);
     promoDiscount = pricing.discountAmount;
@@ -386,7 +499,9 @@ export async function POST(request: NextRequest) {
         if (isUuid(item.productId)) {
           prodQuery = prodQuery.eq('id', item.productId);
         } else {
-          prodQuery = prodQuery.or(`slug.eq.${item.productId},name.eq.${item.name}`);
+          const safeId = item.productId.replace(/[^a-zA-Z0-9_-]/g, '');
+          const safeName = item.name.replace(/[,()]/g, '');
+          prodQuery = prodQuery.or(`slug.eq.${safeId},name.eq.${safeName}`);
         }
         const { data: currentProd } = await prodQuery.maybeSingle();
 

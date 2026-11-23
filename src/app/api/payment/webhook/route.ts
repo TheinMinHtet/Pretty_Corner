@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'node:crypto';
 import { getServerMMPaySdk, getMMPayConfig, handlePaymentSuccess } from '@/lib/mmpay';
+import { getStorefrontRepository } from '@/lib/repository/StorefrontRepository';
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // Fallback verification across MyanMyanPay HMAC formats
+      // Fallback verification across MyanMyanPay HMAC formats with constant-time equality
       if (!isValid) {
         const checkFormats = [
           `${nonce}.${rawBody}`, // Standard MyanMyanPay specification: nonce.body
@@ -41,20 +42,34 @@ export async function POST(req: NextRequest) {
             .createHmac('sha256', config.secretKey)
             .update(candidate)
             .digest('hex');
-          if (expected.toLowerCase() === signature.toLowerCase()) {
+
+          const bufExpected = Buffer.from(expected.toLowerCase(), 'utf8');
+          const bufSignature = Buffer.from(signature.toLowerCase(), 'utf8');
+
+          if (
+            bufExpected.length === bufSignature.length &&
+            crypto.timingSafeEqual(bufExpected, bufSignature)
+          ) {
             isValid = true;
             break;
           }
         }
       }
     } else {
-      // If keys are not set up yet (sandbox testing without credentials), accept with warning in dev
+      // If keys are not set up yet in local development, accept simulation only outside production
       if (process.env.NODE_ENV !== 'production' && !config.isConfigured) {
         isValid = true;
       }
     }
 
-    if (!isValid && config.isConfigured) {
+    if (!config.isConfigured && process.env.NODE_ENV === 'production') {
+      return NextResponse.json(
+        { error: 'Payment gateway configuration is missing' },
+        { status: 503 }
+      );
+    }
+
+    if (!isValid) {
       return NextResponse.json(
         { error: 'Invalid MyanMyanPay signature' },
         { status: 401 }
@@ -80,8 +95,26 @@ export async function POST(req: NextRequest) {
     const { orderId, status } = payload;
 
     if (orderId && (status === 'SUCCESS' || status === 'PAID')) {
-      await handlePaymentSuccess(orderId);
-      console.log(`[MyanMyanPay Webhook] Order ${orderId} marked as paid successfully.`);
+      const cleanOrderId = orderId.trim().toUpperCase();
+      const repo = getStorefrontRepository();
+      const order = await repo.findOrder(cleanOrderId);
+
+      if (order) {
+        const expectedTotal = Math.round(order.total);
+        if (typeof payload.amount === 'number' && payload.amount < expectedTotal) {
+          console.warn(
+            `[MyanMyanPay Webhook] Underpayment detected for ${cleanOrderId}: expected ${expectedTotal}, got ${payload.amount}`
+          );
+          return NextResponse.json(
+            { error: 'Payment amount does not match order total' },
+            { status: 400 }
+          );
+        }
+        await handlePaymentSuccess(cleanOrderId);
+        console.log(`[MyanMyanPay Webhook] Order ${cleanOrderId} marked as paid successfully.`);
+      } else {
+        console.warn(`[MyanMyanPay Webhook] Order ${cleanOrderId} not found.`);
+      }
     }
 
     // MyanMyanPay requires HTTP 200 with { received: true }
