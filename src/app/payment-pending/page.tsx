@@ -487,6 +487,19 @@ function PaymentPendingContent() {
           <span className="text-[12px] text-[#7a6870] mt-1.5 font-medium">
             {t.orderRef}: {currentId}
           </span>
+
+          <div className="mt-2.5 pt-2.5 border-t border-[#eedfe5]/70 w-full flex items-center justify-center gap-1.5 text-[11px] text-[#7a6870]">
+            <svg className="w-3.5 h-3.5 text-[#b73d67] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            <span>
+              {language === 'my'
+                ? 'အမှာစာအခြေအနေနှင့် ပြေစာစစ်ဆေးရန် ဤ Order ID ကို သိမ်းဆည်းထားပေးပါ။'
+                : 'Please save this Order ID to check your order status & receipt.'}
+            </span>
+          </div>
         </div>
 
         {/* Open Secure Payment Page CTA */}
