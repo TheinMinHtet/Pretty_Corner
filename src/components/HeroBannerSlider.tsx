@@ -4,10 +4,10 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useStore } from '@/context/StoreContext';
-import { resolvePromotionDestination } from '@/lib/promotion/resolvePromotionDestination';
+import { resolvePromotionDestination, evaluatePromotionAction } from '@/lib/promotion/resolvePromotionDestination';
 
 export default function HeroBannerSlider() {
-  const { promotions, t, language, applyPromoCode } = useStore();
+  const { promotions, promotionsLoading, t, language, applyPromoCode } = useStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [cycleCount, setCycleCount] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -15,16 +15,8 @@ export default function HeroBannerSlider() {
 
   const touchStartX = useRef<number | null>(null);
 
-  // Filter only active, in-stock, non-expired, and non-exhausted promotions
-  const now = new Date();
-  const activePromos = promotions.filter((p) => {
-    if (p.active === false || p.isOutOfStock === true) return false;
-    if (p.endDate && new Date(p.endDate) < now) return false;
-    if (p.usageLimit !== null && p.usageLimit !== undefined && (p.usageCount ?? 0) >= p.usageLimit) {
-      return false;
-    }
-    return true;
-  });
+  // Filter only valid, active, in-stock, non-expired promotions using deep promotion evaluator
+  const activePromos = promotions.filter((p) => evaluatePromotionAction(p).isValid);
   const totalSlides = activePromos.length;
 
   const nextSlide = useCallback(() => {
@@ -85,29 +77,55 @@ export default function HeroBannerSlider() {
     }
   };
 
-  // State 0: Fallback to default editorial hero if no active promotions
-  if (totalSlides === 0) {
+  // Loading state shimmer before promotions are resolved
+  if (promotionsLoading && promotions.length === 0) {
     return (
       <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 md:pt-6">
-        <div className="relative w-full h-[330px] sm:h-[410px] md:h-[480px] lg:h-[520px] rounded-[20px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs">
+        <div className="w-full h-[360px] sm:h-[440px] md:h-[500px] lg:h-[540px] rounded-[24px] sm:rounded-[36px] bg-[#faf7f8] border border-[#eedfe5]/70 skeleton-shimmer" />
+      </section>
+    );
+  }
+
+  // State 0: Fallback to default editorial hero if no active promotions
+  if (totalSlides === 0) {
+    const quickCategories = [
+      { name: t.catSkincare, href: '/shop?category=skincare' },
+      { name: t.catElectrical, href: '/shop?category=electrical' },
+      { name: t.catMakeup, href: '/shop?category=makeup' },
+      { name: t.catLenses, href: '/shop?category=lenses' },
+    ];
+
+    return (
+      <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 md:pt-6">
+        <div className="relative w-full h-[360px] sm:h-[440px] md:h-[500px] lg:h-[540px] rounded-[24px] sm:rounded-[36px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs group select-none">
+          {/* Editorial Background Image with Subtle Ambient Drift on Hover */}
           <Image
             src="/assets/hero-banner.jpg"
             alt="Pretty Corner Hero"
             fill
             priority
             sizes="(max-width: 768px) 100vw, 1280px"
-            className="object-cover pointer-events-none"
+            className="object-cover pointer-events-none transition-transform duration-[7000ms] ease-out group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/75 via-white/40 to-transparent pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-white/35 via-transparent to-transparent pointer-events-none" />
 
+          {/* Layered Perplexity-Style Luminous Gradient Masks */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 md:via-white/60 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/40 to-transparent pointer-events-none" />
+
+          {/* Hero Content Shell */}
           <div className="absolute inset-0 p-5 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-between z-10">
-            <div className="max-w-lg">
-              <span className="inline-block font-sans text-[10.5px] sm:text-[12px] font-bold tracking-[1.5px] sm:tracking-[2px] text-[#b73d67] uppercase bg-white/80 backdrop-blur-xs px-3 py-0.5 sm:py-1 rounded-full border border-[#f1d3df] shadow-2xs">
-                {t.heroBadge}
-              </span>
+            <div className="max-w-xl">
+              {/* Frosted Capsule Brand Badge */}
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1 rounded-full bg-white/90 backdrop-blur-md border border-[#f1d3df] shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-[#b73d67] animate-pulse" />
+                <span className="font-sans text-[10.5px] sm:text-[12px] font-bold tracking-[1.5px] sm:tracking-[2px] text-[#b73d67] uppercase">
+                  {t.heroBadge}
+                </span>
+              </div>
+
+              {/* Bold, Font-Black Display Headline */}
               <h2
-                className={`font-serif font-medium leading-[1.1] text-[#38262e] mt-2 sm:mt-3 ${
+                className={`font-serif font-black leading-[1.08] text-[#22131b] tracking-tight mt-2.5 sm:mt-4 ${
                   language === 'my'
                     ? 'text-[24px] sm:text-[34px] md:text-[42px] lg:text-[48px]'
                     : 'text-[30px] sm:text-[44px] md:text-[54px] lg:text-[60px]'
@@ -117,18 +135,69 @@ export default function HeroBannerSlider() {
                 <br />
                 {t.heroTitleLine2}
               </h2>
-              <p className="font-sans text-[13.5px] sm:text-[16px] font-medium text-[#2e1d25] leading-relaxed mt-2 sm:mt-3 max-w-md line-clamp-2 sm:line-clamp-none">
+
+              {/* Refined Supporting Copy */}
+              <p className="font-sans text-[13.5px] sm:text-[16px] font-normal text-[#422c36] leading-relaxed mt-2.5 sm:mt-3.5 max-w-lg line-clamp-2 sm:line-clamp-none">
                 {t.heroDescription}
               </p>
             </div>
 
-            <div>
-              <Link
-                href="/shop"
-                className="inline-flex items-center justify-center bg-[#b73d67] text-white text-[13px] sm:text-[15px] font-bold h-[42px] sm:h-[50px] px-6 sm:px-8 rounded-[12px] sm:rounded-[14px] shadow-sm hover:bg-[#a33259] active:scale-[0.98] transition-all"
-              >
-                {t.heroCta}
-              </Link>
+            {/* Bottom Actions & Category Jump Chips */}
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <Link
+                  href="/shop"
+                  className="inline-flex items-center justify-center gap-2 bg-[#b73d67] text-white text-[13px] sm:text-[15px] font-bold h-[44px] sm:h-[50px] px-6 sm:px-8 rounded-[14px] sm:rounded-[16px] shadow-sm hover:bg-[#a33259] hover:shadow-md active:scale-[0.98] transition-all group/btn"
+                >
+                  <span>{t.heroCta}</span>
+                  <svg
+                    className="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </Link>
+
+                {/* Direct Category Jump Chips */}
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  {quickCategories.map((cat) => (
+                    <Link
+                      key={cat.href}
+                      href={cat.href}
+                      className="inline-flex items-center text-[11px] sm:text-[12.5px] font-semibold text-[#422c36] hover:text-[#b73d67] bg-white/85 hover:bg-white backdrop-blur-xs border border-[#eedfe5] hover:border-[#b73d67]/40 px-3 py-1 sm:py-1.5 rounded-full shadow-2xs transition-all active:scale-[0.97]"
+                    >
+                      {cat.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Minimalist Trust Indicator Strip */}
+              <div className="hidden sm:flex items-center gap-4 text-[11.5px] font-medium text-[#6e5862] pt-1">
+                <span className="inline-flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5 text-[#b73d67]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {language === 'my' ? '၁၀၀% စစ်မှန်သော ပစ္စည်းများ' : '100% Authentic Curation'}
+                </span>
+                <span className="w-1 h-1 rounded-full bg-[#eedfe5]" />
+                <span className="inline-flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5 text-[#b73d67]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  {language === 'my' ? 'မြန်မာတစ်နိုင်ငံလုံး အမြန်ပို့ဆောင်မှု' : 'Express Delivery across Myanmar'}
+                </span>
+                <span className="w-1 h-1 rounded-full bg-[#eedfe5]" />
+                <span className="inline-flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5 text-[#b73d67]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  {language === 'my' ? 'စိတ်ချရသော ငွေပေးချေမှုစနစ်' : 'COD & Mobile Banking'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -139,7 +208,7 @@ export default function HeroBannerSlider() {
   return (
     <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 md:pt-6">
       <div
-        className="relative w-full h-[330px] sm:h-[410px] md:h-[480px] lg:h-[520px] rounded-[20px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs select-none"
+        className="relative w-full h-[340px] sm:h-[410px] md:h-[480px] lg:h-[520px] rounded-[22px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs select-none"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={handleTouchStart}
@@ -149,15 +218,10 @@ export default function HeroBannerSlider() {
         {activePromos.map((promo, idx) => {
           const isActive = idx === currentIndex;
           const bannerImage = promo.imageUrl || '/assets/hero-banner.jpg';
-          const badgeText = promo.bannerBadge || `${promo.discountPercentage}% OFF EXCLUSIVE`;
-          const ctaLabel = promo.ctaText || t.heroCta;
-          const ctaDestination = resolvePromotionDestination({
-            targetType: promo.targetType,
-            promotionSlug: promo.slug,
-            targetSlug: promo.targetSlug,
-            code: promo.code,
-            featuredProductIds: promo.featuredProductIds,
-          });
+          const action = evaluatePromotionAction(promo, { language, defaultCta: t.heroCta });
+          const badgeText = action.badgeLabel;
+          const ctaLabel = action.ctaLabel;
+          const ctaDestination = action.destinationUrl;
 
           return (
             <div
@@ -181,8 +245,8 @@ export default function HeroBannerSlider() {
               </div>
 
               {/* Editorial Gradient Overlays */}
-              <div className="absolute inset-0 bg-gradient-to-r from-white/85 via-white/45 to-transparent pointer-events-none" />
-              <div className="absolute inset-0 bg-gradient-to-t from-white/35 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/55 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-white/40 via-transparent to-transparent pointer-events-none" />
 
               {/* Slide Content with Staggered Entrance Animations */}
               <div className="absolute inset-0 p-4 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-between">
@@ -205,7 +269,7 @@ export default function HeroBannerSlider() {
                     } ${
                       language === 'my'
                         ? 'text-[22px] sm:text-[34px] md:text-[42px] lg:text-[48px]'
-                        : 'text-[26px] sm:text-[42px] md:text-[54px] lg:text-[62px]'
+                        : 'text-[25px] sm:text-[42px] md:text-[54px] lg:text-[62px]'
                     }`}
                   >
                     {promo.title}
@@ -214,7 +278,7 @@ export default function HeroBannerSlider() {
                   {/* Subtitle / Description */}
                   {promo.subtitle && (
                     <p
-                      className={`font-sans text-[12.5px] sm:text-[16px] font-medium text-[#2e1d25] leading-snug sm:leading-relaxed mt-1.5 sm:mt-3 max-w-md transition-all duration-700 delay-200 ease-out ${
+                      className={`font-sans text-[12px] sm:text-[16px] font-medium text-[#2e1d25] leading-snug sm:leading-relaxed mt-1 sm:mt-3 max-w-md line-clamp-2 sm:line-clamp-none transition-all duration-700 delay-200 ease-out ${
                         isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                       }`}
                     >
@@ -245,9 +309,9 @@ export default function HeroBannerSlider() {
                   )}
                 </div>
 
-                {/* Primary CTA Button */}
+                {/* Primary CTA Button & Mobile Side-by-Side Indicator Row */}
                 <div
-                  className={`pt-2 sm:pt-4 transition-all duration-700 delay-300 ease-out ${
+                  className={`pt-2 sm:pt-4 flex items-center gap-2 sm:block transition-all duration-700 delay-300 ease-out ${
                     isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                   }`}
                 >
@@ -258,19 +322,86 @@ export default function HeroBannerSlider() {
                         applyPromoCode(promo.code);
                       }
                     }}
-                    className="inline-flex items-center justify-center bg-[#b73d67] text-white text-[12.5px] sm:text-[15px] font-bold h-[38px] sm:h-[50px] px-4 sm:px-8 rounded-[11px] sm:rounded-[14px] shadow-sm hover:bg-[#982f53] active:scale-[0.98] transition-all"
+                    className="inline-flex items-center justify-center gap-1.5 bg-[#b73d67] text-white text-[12px] sm:text-[15px] font-bold h-[36px] sm:h-[50px] px-4 sm:px-8 rounded-full sm:rounded-[14px] shadow-sm hover:bg-[#982f53] active:scale-[0.98] transition-all shrink-0 cursor-pointer"
                   >
-                    {ctaLabel}
+                    <span>{ctaLabel}</span>
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
                   </Link>
+
+                  {/* MOBILE-ONLY: Side-by-side Vertically Centered Story Indicator */}
+                  {totalSlides > 1 && (
+                    <div
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      className="sm:hidden inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-[#eedfe5] shadow-2xs shrink-0 select-none"
+                    >
+                      {/* Segmented Progress Story Bars for Mobile */}
+                      <div className="flex items-center gap-1">
+                        {activePromos.map((_, pIdx) => {
+                          const isCurrent = pIdx === currentIndex;
+                          const isPast = pIdx < currentIndex;
+                          return (
+                            <button
+                              key={pIdx}
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                goToSlide(pIdx);
+                              }}
+                              aria-label={`Jump to promotion slide ${pIdx + 1}`}
+                              className="py-0.5 px-0.5 flex items-center cursor-pointer focus:outline-none"
+                            >
+                              <div
+                                className={`h-1.5 rounded-full overflow-hidden transition-all duration-300 ${
+                                  isCurrent ? 'w-5 bg-[#eedfe5]' : 'w-2 bg-[#eedfe5]/75'
+                                }`}
+                              >
+                                {isCurrent && (
+                                  <div
+                                    key={`prog-mob-${currentIndex}-${cycleCount}`}
+                                    className="h-full bg-[#b73d67] rounded-full animate-hero-progress origin-left"
+                                    style={{
+                                      animationPlayState: isPaused ? 'paused' : 'running',
+                                    }}
+                                  />
+                                )}
+                                {isPast && (
+                                  <div className="h-full w-full bg-[#b73d67] rounded-full" />
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Mobile Slide Index Counter */}
+                      <div className="flex items-center gap-1 pl-1 border-l border-[#eedfe5] text-[10px] font-mono font-bold text-[#514149] leading-none">
+                        <span>
+                          0{currentIndex + 1}/0{totalSlides}
+                        </span>
+                        {isPaused && (
+                          <span
+                            className="w-1.5 h-1.5 rounded-full bg-[#b73d67] animate-pulse"
+                            title={language === 'my' ? 'ခေတ္တရပ်ထားသည်' : 'Paused'}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           );
         })}
 
-        {/* Minimalist Automated Progress Story Indicators (Replacing manual left/right buttons) */}
+        {/* DESKTOP/LAPTOP-ONLY: Original Dedicated Story Progress Bar & Navigation */}
         {totalSlides > 1 && (
-          <div className="absolute bottom-5 sm:bottom-7 left-6 sm:left-10 md:left-12 lg:left-16 z-30 flex items-center gap-2.5">
+          <div className="hidden sm:flex absolute sm:bottom-7 sm:left-10 md:left-12 lg:left-16 z-30 items-center gap-2.5">
             {activePromos.map((_, idx) => {
               const isCurrent = idx === currentIndex;
               const isPast = idx < currentIndex;
@@ -280,13 +411,12 @@ export default function HeroBannerSlider() {
                   type="button"
                   onClick={() => goToSlide(idx)}
                   aria-label={`Jump to promotion slide ${idx + 1}`}
-                  className="group/seg relative h-6 sm:h-7 flex items-center cursor-pointer focus:outline-none"
+                  className="group/seg relative sm:h-7 flex items-center cursor-pointer focus:outline-none"
                 >
-                  {/* Outer track pill */}
-                  <div className="w-10 sm:w-16 md:w-20 h-1.5 sm:h-2 rounded-full bg-black/15 backdrop-blur-xs overflow-hidden transition-all group-hover/seg:bg-black/25">
+                  <div className="w-16 md:w-20 sm:h-2 rounded-full bg-black/15 backdrop-blur-xs overflow-hidden transition-all group-hover/seg:bg-black/25">
                     {isCurrent && (
                       <div
-                        key={`prog-${currentIndex}-${cycleCount}`}
+                        key={`prog-desk-${currentIndex}-${cycleCount}`}
                         className="h-full bg-[#b73d67] rounded-full animate-hero-progress origin-left"
                         style={{
                           animationPlayState: isPaused ? 'paused' : 'running',
@@ -304,13 +434,13 @@ export default function HeroBannerSlider() {
               );
             })}
 
-            {/* Slide Index Counter & Live Pause Indicator */}
-            <div className="ml-2 flex items-center gap-2 text-[11px] sm:text-[12px] font-bold text-[#38262e]/75">
+            {/* Slide Index Counter & Live Pause Indicator for Desktop */}
+            <div className="ml-2 flex items-center gap-2 text-[12px] font-bold text-[#38262e]/75">
               <span className="font-mono tracking-wider">
                 0{currentIndex + 1} / 0{totalSlides}
               </span>
               {isPaused && (
-                <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold text-[#b73d67] bg-white/85 backdrop-blur-xs px-2.5 py-0.5 rounded-full border border-[#f1d3df] shadow-2xs">
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#b73d67] bg-white/85 backdrop-blur-xs px-2.5 py-0.5 rounded-full border border-[#f1d3df] shadow-2xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] animate-pulse" />
                   {language === 'my' ? 'ခေတ္တရပ်ထားသည်' : 'Paused'}
                 </span>

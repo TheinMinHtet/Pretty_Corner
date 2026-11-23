@@ -21,8 +21,7 @@ export default function ShoppingBagPage() {
     applyPromoCode,
     removePromoCode,
     lineItemsPricing,
-    promoSubtotal,
-    nonPromoSubtotal,
+    pricing,
     isMounted,
     t,
     language,
@@ -31,11 +30,13 @@ export default function ShoppingBagPage() {
   const [promoInput, setPromoInput] = useState('');
   const [promoFeedback, setPromoFeedback] = useState<string | null>(null);
 
-  const promoItemsCount = lineItemsPricing
-    ? lineItemsPricing
-      .filter((lp) => lp.discountAmount > 0)
-      .reduce((sum, lp) => sum + lp.quantity, 0)
-    : 0;
+  const promoItemsCount = pricing?.promoItemsCount ?? (
+    lineItemsPricing
+      ? lineItemsPricing
+        .filter((lp) => lp.discountAmount > 0)
+        .reduce((sum, lp) => sum + lp.quantity, 0)
+      : 0
+  );
 
   if (!isMounted) {
     return <BagPageSkeleton />;

@@ -30,23 +30,23 @@ export default function CheckoutPage() {
     applyPromoCode,
     removePromoCode,
     lineItemsPricing,
-    promoSubtotal,
-    nonPromoSubtotal,
+    pricing,
+    setSelectedTownship,
     createOrder,
     clearCart,
     isMounted,
     t,
     language,
-    activePendingOrderId,
-    cancelOrder,
     orders,
   } = useStore();
 
-  const promoItemsCount = lineItemsPricing
-    ? lineItemsPricing
-        .filter((lp) => lp.discountAmount > 0)
-        .reduce((sum, lp) => sum + lp.quantity, 0)
-    : 0;
+  const promoItemsCount = pricing?.promoItemsCount ?? (
+    lineItemsPricing
+      ? lineItemsPricing
+          .filter((lp) => lp.discountAmount > 0)
+          .reduce((sum, lp) => sum + lp.quantity, 0)
+      : 0
+  );
 
   const [customerName, setCustomerName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -95,7 +95,7 @@ export default function CheckoutPage() {
 
   const grandTotal = cartTotal;
 
-  const handleMapLocationSelect = (
+  const handleMapLocationSelect = async (
     coords: { lat: number; lng: number },
     address: string
   ) => {
@@ -104,6 +104,14 @@ export default function CheckoutPage() {
     setAddressTouched(false);
     setGpsStatus('success');
     setGpsErrorMsg('');
+
+    try {
+      const resolver = getAddressResolver();
+      const fix = await resolver.resolveDeliveryFix(coords, language);
+      if (fix.township) {
+        setSelectedTownship(fix.township);
+      }
+    } catch {}
   };
 
   const handleUseCurrentLocation = async () => {
@@ -113,12 +121,15 @@ export default function CheckoutPage() {
 
     try {
       const resolver = getAddressResolver();
-      const fix = await resolver.resolveCurrentDeliveryLocation(language, 8000);
+      const fix = await resolver.resolveDeliveryFix({ useCurrentGps: true, timeoutMs: 8000 }, language);
       setPinCoords(fix.coordinates);
       if (fix.accuracyMeters !== undefined) {
         setLocationAccuracy(fix.accuracyMeters);
       }
       setStreetAddress(fix.formattedAddress);
+      if (fix.township) {
+        setSelectedTownship(fix.township);
+      }
       setGpsStatus('success');
     } catch (err: unknown) {
       setGpsStatus('error');

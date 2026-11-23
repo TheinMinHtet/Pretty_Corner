@@ -12,6 +12,24 @@ export interface LineItemPricing {
   discountAmount: number;
   finalTotal: number;
   promoCode?: string;
+  hasDiscount?: boolean;
+  formattedUnitPrice?: string;
+  formattedSubtotal?: string;
+  formattedFinalTotal?: string;
+  discountBadge?: string;
+}
+
+export interface PricingSummaryRow {
+  key: 'subtotal' | 'discount' | 'shipping' | 'total';
+  labelEn: string;
+  labelMy: string;
+  amount: number;
+  formattedAmount: string;
+  badge?: string;
+  detailEn?: string;
+  detailMy?: string;
+  isNegative?: boolean;
+  isHighlight?: boolean;
 }
 
 export interface CartPricingSummary {
@@ -24,6 +42,10 @@ export interface CartPricingSummary {
   grandTotal: number;
   appliedPromo: Promotion | null;
   lineItems: LineItemPricing[];
+  summaryRows?: PricingSummaryRow[];
+  subtotalDetailEn?: string;
+  subtotalDetailMy?: string;
+  promoItemsCount?: number;
 }
 
 /**
@@ -61,7 +83,8 @@ export function calculatePricing(
     let isEligible = false;
 
     if (promo && percentage > 0) {
-      switch (promo.targetType) {
+      const targetType = promo.targetType || 'ENTIRE_STORE';
+      switch (targetType) {
         case 'SINGLE_PRODUCT': {
           const target = promo.targetSlug || promo.featuredProductIds?.[0];
           const matched = catalogProducts?.find(
@@ -118,20 +141,25 @@ export function calculatePricing(
   // strictly against promoSubtotal.
   // For ENTIRE_STORE, evaluated against total subtotal.
   const minOrder = promo?.minimumOrderAmount || 0;
+  const targetType = promo?.targetType || 'ENTIRE_STORE';
   const thresholdBasis =
-    promo?.targetType === 'ENTIRE_STORE' ? subtotal : promoSubtotal;
+    targetType === 'ENTIRE_STORE' ? subtotal : promoSubtotal;
   const satisfiesMinOrder = thresholdBasis >= minOrder;
 
-  // Second pass: compute per-line discountAmount
+  // Second pass: compute per-line discountAmount & enriched presentation fields
   const lineItems: LineItemPricing[] = evaluatedItems.map(
     ({ item, itemSubtotal, isEligible }) => {
       let itemDiscount = 0;
-      if (isEligible && satisfiesMinOrder && percentage > 0) {
+      const qualifies = Boolean(isEligible && satisfiesMinOrder && percentage > 0);
+      if (qualifies) {
         // Apply 60% maximum safety margin ceiling per item
         const maxAllowedDiscount = Math.round(itemSubtotal * 0.6);
         const rawDiscount = Math.round((itemSubtotal * percentage) / 100);
         itemDiscount = Math.min(rawDiscount, maxAllowedDiscount);
       }
+
+      const hasDiscount = itemDiscount > 0;
+      const finalTotal = itemSubtotal - itemDiscount;
 
       return {
         itemId: item.id,
@@ -143,8 +171,13 @@ export function calculatePricing(
         subtotal: itemSubtotal,
         isEligible: Boolean(isEligible && satisfiesMinOrder),
         discountAmount: itemDiscount,
-        finalTotal: itemSubtotal - itemDiscount,
+        finalTotal,
         promoCode: isEligible && satisfiesMinOrder ? promo?.code : undefined,
+        hasDiscount,
+        formattedUnitPrice: `${item.price.toLocaleString()} MMK`,
+        formattedSubtotal: `${itemSubtotal.toLocaleString()} MMK`,
+        formattedFinalTotal: `${finalTotal.toLocaleString()} MMK`,
+        discountBadge: hasDiscount ? `-${percentage}% OFF` : undefined,
       };
     }
   );
@@ -160,6 +193,56 @@ export function calculatePricing(
   const totalAfterDiscount = Math.max(0, subtotal - discountAmount);
   const grandTotal = totalAfterDiscount + (shippingFee > 0 ? shippingFee : 0);
 
+  const promoItemsCount = lineItems.filter((li) => li.hasDiscount).reduce((sum, li) => sum + li.quantity, 0);
+  const subtotalDetailEn = `(${itemCount} ${itemCount === 1 ? 'item' : 'items'})`;
+  const subtotalDetailMy = `(${itemCount} ခု)`;
+
+  const summaryRows: PricingSummaryRow[] = [
+    {
+      key: 'subtotal',
+      labelEn: `Subtotal ${subtotalDetailEn}`,
+      labelMy: `ကုန်ပစ္စည်းစုစုပေါင်း ${subtotalDetailMy}`,
+      amount: subtotal,
+      formattedAmount: `${subtotal.toLocaleString()} MMK`,
+      detailEn: subtotalDetailEn,
+      detailMy: subtotalDetailMy,
+    },
+  ];
+
+  if (discountAmount > 0) {
+    const promoDetailEn = promoItemsCount > 0 ? `(${promoItemsCount} ${promoItemsCount === 1 ? 'item' : 'items'})` : '';
+    const promoDetailMy = promoItemsCount > 0 ? `(${promoItemsCount} ခု)` : '';
+    summaryRows.push({
+      key: 'discount',
+      labelEn: `Promotion discount ${promoDetailEn}`.trim(),
+      labelMy: `ပရိုမိုးရှင်း လျှော့စျေး ${promoDetailMy}`.trim(),
+      amount: discountAmount,
+      formattedAmount: `−${discountAmount.toLocaleString()} MMK`,
+      badge: promo?.code ? `${promo.code} (-${percentage}%)` : undefined,
+      detailEn: promoDetailEn,
+      detailMy: promoDetailMy,
+      isNegative: true,
+      isHighlight: true,
+    });
+  }
+
+  summaryRows.push({
+    key: 'shipping',
+    labelEn: 'Delivery Fee',
+    labelMy: 'ပို့ဆောင်ခ',
+    amount: shippingFee,
+    formattedAmount: shippingFee > 0 ? `${shippingFee.toLocaleString()} MMK` : 'FREE / အခမဲ့',
+  });
+
+  summaryRows.push({
+    key: 'total',
+    labelEn: 'Total Amount',
+    labelMy: 'ကျသင့်ငွေစုစုပေါင်း',
+    amount: grandTotal,
+    formattedAmount: `${grandTotal.toLocaleString()} MMK`,
+    isHighlight: true,
+  });
+
   return {
     itemCount,
     subtotal,
@@ -170,6 +253,10 @@ export function calculatePricing(
     grandTotal,
     appliedPromo: promo,
     lineItems,
+    summaryRows,
+    subtotalDetailEn,
+    subtotalDetailMy,
+    promoItemsCount,
   };
 }
 

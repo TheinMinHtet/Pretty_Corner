@@ -100,3 +100,18 @@ export interface Promotion {
   featuredProductIds?: string[];
   isOutOfStock?: boolean;
 }
+
+export interface SocialChannel {
+  id: string;
+  platform: string;
+  url: string;
+  isActive: boolean;
+  displayOrder?: number;
+}
+
+export interface SocialLinksMap {
+  facebook: string;
+  tiktok: string;
+  instagram?: string;
+}
+
