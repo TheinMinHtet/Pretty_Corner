@@ -59,16 +59,6 @@ export default function CheckoutPage() {
   const [promoFeedback, setPromoFeedback] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Active pending order detection for transaction control
-  const activePendingOrder = activePendingOrderId
-    ? orders.find(
-        (o) =>
-          o.id.toUpperCase() === activePendingOrderId.toUpperCase() &&
-          o.paymentStatus !== 'paid' &&
-          o.paymentStatus !== 'cancelled'
-      )
-    : null;
-
   // Rule 04: Duplicate Prevention - warning on refresh while form is submitting
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -145,13 +135,6 @@ export default function CheckoutPage() {
     }
 
     const isCOD = paymentMethod === 'Cash on Delivery';
-
-    // Rule 03: Transaction Control - Do not create duplicate transaction if active order exists
-    if (activePendingOrder && !isCOD) {
-      setIsSubmitting(true);
-      router.push(`/payment-pending?orderId=${encodeURIComponent(activePendingOrder.id)}`);
-      return;
-    }
 
     const completeAddress = streetAddress.trim();
 
@@ -249,43 +232,6 @@ export default function CheckoutPage() {
         noValidate
         className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2"
       >
-        {/* Rule 03: Active Transaction Control Banner */}
-        {activePendingOrder && (
-          <div className="mb-6 p-4 sm:p-5 bg-amber-50/90 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-2xs">
-            <div className="flex items-start gap-3">
-              <span className="text-amber-600 text-xl leading-none mt-0.5">⚠️</span>
-              <div>
-                <p className="text-[14px] font-bold text-amber-950">
-                  {language === 'my'
-                    ? `ငွေပေးချေရန် ကျန်ရှိနေသော အမှာစာ #${activePendingOrder.id} ရှိနေပါသည် (${activePendingOrder.total.toLocaleString()} MMK)`
-                    : `Active Pending Payment for Order #${activePendingOrder.id} (${activePendingOrder.total.toLocaleString()} MMK)`}
-                </p>
-                <p className="text-[12.5px] text-amber-800/90 mt-1">
-                  {language === 'my'
-                    ? 'ငွေပေးချေမှု အထပ်ထပ်မဖြစ်စေရန် ဤအမှာစာကို ဆက်လက်ပေးချေပါ သို့မဟုတ် ပယ်ဖျက်ပြီးမှ အသစ်မှာယူပါ။'
-                    : 'To prevent duplicate transactions, please resume this payment or cancel it before placing a new order.'}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2.5 shrink-0">
-              <button
-                type="button"
-                onClick={() => router.push(`/payment-pending?orderId=${encodeURIComponent(activePendingOrder.id)}`)}
-                className="px-4 py-2 bg-[#b73d67] text-white text-[13px] font-bold rounded-xl hover:bg-[#a33259] transition-colors cursor-pointer shadow-2xs"
-              >
-                {language === 'my' ? 'ငွေပေးချေရန် ဆက်သွားမည်' : 'Resume Payment'}
-              </button>
-              <button
-                type="button"
-                onClick={() => cancelOrder(activePendingOrder.id)}
-                className="px-3.5 py-2 bg-white border border-amber-300 text-amber-900 text-[12.5px] font-semibold rounded-xl hover:bg-amber-100/60 transition-colors cursor-pointer"
-              >
-                {language === 'my' ? 'ပယ်ဖျက်မည်' : 'Cancel Request'}
-              </button>
-            </div>
-          </div>
-        )}
-
         <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-start">
           {/* Left Column: Delivery Form & Payment Methods */}
           <div className="md:col-span-7 lg:col-span-8 space-y-6">
