@@ -218,9 +218,14 @@ export default function ShoppingBagPage() {
                           </div>
                         </div>
                         <div className="text-right shrink-0">
-                          <span className="font-bold whitespace-nowrap text-[13.5px] text-[#38262e]">
-                            {(item.price * item.quantity).toLocaleString()} MMK
+                          <span className={`font-bold whitespace-nowrap text-[13.5px] ${isDiscounted ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                            {finalLineTotal.toLocaleString()} MMK
                           </span>
+                          {isDiscounted && (
+                            <div className="text-[12px] text-[#7a6870] line-through">
+                              {(item.price * item.quantity).toLocaleString()} MMK
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -296,7 +301,14 @@ export default function ShoppingBagPage() {
 
                   {discount > 0 && (
                     <div className="flex justify-between items-center text-emerald-700">
-                      <span className="font-medium">{t.discountTotal}</span>
+                      <span className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium">{t.discountTotal}</span>
+                        {appliedPromo && (
+                          <span className="px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
+                            {appliedPromo.code} · {appliedPromo.discountPercentage}% OFF
+                          </span>
+                        )}
+                      </span>
                       <span className="font-bold whitespace-nowrap">-{discount.toLocaleString()} MMK</span>
                     </div>
                   )}
