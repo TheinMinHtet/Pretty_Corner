@@ -287,24 +287,24 @@ export default function PromotionHubPage() {
                   </div>
 
                   {/* Details */}
-                  <div className="pt-3.5 flex-1 flex flex-col justify-between">
+                  <div className="pt-2 sm:pt-3 flex-1 flex flex-col justify-between">
                     <div>
                       <p className="text-[10px] sm:text-[11px] font-medium tracking-wide text-[#7a6870] uppercase">
                         {product.category}
                       </p>
                       <Link href={`/product/${product.slug || product.id}`}>
-                        <h3 className="text-[15px] sm:text-[16px] font-medium text-[#38262e] hover:text-[#b73d67] transition-colors line-clamp-1 mt-0.5">
+                        <h3 className="text-[14px] sm:text-[16px] font-medium text-[#38262e] hover:text-[#b73d67] transition-colors line-clamp-2 mt-0.5 leading-snug">
                           {product.name}
                         </h3>
                       </Link>
                     </div>
 
-                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-[#f5edf0]">
+                    <div className="flex items-center justify-between gap-1.5 mt-2.5 pt-2 border-t border-[#f5edf0]">
                       <div>
-                        <span className="block text-[14px] sm:text-[15px] font-bold text-[#b73d67]">
-                          {discountedPrice.toLocaleString()} MMK
+                        <span className="block text-[13px] sm:text-[15px] font-bold text-[#b73d67] whitespace-nowrap leading-tight">
+                          {discountedPrice.toLocaleString()} <span className="text-[10px] sm:text-[11px] font-medium">MMK</span>
                         </span>
-                        <span className="block text-[11px] text-[#7a6870] line-through">
+                        <span className="block text-[10.5px] sm:text-[11px] text-[#7a6870] line-through whitespace-nowrap leading-tight">
                           {product.price.toLocaleString()} MMK
                         </span>
                       </div>

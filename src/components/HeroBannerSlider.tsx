@@ -88,8 +88,8 @@ export default function HeroBannerSlider() {
   // State 0: Fallback to default editorial hero if no active promotions
   if (totalSlides === 0) {
     return (
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 md:pt-6">
-        <div className="relative w-full h-[386px] sm:h-[460px] md:h-[500px] lg:h-[540px] rounded-[24px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 md:pt-6">
+        <div className="relative w-full h-[330px] sm:h-[410px] md:h-[480px] lg:h-[520px] rounded-[20px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs">
           <Image
             src="/assets/hero-banner.jpg"
             alt="Pretty Corner Hero"
@@ -101,23 +101,23 @@ export default function HeroBannerSlider() {
           <div className="absolute inset-0 bg-gradient-to-r from-white/75 via-white/40 to-transparent pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-t from-white/35 via-transparent to-transparent pointer-events-none" />
 
-          <div className="absolute inset-0 p-6 sm:p-10 md:p-12 lg:p-16 flex flex-col justify-between z-10">
+          <div className="absolute inset-0 p-5 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-between z-10">
             <div className="max-w-lg">
-              <span className="inline-block font-sans text-[11px] sm:text-[12px] font-bold tracking-[2px] text-[#b73d67] uppercase bg-white/80 backdrop-blur-xs px-3 py-1 rounded-full border border-[#f1d3df] shadow-2xs">
+              <span className="inline-block font-sans text-[10.5px] sm:text-[12px] font-bold tracking-[1.5px] sm:tracking-[2px] text-[#b73d67] uppercase bg-white/80 backdrop-blur-xs px-3 py-0.5 sm:py-1 rounded-full border border-[#f1d3df] shadow-2xs">
                 {t.heroBadge}
               </span>
               <h2
-                className={`font-serif font-medium leading-[1.1] text-[#38262e] mt-3 ${
+                className={`font-serif font-medium leading-[1.1] text-[#38262e] mt-2 sm:mt-3 ${
                   language === 'my'
-                    ? 'text-[28px] sm:text-[36px] md:text-[42px] lg:text-[48px]'
-                    : 'text-[41px] sm:text-[50px] md:text-[58px] lg:text-[64px]'
+                    ? 'text-[24px] sm:text-[34px] md:text-[42px] lg:text-[48px]'
+                    : 'text-[30px] sm:text-[44px] md:text-[54px] lg:text-[60px]'
                 }`}
               >
                 {t.heroTitleLine1}
                 <br />
                 {t.heroTitleLine2}
               </h2>
-              <p className="font-sans text-[15px] sm:text-[16.5px] font-medium text-[#2e1d25] leading-relaxed mt-3 max-w-md">
+              <p className="font-sans text-[13.5px] sm:text-[16px] font-medium text-[#2e1d25] leading-relaxed mt-2 sm:mt-3 max-w-md line-clamp-2 sm:line-clamp-none">
                 {t.heroDescription}
               </p>
             </div>
@@ -125,7 +125,7 @@ export default function HeroBannerSlider() {
             <div>
               <Link
                 href="/shop"
-                className="inline-flex items-center justify-center bg-[#b73d67] text-white text-[14px] sm:text-[15px] font-bold h-[48px] sm:h-[52px] px-7 sm:px-8 rounded-[14px] shadow-sm hover:bg-[#a33259] active:scale-[0.98] transition-all"
+                className="inline-flex items-center justify-center bg-[#b73d67] text-white text-[13px] sm:text-[15px] font-bold h-[42px] sm:h-[50px] px-6 sm:px-8 rounded-[12px] sm:rounded-[14px] shadow-sm hover:bg-[#a33259] active:scale-[0.98] transition-all"
               >
                 {t.heroCta}
               </Link>
@@ -137,9 +137,9 @@ export default function HeroBannerSlider() {
   }
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 md:pt-6">
+    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 md:pt-6">
       <div
-        className="relative w-full h-[390px] sm:h-[460px] md:h-[500px] lg:h-[540px] rounded-[24px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs select-none"
+        className="relative w-full h-[330px] sm:h-[410px] md:h-[480px] lg:h-[520px] rounded-[20px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs select-none"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={handleTouchStart}
@@ -185,7 +185,7 @@ export default function HeroBannerSlider() {
               <div className="absolute inset-0 bg-gradient-to-t from-white/35 via-transparent to-transparent pointer-events-none" />
 
               {/* Slide Content with Staggered Entrance Animations */}
-              <div className="absolute inset-0 p-6 sm:p-10 md:p-12 lg:p-16 flex flex-col justify-between">
+              <div className="absolute inset-0 p-5 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-between">
                 <div className="max-w-xl">
                   {/* Banner Badge Tag */}
                   <div
@@ -193,19 +193,19 @@ export default function HeroBannerSlider() {
                       isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
                     }`}
                   >
-                    <span className="inline-block font-sans text-[11px] sm:text-[12px] font-bold tracking-[2px] text-[#b73d67] uppercase bg-white/85 backdrop-blur-xs px-3.5 py-1 rounded-full border border-[#f1d3df] shadow-2xs">
+                    <span className="inline-block font-sans text-[10px] sm:text-[12px] font-bold tracking-[1.5px] sm:tracking-[2px] text-[#b73d67] uppercase bg-white/85 backdrop-blur-xs px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full border border-[#f1d3df] shadow-2xs">
                       {badgeText}
                     </span>
                   </div>
 
                   {/* Headline Title */}
                   <h2
-                    className={`font-serif font-medium leading-[1.1] text-[#38262e] mt-2 transition-all duration-700 delay-100 ease-out ${
+                    className={`font-serif font-medium leading-[1.15] text-[#38262e] mt-1.5 sm:mt-2 transition-all duration-700 delay-100 ease-out ${
                       isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                     } ${
                       language === 'my'
-                        ? 'text-[28px] sm:text-[36px] md:text-[42px] lg:text-[48px]'
-                        : 'text-[38px] sm:text-[48px] md:text-[56px] lg:text-[62px]'
+                        ? 'text-[24px] sm:text-[34px] md:text-[42px] lg:text-[48px]'
+                        : 'text-[30px] sm:text-[42px] md:text-[54px] lg:text-[62px]'
                     }`}
                   >
                     {promo.title}
@@ -214,7 +214,7 @@ export default function HeroBannerSlider() {
                   {/* Subtitle / Description */}
                   {promo.subtitle && (
                     <p
-                      className={`font-sans text-[15px] sm:text-[16.5px] font-medium text-[#2e1d25] leading-relaxed mt-3 max-w-md transition-all duration-700 delay-200 ease-out ${
+                      className={`font-sans text-[13px] sm:text-[16px] font-medium text-[#2e1d25] leading-snug sm:leading-relaxed mt-2 sm:mt-3 max-w-md transition-all duration-700 delay-200 ease-out ${
                         isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                       }`}
                     >
@@ -225,18 +225,18 @@ export default function HeroBannerSlider() {
                   {/* Coupon Code Pill */}
                   {promo.code && (
                     <div
-                      className={`mt-4 inline-flex items-center gap-2 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#eedfe5] shadow-xs transition-all duration-700 delay-250 ease-out ${
+                      className={`mt-2.5 sm:mt-4 inline-flex items-center gap-2 bg-white/90 backdrop-blur-md px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-[#eedfe5] shadow-xs transition-all duration-700 delay-250 ease-out ${
                         isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                       }`}
                     >
-                      <span className="text-[11px] sm:text-[12px] font-medium text-[#7a6870]">Use Code:</span>
-                      <span className="text-[12px] sm:text-[13px] font-mono font-bold text-[#b73d67] tracking-wider">
+                      <span className="text-[10px] sm:text-[12px] font-medium text-[#7a6870]">Use Code:</span>
+                      <span className="text-[11px] sm:text-[13px] font-mono font-bold text-[#b73d67] tracking-wider">
                         {promo.code}
                       </span>
                       <button
                         type="button"
                         onClick={(e) => handleCopyCode(promo.code, e)}
-                        className="ml-1 text-[11px] font-bold text-[#38262e] hover:text-[#b73d67] bg-[#fceef2] hover:bg-[#f8dde5] px-2 py-0.5 rounded-full transition-colors cursor-pointer"
+                        className="ml-1 text-[10px] sm:text-[11px] font-bold text-[#38262e] hover:text-[#b73d67] bg-[#fceef2] hover:bg-[#f8dde5] px-2 py-0.5 rounded-full transition-colors cursor-pointer"
                         title="Copy coupon code"
                       >
                         {copiedCode === promo.code ? '✓ Copied' : 'Copy'}
@@ -247,7 +247,7 @@ export default function HeroBannerSlider() {
 
                 {/* Primary CTA Button */}
                 <div
-                  className={`pt-4 transition-all duration-700 delay-300 ease-out ${
+                  className={`pt-2 sm:pt-4 transition-all duration-700 delay-300 ease-out ${
                     isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                   }`}
                 >
@@ -258,7 +258,7 @@ export default function HeroBannerSlider() {
                         applyPromoCode(promo.code);
                       }
                     }}
-                    className="inline-flex items-center justify-center bg-[#b73d67] text-white text-[14px] sm:text-[15px] font-bold h-[48px] sm:h-[52px] px-7 sm:px-8 rounded-[14px] shadow-sm hover:bg-[#982f53] active:scale-[0.98] transition-all"
+                    className="inline-flex items-center justify-center bg-[#b73d67] text-white text-[13px] sm:text-[15px] font-bold h-[42px] sm:h-[50px] px-5 sm:px-8 rounded-[12px] sm:rounded-[14px] shadow-sm hover:bg-[#982f53] active:scale-[0.98] transition-all"
                   >
                     {ctaLabel}
                   </Link>

@@ -107,25 +107,25 @@ export default function HomePage() {
       <HeroBannerSlider />
 
       {/* 4. Categories - Responsive Container */}
-      <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-8 pb-3">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-3">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="font-serif text-[22px] sm:text-[28px] font-medium text-[#38262e]">
+          <h3 className="font-serif text-[20px] sm:text-[28px] font-medium text-[#38262e]">
             {t.exploreByCategory}
           </h3>
           <button
             onClick={() => setShowCategoryModal(true)}
-            className="text-[13px] font-bold text-[#b73d67] hover:underline cursor-pointer shrink-0"
+            className="text-[12.5px] sm:text-[13px] font-bold text-[#b73d67] hover:underline cursor-pointer shrink-0"
           >
             {t.viewAll}
           </button>
         </div>
 
-        <div className="flex items-center gap-2.5 mt-3.5 overflow-x-auto no-scrollbar pb-1">
+        <div className="flex items-center gap-2 sm:gap-2.5 mt-2.5 sm:mt-3.5 overflow-x-auto no-scrollbar pb-1">
           {categoriesList.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className={`h-[36px] sm:h-[40px] px-5 rounded-[20px] text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
+              className={`h-[34px] sm:h-[40px] px-4 sm:px-5 rounded-[20px] text-[12px] sm:text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer ${
                 activeCategory === cat.id
                   ? 'bg-[#38262e] text-white'
                   : 'bg-[#fceef2] text-[#38262e] hover:bg-[#f6e1e8]'
@@ -138,27 +138,27 @@ export default function HomePage() {
       </section>
 
       {/* 5. Bestsellers - Responsive Grid */}
-      <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pt-4 pb-6 sm:pb-8">
-        <div className="flex items-start sm:items-baseline justify-between gap-3 mb-5">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-6 sm:pb-8">
+        <div className="flex items-center justify-between gap-3 mb-4 sm:mb-5">
           <div className="min-w-0">
-            <h3 className="font-serif text-[22px] sm:text-[32px] font-medium text-[#38262e] leading-tight">
+            <h3 className="font-serif text-[20px] sm:text-[32px] font-medium text-[#38262e] leading-tight">
               {t.topPicksTitle}
             </h3>
           </div>
           <Link
             href={activeCategory === 'all' ? '/shop' : `/shop?category=${activeCategory}`}
-            className="text-[13px] font-bold text-[#b73d67] hover:underline shrink-0 whitespace-nowrap pt-1 sm:pt-0"
+            className="text-[12.5px] sm:text-[13px] font-bold text-[#b73d67] hover:underline shrink-0 whitespace-nowrap"
           >
             {t.shopMore}
           </Link>
         </div>
 
         {/* Responsive Product Grid: 2 cols on mobile, 3 cols on tablet, 4 cols on desktop */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5 lg:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
           {displayedProducts.map((product) => {
             return (
               <div key={product.id} className="flex flex-col group">
-                <div className="relative w-full h-[184px] sm:h-[230px] md:h-[260px] lg:h-[280px] bg-[#f9f5f7] rounded-[12px] overflow-hidden">
+                <div className="relative w-full h-[175px] sm:h-[230px] md:h-[260px] lg:h-[280px] bg-[#f9f5f7] rounded-[12px] overflow-hidden">
                   <Link href={`/product/${product.slug || product.id}`} className="block relative w-full h-full">
                     <Image
                       src={product.image}
@@ -171,25 +171,27 @@ export default function HomePage() {
 
                   {/* Badge */}
                   {product.badge && (
-                    <span className="absolute top-2.5 left-2.5 bg-white text-[#b73d67] text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-[5px] shadow-sm select-none">
+                    <span className="absolute top-2 left-2 sm:top-2.5 sm:left-2.5 bg-white text-[#b73d67] text-[9.5px] sm:text-[11px] font-bold px-2 sm:px-2.5 py-0.5 rounded-[5px] shadow-sm select-none">
                       {product.badge}
                     </span>
                   )}
                 </div>
 
                 {/* Details */}
-                <div className="pt-3">
-                  <p className="text-[10px] sm:text-[11px] font-medium tracking-wide text-[#7a6870] uppercase">
-                    {product.category}
-                  </p>
-                  <Link href={`/product/${product.slug || product.id}`}>
-                    <h4 className="text-[15px] sm:text-[16px] font-normal text-[#38262e] hover:text-[#b73d67] transition-colors line-clamp-1 mt-0.5">
-                      {product.name}
-                    </h4>
-                  </Link>
-                  <div className="flex items-center justify-between mt-2">
-                    <p className="text-[14px] sm:text-[15px] font-bold text-[#b73d67]">
-                      {product.price.toLocaleString()} MMK
+                <div className="pt-2 sm:pt-3 flex flex-col flex-1 justify-between">
+                  <div>
+                    <p className="text-[10px] sm:text-[11px] font-medium tracking-wide text-[#7a6870] uppercase">
+                      {product.category}
+                    </p>
+                    <Link href={`/product/${product.slug || product.id}`}>
+                      <h4 className="text-[14px] sm:text-[16px] font-normal text-[#38262e] hover:text-[#b73d67] transition-colors line-clamp-2 mt-0.5 leading-snug">
+                        {product.name}
+                      </h4>
+                    </Link>
+                  </div>
+                  <div className="flex items-center justify-between gap-1.5 mt-2 pt-1">
+                    <p className="text-[13px] sm:text-[15px] font-bold text-[#b73d67] whitespace-nowrap leading-none">
+                      {product.price.toLocaleString()} <span className="text-[10px] sm:text-[11px] font-medium">MMK</span>
                     </p>
                     <ProductCardStepper productId={product.id} />
                   </div>
@@ -200,7 +202,7 @@ export default function HomePage() {
         </div>
 
         {/* Full catalog CTA button beneath the preview grid */}
-        <div className="mt-7 text-center">
+        <div className="mt-8 mb-4 sm:mt-10 sm:mb-6 text-center">
           <Link
             href={activeCategory === 'all' ? '/shop' : `/shop?category=${activeCategory}`}
             className="inline-flex items-center justify-center gap-1.5 h-[42px] px-6 rounded-[10px] bg-[#faf7f8] text-[#b73d67] border border-[#eedfe5] hover:bg-[#fceef2] hover:border-[#b73d67] text-[13px] font-bold transition-all shadow-2xs"
@@ -211,7 +213,7 @@ export default function HomePage() {
       </section>
 
       {/* 6. Address Card Banner */}
-      <section className="w-full max-w-7xl mx-auto px-5 sm:px-6 lg:px-8 pb-6 sm:pb-8">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12">
         <div className="bg-[#fceef2] rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-[#eedfe5]">
           {/* Address Card Image */}
           <div className="w-full md:max-w-2xl bg-white rounded-xl shadow-xs overflow-hidden border border-[#eedfe5]/80">
