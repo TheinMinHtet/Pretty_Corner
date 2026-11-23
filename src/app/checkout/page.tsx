@@ -421,53 +421,53 @@ export default function CheckoutPage() {
               <fieldset className="grid grid-cols-1 sm:grid-cols-2 gap-3.5" role="radiogroup" aria-label={t.paymentMethod}>
                 {/* 1. Mobile Banking */}
                 <label
-                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
+                  className={`p-3.5 sm:p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between gap-2 ${
                     paymentMethod === 'Mobile Banking'
                       ? 'bg-[#fceef2] border-[#b73d67] ring-1 ring-[#b73d67]'
                       : 'bg-white border-[#eedfe5] hover:border-[#b73d67]'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="Mobile Banking"
                       checked={paymentMethod === 'Mobile Banking'}
                       onChange={() => setPaymentMethod('Mobile Banking')}
-                      className="w-4 h-4 text-[#b73d67] accent-[#b73d67] cursor-pointer"
+                      className="w-4 h-4 text-[#b73d67] accent-[#b73d67] cursor-pointer shrink-0"
                     />
-                    <span className={`text-[15px] font-bold ${paymentMethod === 'Mobile Banking' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                    <span className={`text-[14px] sm:text-[15px] font-bold ${paymentMethod === 'Mobile Banking' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
                       {t.mobileBanking}
                     </span>
                   </div>
-                  <span className="text-[11px] font-semibold text-[#7a6870] bg-white px-2 py-0.5 rounded border border-[#eedfe5] shadow-2xs">
+                  <span className="text-[10.5px] sm:text-[11px] font-semibold text-[#7a6870] bg-white px-2 py-0.5 rounded border border-[#eedfe5] shadow-2xs shrink-0 whitespace-nowrap">
                     MMQR
                   </span>
                 </label>
 
                 {/* 2. Cash on Delivery */}
                 <label
-                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
+                  className={`p-3.5 sm:p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between gap-2 ${
                     paymentMethod === 'Cash on Delivery'
                       ? 'bg-[#fceef2] border-[#b73d67] ring-1 ring-[#b73d67]'
                       : 'bg-white border-[#eedfe5] hover:border-[#b73d67]'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <input
                       type="radio"
                       name="paymentMethod"
                       value="Cash on Delivery"
                       checked={paymentMethod === 'Cash on Delivery'}
                       onChange={() => setPaymentMethod('Cash on Delivery')}
-                      className="w-4 h-4 text-[#b73d67] accent-[#b73d67] cursor-pointer"
+                      className="w-4 h-4 text-[#b73d67] accent-[#b73d67] cursor-pointer shrink-0"
                     />
-                    <span className={`text-[15px] font-bold ${paymentMethod === 'Cash on Delivery' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
+                    <span className={`text-[14px] sm:text-[15px] font-bold ${paymentMethod === 'Cash on Delivery' ? 'text-[#b73d67]' : 'text-[#38262e]'}`}>
                       {t.cod}
                     </span>
                   </div>
-                  <span className="text-[11px] font-semibold text-[#7a6870] bg-white px-2 py-0.5 rounded border border-[#eedfe5] shadow-2xs">
-                    Pay on Arrival
+                  <span className="text-[10.5px] sm:text-[11px] font-semibold text-[#7a6870] bg-white px-2 py-0.5 rounded border border-[#eedfe5] shadow-2xs shrink-0 whitespace-nowrap">
+                    COD
                   </span>
                 </label>
               </fieldset>
@@ -554,13 +554,13 @@ export default function CheckoutPage() {
                   </div>
                 ) : (
                   <div className="space-y-1.5">
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 w-full">
                       <input
                         type="text"
                         value={promoInput}
                         onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
                         placeholder={t.promoPlaceholder}
-                        className="flex-1 h-[36px] px-3 rounded-lg border border-[#eedfe5] text-[13px] font-mono uppercase text-[#38262e] placeholder:text-[#a89aa0] focus:outline-none focus:border-[#b73d67] transition-colors"
+                        className="flex-1 min-w-0 h-[36px] px-3 rounded-lg border border-[#eedfe5] text-[12.5px] sm:text-[13px] font-mono uppercase text-[#38262e] placeholder:text-[#a89aa0] focus:outline-none focus:border-[#b73d67] transition-colors"
                       />
                       <button
                         type="button"

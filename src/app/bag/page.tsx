@@ -274,17 +274,17 @@ export default function ShoppingBagPage() {
                       }}
                       className="space-y-1.5"
                     >
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 w-full">
                         <input
                           type="text"
                           value={promoInput}
                           onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
                           placeholder={t.promoPlaceholder}
-                          className="flex-1 h-[38px] px-3 rounded-lg border border-[#eedfe5] text-[13px] font-mono uppercase text-[#38262e] placeholder:text-[#a89aa0] focus:outline-none focus:border-[#b73d67] transition-colors"
+                          className="flex-1 min-w-0 h-[38px] px-3 rounded-lg border border-[#eedfe5] text-[12.5px] sm:text-[13px] font-mono uppercase text-[#38262e] placeholder:text-[#a89aa0] focus:outline-none focus:border-[#b73d67] transition-colors"
                         />
                         <button
                           type="submit"
-                          className="h-[38px] px-4 bg-[#38262e] hover:bg-[#b73d67] text-white text-[12px] font-bold rounded-lg transition-colors cursor-pointer shrink-0"
+                          className="h-[38px] px-3.5 sm:px-4 bg-[#38262e] hover:bg-[#b73d67] text-white text-[12px] font-bold rounded-lg transition-colors cursor-pointer shrink-0"
                         >
                           {t.apply}
                         </button>

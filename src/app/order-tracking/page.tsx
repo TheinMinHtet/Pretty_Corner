@@ -92,12 +92,13 @@ function OrderReceiptContent() {
 
         {/* Page Details Header */}
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <Link href="/shop" className="text-[12px] font-bold text-[#b73d67] hover:underline">
+          <div className="flex items-center justify-between gap-2">
+            <Link href="/shop" className="text-[12px] font-bold text-[#b73d67] hover:underline shrink-0 whitespace-nowrap">
               {t.backToShop}
             </Link>
-            <span className="text-[11px] font-bold text-[#7a6870] uppercase tracking-wider bg-white px-2.5 py-1 rounded-full border border-[#eedfe5]">
-              {t.officialReceipt}
+            <span className="text-[10px] sm:text-[11px] font-bold text-[#7a6870] uppercase tracking-wider bg-white px-2.5 py-0.5 sm:py-1 rounded-full border border-[#eedfe5] shrink-0 whitespace-nowrap">
+              <span className="hidden sm:inline">{t.officialReceipt}</span>
+              <span className="sm:hidden">{language === 'my' ? 'အရောင်းပြေစာ' : 'Official Receipt'}</span>
             </span>
           </div>
 
