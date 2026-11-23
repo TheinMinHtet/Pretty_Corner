@@ -42,11 +42,10 @@ function PaymentPendingContent() {
 
   const activeOrder = localOrder || remoteOrder;
 
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showSlideConfirmModal, setShowSlideConfirmModal] = useState(false);
-  const [mockPaymentSuccess, setMockPaymentSuccess] = useState(false);
   const [isInitializingPayment, setIsInitializingPayment] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<number>(300); // 5 minutes (300s)
 
   // 02: State Caching - cache payment session in sessionStorage & localStorage
@@ -262,19 +261,30 @@ function PaymentPendingContent() {
           }
         } catch {}
       }
-      if (isInitializingPayment || showPaymentModal || hasActivePending) {
+      if (isInitializingPayment || hasActivePending) {
         e.preventDefault();
         e.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [cleanId, isInitializingPayment, showPaymentModal]);
+  }, [cleanId, isInitializingPayment]);
 
   const handleOpenPaymentGateway = async () => {
+    setPaymentError(null);
     const pubKey = process.env.NEXT_PUBLIC_MMPAY_PUBLISHABLE_KEY;
-    const targetId = activeOrder?.id || cleanId;
-    const amountToPay = activeOrder?.total ?? 0;
+    const rawTargetId = activeOrder?.id || cleanId;
+    const targetId = rawTargetId.trim().replace(/\s+/g, '-').replace(/[^a-zA-Z0-9_-]/g, '');
+    const amountToPay = Math.round(activeOrder?.total ?? 0);
+
+    if (!amountToPay || amountToPay <= 0) {
+      setPaymentError(
+        language === 'my'
+          ? 'အမှာစာငွေပမာဏ ရှာမတွေ့သေးပါ။ စာမျက်နှာကို ပြန်လည်ဖွင့်ပေးပါ သို့မဟုတ် ဆိုင်သို့ တိုက်ရိုက် ဆက်သွယ်ပေးပါ။'
+          : 'Order amount is not available. Please refresh the page or contact our team directly.'
+      );
+      return;
+    }
 
     cachePaymentSession();
 
@@ -346,7 +356,11 @@ function PaymentPendingContent() {
             updatePaymentStatus(targetId, 'expired');
           } else if (result.failed) {
             setIsInitializingPayment(false);
-            setShowPaymentModal(true);
+            setPaymentError(
+              language === 'my'
+                ? 'ငွေပေးချေမှု ချိတ်ဆက်၍ မရသေးပါ။ ဆိုင်သို့ တိုက်ရိုက် ဆက်သွယ်ပေးပါရန် မေတ္တာရပ်ခံပါသည်။'
+                : 'Unable to connect to payment gateway. Please contact our support team.'
+            );
           }
         };
 
@@ -408,19 +422,23 @@ function PaymentPendingContent() {
 
         setIsInitializingPayment(false);
         return;
-      } catch (err) {
-        console.warn('MyanMyanPay SDK modal failed, using standard modal:', err);
+      } catch (err: any) {
+        console.warn('MyanMyanPay SDK modal failed:', err);
         setIsInitializingPayment(false);
+        setPaymentError(
+          err?.message ||
+          (language === 'my'
+            ? 'ငွေပေးချေမှု ချိတ်ဆက်၍ မရသေးပါ။ ဆိုင်သို့ တိုက်ရိုက် ဆက်သွယ်ပေးပါရန် မေတ္တာရပ်ခံပါသည်။'
+            : 'Unable to connect to payment gateway. Please contact our support team.')
+        );
       }
+    } else {
+      setPaymentError(
+        language === 'my'
+          ? 'ငွေပေးချေမှုစနစ် မရရှိနိုင်သေးပါ။ ဆိုင်သို့ တိုက်ရိုက် ဆက်သွယ်ပေးပါရန် မေတ္တာရပ်ခံပါသည်။'
+          : 'Payment system is not available right now. Please contact our support team.'
+      );
     }
-
-    // Fallback if keys are not set yet or SDK modal is bypassed
-    setShowPaymentModal(true);
-  };
-
-  const handleConfirmGatewayPayment = () => {
-    setShowPaymentModal(false);
-    setShowSlideConfirmModal(true);
   };
 
   // 03: Transaction Control - Explicit cancellation handler
@@ -629,6 +647,44 @@ function PaymentPendingContent() {
           )}
         </button>
 
+        {/* Payment Error / Help Assist Card */}
+        {paymentError && (
+          <div className="w-full mt-3 p-4 bg-rose-50 border border-rose-200 rounded-xl text-left animate-in fade-in duration-200">
+            <div className="flex items-start gap-2.5">
+              <svg className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <div className="flex-1">
+                <p className="text-[13px] font-bold text-rose-900">
+                  {language === 'my' ? 'ငွေပေးချေမှု ချိတ်ဆက်ရာတွင် အဆင်မပြေဖြစ်နေပါသည်' : 'Payment gateway assistance'}
+                </p>
+                <p className="text-[12px] text-rose-700 mt-1 leading-relaxed">
+                  {paymentError}
+                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Link
+                    href={`/contact?orderId=${encodeURIComponent(currentId)}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#b73d67] text-white text-[12px] font-bold rounded-lg hover:bg-[#a33259] transition-colors shadow-2xs"
+                  >
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                    </svg>
+                    <span>{language === 'my' ? 'ဆိုင်သို့ တိုက်ရိုက် ဆက်သွယ်မည်' : 'Contact Us'}</span>
+                  </Link>
+                  <a
+                    href="tel:09880123456"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-rose-300 text-rose-900 text-[12px] font-bold rounded-lg hover:bg-rose-100 transition-colors shadow-2xs"
+                  >
+                    <span>📞 09-880123456</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Slide to Confirm Button for fast mobile confirmation */}
         <button
           type="button"
@@ -657,7 +713,7 @@ function PaymentPendingContent() {
             {t.needHelpPayment} <span className="font-mono font-bold text-[#38262e]">{currentId}</span>.
           </p>
           <Link
-            href="/contact"
+            href={`/contact?orderId=${encodeURIComponent(currentId)}`}
             className="text-[12px] font-bold text-[#b73d67] hover:underline mt-1.5 inline-block"
           >
             {t.questionsContact}
@@ -698,76 +754,6 @@ function PaymentPendingContent() {
                 {language === 'my' ? 'မပယ်ဖျက်တော့ပါ' : 'Keep Order & Return'}
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Payment Gateway Simulation Modal */}
-      {showPaymentModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="w-full max-w-[380px] my-auto bg-white rounded-[20px] p-5 sm:p-6 shadow-2xl flex flex-col text-center max-h-[calc(100dvh-32px)] overflow-y-auto">
-            <div className="w-12 h-12 rounded-full bg-[#fceef2] text-[#b73d67] flex items-center justify-center mx-auto mb-3 shrink-0">
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="7" height="7" />
-                <rect x="14" y="3" width="7" height="7" />
-                <rect x="14" y="14" width="7" height="7" />
-                <rect x="3" y="14" width="7" height="7" />
-              </svg>
-            </div>
-            <div className="inline-block mx-auto mb-1 px-2.5 py-0.5 bg-[#fceef2] text-[#b73d67] text-[11px] font-bold rounded-full uppercase tracking-wider">
-              MyanMyanPay Sandbox
-            </div>
-            <h3 className="font-serif text-[22px] font-bold text-[#38262e] mb-1">
-              MMQR Payment
-            </h3>
-            <p className="text-[13px] text-[#7a6870] mb-3">
-              {language === 'my'
-                ? 'KBZPay, WavePay, AYA Pay သို့မဟုတ် CB Pay ဖြင့် ပေးချေနိုင်ပါသည်။'
-                : 'Supports KBZPay, WavePay, AYA Pay, CB Pay and any MMQR app.'}
-            </p>
-
-            <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
-              <span className="px-2 py-1 bg-[#002f6c]/10 text-[#002f6c] text-[11px] font-bold rounded">KBZPay</span>
-              <span className="px-2 py-1 bg-[#fcd116]/30 text-[#856404] text-[11px] font-bold rounded">WavePay</span>
-              <span className="px-2 py-1 bg-[#ed1b24]/10 text-[#ed1b24] text-[11px] font-bold rounded">AYA Pay</span>
-              <span className="px-2 py-1 bg-[#005ba4]/10 text-[#005ba4] text-[11px] font-bold rounded">CB Pay</span>
-            </div>
-
-            <div className="bg-[#faf7f8] rounded-xl p-3 mb-5 border border-[#eedfe5]">
-              <span className="text-[11px] text-[#7a6870] block">
-                {language === 'my' ? 'လွှဲပြောင်းရမည့်ငွေ' : 'Amount to transfer'}
-              </span>
-              <span className="font-bold text-[20px] text-[#b73d67]">
-                {totalAmount.toLocaleString()} MMK
-              </span>
-            </div>
-
-            {mockPaymentSuccess ? (
-              <div className="h-[46px] bg-emerald-50 text-emerald-700 font-bold text-[14px] rounded-[10px] flex items-center justify-center gap-2">
-                <svg className="w-5 h-5 animate-in zoom-in-75 duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M20 6L9 17l-5-5" />
-                </svg>
-                {t.paymentAuthorized}
-              </div>
-            ) : (
-              <button
-                onClick={handleConfirmGatewayPayment}
-                className="w-full h-[46px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[14px] hover:bg-[#a33259] transition-all flex items-center justify-center shadow-xs cursor-pointer"
-              >
-                {language === 'my' ? 'ငွေပေးချေပြီးပြီ (Simulate)' : 'Simulate Successful Payment'}
-              </button>
-            )}
-
-            <button
-              disabled={mockPaymentSuccess}
-              onClick={() => {
-                setShowPaymentModal(false);
-                clearPaymentSession();
-              }}
-              className="mt-3 text-[13px] text-[#7a6870] hover:text-[#38262e] font-medium disabled:opacity-50 cursor-pointer"
-            >
-              {language === 'my' ? 'မလုပ်တော့ပါ' : 'Cancel'}
-            </button>
           </div>
         </div>
       )}
