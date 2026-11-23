@@ -13,22 +13,39 @@ export async function POST(req: NextRequest) {
 
     let isValid = false;
 
-    if (sdk && nonce && signature) {
-      try {
-        isValid = await sdk.verifyCb(rawBody, nonce, signature);
-      } catch (err) {
-        console.warn('MyanMyanPay SDK verification attempt failed:', err);
+    if (config.secretKey && nonce && signature) {
+      if (sdk) {
+        try {
+          isValid = await sdk.verifyCb(rawBody, nonce, signature);
+        } catch (err) {
+          console.warn('MyanMyanPay SDK verification attempt failed:', err);
+        }
       }
 
-      // Fallback manual HMAC-SHA256 verification if sdk.verifyCb errored
-      if (!isValid && config.secretKey) {
+      // Fallback verification across MyanMyanPay HMAC formats
+      if (!isValid) {
+        const checkFormats = [
+          `${nonce}.${rawBody}`, // Standard MyanMyanPay specification: nonce.body
+          `${nonce}${rawBody}`,
+        ];
+
         try {
+          const parsed = JSON.parse(rawBody);
+          const compact = JSON.stringify(parsed);
+          checkFormats.push(`${nonce}.${compact}`);
+          checkFormats.push(`${nonce}${compact}`);
+        } catch {}
+
+        for (const candidate of checkFormats) {
           const expected = crypto
             .createHmac('sha256', config.secretKey)
-            .update(`${nonce}${rawBody}`)
+            .update(candidate)
             .digest('hex');
-          isValid = signature === expected;
-        } catch {}
+          if (expected.toLowerCase() === signature.toLowerCase()) {
+            isValid = true;
+            break;
+          }
+        }
       }
     } else {
       // If keys are not set up yet (sandbox testing without credentials), accept with warning in dev
