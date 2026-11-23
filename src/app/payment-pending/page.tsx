@@ -61,20 +61,6 @@ function PaymentPendingContent() {
     }
   }, [cleanId]);
 
-  // 02: State Caching - auto-restore active payment modal on page refresh
-  useEffect(() => {
-    if (typeof window !== 'undefined' && cleanId && !showPaymentModal && activeOrder?.paymentStatus !== 'paid' && activeOrder?.paymentStatus !== 'cancelled') {
-      try {
-        const cached = sessionStorage.getItem(`pretty_corner_mmpay_active_${cleanId}`);
-        if (cached) {
-          const data = JSON.parse(cached);
-          if (data.active && Date.now() - data.timestamp < 15 * 60 * 1000) {
-            setShowPaymentModal(true);
-          }
-        }
-      } catch {}
-    }
-  }, [cleanId, showPaymentModal, activeOrder?.paymentStatus]);
 
   // 01: Seamless Transitions - auto-detect payment upon returning from banking app & background polling
   useEffect(() => {
@@ -170,6 +156,9 @@ function PaymentPendingContent() {
               clearPaymentSession();
               updatePaymentStatus(targetId, 'paid');
               router.push(`/order-confirmation?orderId=${targetId}`);
+            } else if (result.failed) {
+              setIsInitializingPayment(false);
+              setShowPaymentModal(true);
             }
           }
         );
