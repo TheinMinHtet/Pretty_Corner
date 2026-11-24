@@ -112,7 +112,13 @@ export default function HomePage() {
       {/* 4. Categories - Responsive Container */}
       <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-5 sm:pt-8 pb-3">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="font-serif text-[20px] sm:text-[28px] font-medium text-[#38262e]">
+          <h3
+            className={`font-serif font-medium text-[#38262e] ${
+              language === 'my'
+                ? 'text-[17px] sm:text-[23px]'
+                : 'text-[20px] sm:text-[28px]'
+            }`}
+          >
             {t.exploreByCategory}
           </h3>
           <button
@@ -144,7 +150,13 @@ export default function HomePage() {
       <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-6 sm:pb-8">
         <div className="flex items-center justify-between gap-2.5 mb-3.5 sm:mb-5">
           <div className="min-w-0">
-            <h3 className="font-serif text-[19px] sm:text-[32px] font-medium text-[#38262e] leading-tight">
+            <h3
+              className={`font-serif font-medium text-[#38262e] leading-tight ${
+                language === 'my'
+                  ? 'text-[16.5px] sm:text-[25px]'
+                  : 'text-[19px] sm:text-[32px]'
+              }`}
+            >
               {t.topPicksTitle}
             </h3>
           </div>
@@ -237,7 +249,13 @@ export default function HomePage() {
           {/* Right Side Content */}
           <div className="w-full md:w-auto md:max-w-md flex flex-col justify-center items-start gap-3">
             <div>
-              <h4 className="font-serif text-[18px] min-[380px]:text-[20px] sm:text-[24px] font-medium leading-[1.48] text-[#38262e]">
+              <h4
+                className={`font-serif font-medium leading-[1.48] text-[#38262e] ${
+                  language === 'my'
+                    ? 'text-[15.5px] min-[380px]:text-[17px] sm:text-[20px]'
+                    : 'text-[18px] min-[380px]:text-[20px] sm:text-[24px]'
+                }`}
+              >
                 {t.storeLocationHeading}
               </h4>
             </div>
