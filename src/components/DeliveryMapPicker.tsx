@@ -11,6 +11,7 @@ interface DeliveryMapPickerProps {
   language: 'en' | 'my';
   onLocateGps?: () => void;
   isLocatingGps?: boolean;
+  selectedTownshipName?: string;
 }
 
 interface SearchSuggestion {
@@ -29,6 +30,7 @@ export default function DeliveryMapPicker({
   language,
   onLocateGps,
   isLocatingGps,
+  selectedTownshipName,
 }: DeliveryMapPickerProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
@@ -419,8 +421,8 @@ export default function DeliveryMapPicker({
         </div>
 
         {/* Live Status indicator */}
-        <div className="mt-2 flex items-center justify-between text-[11.5px] text-[#7a6870] px-1">
-          <div className="flex items-center gap-1.5 min-w-0">
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-1.5 text-[11.5px] text-[#7a6870] px-1">
+          <div className="flex items-center gap-1.5 min-w-0 flex-1">
             {isResolving ? (
               <span className="text-[#b73d67] font-medium flex items-center gap-1.5">
                 <span className="inline-block w-3 h-3 border-2 border-[#b73d67] border-t-transparent rounded-full animate-spin" />
@@ -432,9 +434,16 @@ export default function DeliveryMapPicker({
               </span>
             ) : null}
           </div>
-          <span className="font-mono text-[10px] text-[#a89aa0] shrink-0 ml-2">
-            {currentCoords.lat.toFixed(4)}, {currentCoords.lng.toFixed(4)}
-          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            {selectedTownshipName && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#fceef2] text-[#b73d67] font-semibold text-[11px] border border-[#f5d9e3]">
+                <span>📍 {selectedTownshipName}</span>
+              </span>
+            )}
+            <span className="font-mono text-[10px] text-[#a89aa0]">
+              {currentCoords.lat.toFixed(4)}, {currentCoords.lng.toFixed(4)}
+            </span>
+          </div>
         </div>
       </div>
 

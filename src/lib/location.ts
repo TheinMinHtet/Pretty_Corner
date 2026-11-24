@@ -18,7 +18,7 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'Kamayut, Yangon',
     lat: 16.8285,
     lng: 96.1285,
-    aliases: ['kamayut', 'kamaryut', 'ကမာရွတ်', 'ကမာရွတ်မြို့နယ်'],
+    aliases: ['kamayut', 'kamaryut', 'ကမာရွတ်', 'ကမာရွတ်မြို့နယ်', 'kamayut township'],
     townshipEn: 'Kamayut Township',
     townshipMy: 'ကမာရွတ်မြို့နယ်',
     stateEn: 'Yangon Region',
@@ -28,7 +28,7 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'Hledan, Yangon',
     lat: 16.8258,
     lng: 96.1287,
-    aliases: ['hledan', 'hle dan', 'လှည်းတန်း'],
+    aliases: ['hledan', 'hle dan', 'လှည်းတန်း', 'လှည်းတန်းလမ်းဆုံ'],
     townshipEn: 'Hledan, Kamayut Township',
     townshipMy: 'လှည်းတန်း၊ ကမာရွတ်မြို့နယ်',
     stateEn: 'Yangon Region',
@@ -38,7 +38,7 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'Bahan, Yangon',
     lat: 16.8122,
     lng: 96.1544,
-    aliases: ['bahan', 'ဗဟန်း', 'ဗဟန်းမြို့နယ်'],
+    aliases: ['bahan', 'ဗဟန်း', 'ဗဟန်းမြို့နယ်', 'bahan township'],
     townshipEn: 'Bahan Township',
     townshipMy: 'ဗဟန်းမြို့နယ်',
     stateEn: 'Yangon Region',
@@ -48,7 +48,7 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'Sanchaung, Yangon',
     lat: 16.8045,
     lng: 96.1342,
-    aliases: ['sanchaung', 'san chaung', 'စမ်းချောင်း', 'စမ်းချောင်းမြို့နယ်'],
+    aliases: ['sanchaung', 'san chaung', 'စမ်းချောင်း', 'စမ်းချောင်းမြို့နယ်', 'sanchaung township'],
     townshipEn: 'Sanchaung Township',
     townshipMy: 'စမ်းချောင်းမြို့နယ်',
     stateEn: 'Yangon Region',
@@ -58,7 +58,7 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'Dagon, Yangon',
     lat: 16.7975,
     lng: 96.1485,
-    aliases: ['dagon', 'ဒဂုံ', 'ဒဂုံမြို့နယ်'],
+    aliases: ['dagon', 'ဒဂုံ', 'ဒဂုံမြို့နယ်', 'dagon township'],
     townshipEn: 'Dagon Township',
     townshipMy: 'ဒဂုံမြို့နယ်',
     stateEn: 'Yangon Region',
@@ -68,9 +68,89 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'Kyauktada, Yangon',
     lat: 16.7744,
     lng: 96.1601,
-    aliases: ['kyauktada', 'kyauk tada', 'ကျောက်တံတား', 'ကျောက်တံတားမြို့နယ်'],
+    aliases: ['kyauktada', 'kyauk tada', 'ကျောက်တံတား', 'ကျောက်တံတားမြို့နယ်', 'kyauktada township'],
     townshipEn: 'Kyauktada Township',
     townshipMy: 'ကျောက်တံတားမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Pabedan, Yangon',
+    lat: 16.7765,
+    lng: 96.1554,
+    aliases: ['pabedan', 'panbedan', 'ပန်းဘဲတန်း', 'ပန်းဘဲတန်းမြို့နယ်', 'pabedan township'],
+    townshipEn: 'Pabedan Township',
+    townshipMy: 'ပန်းဘဲတန်းမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Latha, Yangon',
+    lat: 16.7760,
+    lng: 96.1495,
+    aliases: ['latha', 'lar thar', 'လသာ', 'လသာမြို့နယ်', 'latha township'],
+    townshipEn: 'Latha Township',
+    townshipMy: 'လသာမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Lanmadaw, Yangon',
+    lat: 16.7780,
+    lng: 96.1430,
+    aliases: ['lanmadaw', 'lan ma daw', 'လမ်းမတော်', 'လမ်းမတော်မြို့နယ်', 'lanmadaw township'],
+    townshipEn: 'Lanmadaw Township',
+    townshipMy: 'လမ်းမတော်မြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Ahlone, Yangon',
+    lat: 16.7865,
+    lng: 96.1310,
+    aliases: ['ahlone', 'ahlon', 'alone', 'အလုံ', 'အလုံမြို့နယ်', 'ahlone township'],
+    townshipEn: 'Ahlone Township',
+    townshipMy: 'အလုံမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Kyeemyindaing, Yangon',
+    lat: 16.8010,
+    lng: 96.1215,
+    aliases: ['kyeemyindaing', 'kyimyindaing', 'kyimyindine', 'ကြည့်မြင်တိုင်', 'ကြည့်မြင်တိုင်မြို့နယ်', 'kyeemyindaing township'],
+    townshipEn: 'Kyeemyindaing Township',
+    townshipMy: 'ကြည့်မြင်တိုင်မြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Botahtaung, Yangon',
+    lat: 16.7780,
+    lng: 96.1705,
+    aliases: ['botahtaung', 'botataung', 'ဗိုလ်တထောင်', 'ဗိုလ်တထောင်မြို့နယ်', 'botataung township', 'botahtaung township'],
+    townshipEn: 'Botahtaung Township',
+    townshipMy: 'ဗိုလ်တထောင်မြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Pazundaung, Yangon',
+    lat: 16.7860,
+    lng: 96.1780,
+    aliases: ['pazundaung', 'pa zun daung', 'ပုဇွန်တောင်', 'ပုဇွန်တောင်မြို့နယ်', 'pazundaung township'],
+    townshipEn: 'Pazundaung Township',
+    townshipMy: 'ပုဇွန်တောင်မြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Mingalar Taung Nyunt, Yangon',
+    lat: 16.7950,
+    lng: 96.1700,
+    aliases: ['mingalar taung nyunt', 'mingalar taungnyunt', 'မင်္ဂလာတောင်ညွန့်', 'မင်္ဂလာတောင်ညွန့်မြို့နယ်', 'mingala taung nyunt'],
+    townshipEn: 'Mingalar Taung Nyunt Township',
+    townshipMy: 'မင်္ဂလာတောင်ညွန့်မြို့နယ်',
     stateEn: 'Yangon Region',
     stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
   },
@@ -78,7 +158,7 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'Yankin, Yangon',
     lat: 16.8375,
     lng: 96.1636,
-    aliases: ['yankin', 'yan kin', 'ရန်ကင်း', 'ရန်ကင်းမြို့နယ်'],
+    aliases: ['yankin', 'yan kin', 'ရန်ကင်း', 'ရန်ကင်းမြို့နယ်', 'yankin township'],
     townshipEn: 'Yankin Township',
     townshipMy: 'ရန်ကင်းမြို့နယ်',
     stateEn: 'Yangon Region',
@@ -88,7 +168,7 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'Mayangone, Yangon',
     lat: 16.8711,
     lng: 96.1444,
-    aliases: ['mayangone', 'mayangon', 'မရမ်းကုန်း', 'မရမ်းကုန်းမြို့နယ်', 'mayangon district'],
+    aliases: ['mayangone', 'mayangon', 'မရမ်းကုန်း', 'မရမ်းကုန်းမြို့နယ်', 'mayangone township'],
     townshipEn: 'Mayangone Township',
     townshipMy: 'မရမ်းကုန်းမြို့နယ်',
     stateEn: 'Yangon Region',
@@ -98,9 +178,19 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'Hlaing, Yangon',
     lat: 16.8488,
     lng: 96.1264,
-    aliases: ['hlaing', 'လှိုင်', 'လှိုင်မြို့နယ်'],
+    aliases: ['hlaing', 'လှိုင်', 'လှိုင်မြို့နယ်', 'hlaing township'],
     townshipEn: 'Hlaing Township',
     townshipMy: 'လှိုင်မြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Insein, Yangon',
+    lat: 16.8900,
+    lng: 96.0950,
+    aliases: ['insein', 'in sein', 'အင်းစိန်', 'အင်းစိန်မြို့နယ်', 'insein township'],
+    townshipEn: 'Insein Township',
+    townshipMy: 'အင်းစိန်မြို့နယ်',
     stateEn: 'Yangon Region',
     stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
   },
@@ -108,9 +198,39 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'Tamwe, Yangon',
     lat: 16.8092,
     lng: 96.1712,
-    aliases: ['tamwe', 'တာမွေ', 'တာမွေမြို့နယ်'],
+    aliases: ['tamwe', 'ta mwe', 'တာမွေ', 'တာမွေမြို့နယ်', 'tamwe township'],
     townshipEn: 'Tamwe Township',
     townshipMy: 'တာမွေမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Thingangyun, Yangon',
+    lat: 16.8200,
+    lng: 96.1950,
+    aliases: ['thingangyun', 'thin gan gyun', 'သင်္ဃန်းကျွန်း', 'သင်္ဃန်းကျွန်းမြို့နယ်', 'thingangyun township'],
+    townshipEn: 'Thingangyun Township',
+    townshipMy: 'သင်္ဃန်းကျွန်းမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Thaketa, Yangon',
+    lat: 16.7900,
+    lng: 96.2050,
+    aliases: ['thaketa', 'tha ke ta', 'သာကေတ', 'သာကေတမြို့နယ်', 'thaketa township'],
+    townshipEn: 'Thaketa Township',
+    townshipMy: 'သာကေတမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Dawbon, Yangon',
+    lat: 16.7820,
+    lng: 96.1920,
+    aliases: ['dawbon', 'daw bon', 'ဒေါပုံ', 'ဒေါပုံမြို့နယ်', 'dawbon township'],
+    townshipEn: 'Dawbon Township',
+    townshipMy: 'ဒေါပုံမြို့နယ်',
     stateEn: 'Yangon Region',
     stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
   },
@@ -118,7 +238,7 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'South Okkalapa, Yangon',
     lat: 16.8485,
     lng: 96.1842,
-    aliases: ['south okkalapa', 'south okkalapa township', 'တောင်ဥက္ကလာပ', 'တောင်ဥက္ကလာ'],
+    aliases: ['south okkalapa', 'south okkalapa township', 'တောင်ဥက္ကလာပ', 'တောင်ဥက္ကလာ', 'တောင်ဥက္ကလာပမြို့နယ်'],
     townshipEn: 'South Okkalapa Township',
     townshipMy: 'တောင်ဥက္ကလာပမြို့နယ်',
     stateEn: 'Yangon Region',
@@ -128,9 +248,99 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'North Okkalapa, Yangon',
     lat: 16.8925,
     lng: 96.1710,
-    aliases: ['north okkalapa', 'north okkalapa township', 'မြောက်ဥက္ကလာပ', 'မြောက်ဥက္ကလာ'],
+    aliases: ['north okkalapa', 'north okkalapa township', 'မြောက်ဥက္ကလာပ', 'မြောက်ဥက္ကလာ', 'မြောက်ဥက္ကလာပမြို့နယ်'],
     townshipEn: 'North Okkalapa Township',
     townshipMy: 'မြောက်ဥက္ကလာပမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'North Dagon, Yangon',
+    lat: 16.8650,
+    lng: 96.2200,
+    aliases: ['north dagon', 'dagon myothit north', 'dagon north', 'မြောက်ဒဂုံ', 'ဒဂုံမြောက်ပိုင်း', 'ဒဂုံမြို့သစ်မြောက်ပိုင်း', 'ဒဂုံမြို့သစ်မြောက်ပိုင်းမြို့နယ်'],
+    townshipEn: 'North Dagon Township',
+    townshipMy: 'ဒဂုံမြို့သစ်မြောက်ပိုင်းမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'South Dagon, Yangon',
+    lat: 16.8400,
+    lng: 96.2400,
+    aliases: ['south dagon', 'dagon myothit south', 'dagon south', 'တောင်ဒဂုံ', 'ဒဂုံတောင်ပိုင်း', 'ဒဂုံမြို့သစ်တောင်ပိုင်း', 'ဒဂုံမြို့သစ်တောင်ပိုင်းမြို့နယ်'],
+    townshipEn: 'South Dagon Township',
+    townshipMy: 'ဒဂုံမြို့သစ်တောင်ပိုင်းမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'East Dagon, Yangon',
+    lat: 16.8800,
+    lng: 96.2500,
+    aliases: ['east dagon', 'dagon myothit east', 'dagon east', 'အရှေ့ဒဂုံ', 'ဒဂုံအရှေ့ပိုင်း', 'ဒဂုံမြို့သစ်အရှေ့ပိုင်း', 'ဒဂုံမြို့သစ်အရှေ့ပိုင်းမြို့နယ်'],
+    townshipEn: 'East Dagon Township',
+    townshipMy: 'ဒဂုံမြို့သစ်အရှေ့ပိုင်းမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Dagon Seikkan, Yangon',
+    lat: 16.8150,
+    lng: 96.2550,
+    aliases: ['dagon seikkan', 'dagon port', 'ဒဂုံဆိပ်ကမ်း', 'ဒဂုံဆိပ်ကမ်းမြို့နယ်', 'dagon seikkan township'],
+    townshipEn: 'Dagon Seikkan Township',
+    townshipMy: 'ဒဂုံဆိပ်ကမ်းမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Hlaingtharya, Yangon',
+    lat: 16.8650,
+    lng: 96.0500,
+    aliases: ['hlaingtharya', 'hlaing tharyar', 'hlaing tharya', 'လှိုင်သာယာ', 'လှိုင်သာယာမြို့နယ်', 'hlaingtharyar township'],
+    townshipEn: 'Hlaingtharya Township',
+    townshipMy: 'လှိုင်သာယာမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Shwepyitha, Yangon',
+    lat: 16.9400,
+    lng: 96.0700,
+    aliases: ['shwepyitha', 'shwe pyi tha', 'shwepyithar', 'ရွှေပြည်သာ', 'ရွှေပြည်သာမြို့နယ်', 'shwepyitha township'],
+    townshipEn: 'Shwepyitha Township',
+    townshipMy: 'ရွှေပြည်သာမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Mingaladon, Yangon',
+    lat: 16.9200,
+    lng: 96.1600,
+    aliases: ['mingaladon', 'mingalardon', 'မင်္ဂလာဒုံ', 'မင်္ဂလာဒုံမြို့နယ်', 'mingaladon township'],
+    townshipEn: 'Mingaladon Township',
+    townshipMy: 'မင်္ဂလာဒုံမြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Thanlyin, Yangon',
+    lat: 16.7600,
+    lng: 96.2500,
+    aliases: ['thanlyin', 'syriam', 'သန်လျင်', 'သန်လျင်မြို့နယ်', 'thanlyin township'],
+    townshipEn: 'Thanlyin Township',
+    townshipMy: 'သန်လျင်မြို့နယ်',
+    stateEn: 'Yangon Region',
+    stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
+  },
+  {
+    name: 'Kyauktan, Yangon',
+    lat: 16.6300,
+    lng: 96.3300,
+    aliases: ['kyauktan', 'ကျောက်တန်း', 'ကျောက်တန်းမြို့နယ်', 'kyauktan township'],
+    townshipEn: 'Kyauktan Township',
+    townshipMy: 'ကျောက်တန်းမြို့နယ်',
     stateEn: 'Yangon Region',
     stateMy: 'ရန်ကုန်တိုင်းဒေသကြီး',
   },
@@ -138,7 +348,7 @@ export const TOWNSHIP_GEO_METAS: TownshipGeoMeta[] = [
     name: 'Mandalay City (Express Delivery)',
     lat: 21.9750,
     lng: 96.0836,
-    aliases: ['mandalay', 'mandalay city', 'မန္တလေး'],
+    aliases: ['mandalay', 'mandalay city', 'မန္တလေး', 'မန္တလေးမြို့'],
     townshipEn: 'Mandalay City',
     townshipMy: 'မန္တလေးမြို့',
     stateEn: 'Mandalay Region',
@@ -191,18 +401,57 @@ export function resolveTownshipMeta(
 ): TownshipGeoMeta | null {
   const normalizedRaw = (rawName || '').trim().toLowerCase();
 
-  // 1. Check exact alias matching if a name was returned by geocoder
+  // 1. Check exact or alias matching if a name was returned by geocoder
   if (normalizedRaw) {
+    // 1a. Direct exact match against any alias or name
     for (const meta of TOWNSHIP_GEO_METAS) {
       if (
-        meta.aliases.some(
-          (alias) =>
-            normalizedRaw === alias ||
-            normalizedRaw.includes(alias) ||
-            alias.includes(normalizedRaw)
-        )
+        meta.name.toLowerCase() === normalizedRaw ||
+        meta.townshipEn.toLowerCase() === normalizedRaw ||
+        meta.townshipMy === normalizedRaw ||
+        meta.aliases.some((alias) => alias.toLowerCase() === normalizedRaw)
       ) {
         return meta;
+      }
+    }
+
+    // 1b. Cleaned name exact match (strip "township", "မြို့နယ်", etc.)
+    const cleanRaw = normalizedRaw
+      .replace(/(township|city|district|quarter|ward|myothit|မြို့နယ်|မြို့|ရပ်ကွက်)/gi, '')
+      .trim();
+
+    if (cleanRaw) {
+      for (const meta of TOWNSHIP_GEO_METAS) {
+        for (const alias of meta.aliases) {
+          const cleanAlias = alias
+            .replace(/(township|city|district|quarter|ward|myothit|မြို့နယ်|မြို့|ရပ်ကွက်)/gi, '')
+            .trim()
+            .toLowerCase();
+          if (cleanRaw === cleanAlias) {
+            return meta;
+          }
+        }
+      }
+    }
+
+    // 1c. Substring match, sorted so longer/more specific names match first
+    // (e.g. "hlaingtharya" matches Hlaingtharya, NOT Hlaing; "north dagon" matches North Dagon, NOT Dagon)
+    const sortedMetas = [...TOWNSHIP_GEO_METAS].sort((a, b) => {
+      const maxA = Math.max(...a.aliases.map((al) => al.length));
+      const maxB = Math.max(...b.aliases.map((al) => al.length));
+      return maxB - maxA;
+    });
+
+    for (const meta of sortedMetas) {
+      const sortedAliases = [...meta.aliases].sort((x, y) => y.length - x.length);
+      for (const alias of sortedAliases) {
+        const lowerAlias = alias.toLowerCase();
+        if (
+          lowerAlias.length >= 3 &&
+          (normalizedRaw.includes(lowerAlias) || (cleanRaw && cleanRaw.includes(lowerAlias)))
+        ) {
+          return meta;
+        }
       }
     }
   }
