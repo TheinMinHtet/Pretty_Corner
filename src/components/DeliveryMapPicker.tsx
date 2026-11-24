@@ -141,22 +141,29 @@ export default function DeliveryMapPicker({
     };
   }, [searchQuery, language]);
 
+  // Store latest callbacks and values in refs to keep drag listeners fresh without recreating map
+  const onLocationSelectRef = useRef(onLocationSelect);
+  onLocationSelectRef.current = onLocationSelect;
+  const languageRef = useRef(language);
+  languageRef.current = language;
+  const isDraggingRef = useRef(false);
+
   // Reverse geocodes coordinates and calls callback immediately
   const handleGeocodeAndSelect = useCallback(
     async (lat: number, lng: number) => {
       setIsResolving(true);
       try {
         const resolver = getAddressResolver();
-        const fix = await resolver.resolveFromCoordinates(lat, lng, language);
+        const fix = await resolver.resolveFromCoordinates(lat, lng, languageRef.current);
         const resolved = fix.formattedAddress || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
         setPinnedAddress(resolved);
-        onLocationSelect({ lat, lng }, resolved, fix.landmark);
+        onLocationSelectRef.current({ lat, lng }, resolved, fix.landmark);
 
         if (markerRef.current) {
           markerRef.current
             .bindPopup(
               `<div style="font-family: inherit; font-size: 12px; color: #38262e; padding: 2px 4px;">
-                <b style="color: #b73d67;">${language === 'my' ? 'ပို့ဆောင်မည့်နေရာ' : 'Delivery Pin'}</b><br/>
+                <b style="color: #b73d67;">${languageRef.current === 'my' ? 'ပို့ဆောင်မည့်နေရာ' : 'Delivery Pin'}</b><br/>
                 <span style="display:inline-block; margin-top:2px;">${resolved}</span>
               </div>`,
               { closeButton: false, offset: [0, -36] }
@@ -167,12 +174,12 @@ export default function DeliveryMapPicker({
         console.warn('Geocoding failed:', err);
         const fallback = `GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
         setPinnedAddress(fallback);
-        onLocationSelect({ lat, lng }, fallback);
+        onLocationSelectRef.current({ lat, lng }, fallback);
       } finally {
         setIsResolving(false);
       }
     },
-    [language, onLocationSelect]
+    []
   );
 
   // Select a suggestion from search results
@@ -210,33 +217,43 @@ export default function DeliveryMapPicker({
         attribution: '&copy; OpenStreetMap',
       }).addTo(map);
 
-      // Custom Pink Branded Marker Icon
+      // Custom Pink Branded Marker Icon with explicit iconSize & iconAnchor for reliable drag behavior
       const customPinIcon = L.divIcon({
         className: 'custom-map-pin',
         html: `
-          <div style="position: relative; width: 34px; height: 44px; transform: translate(-17px, -44px); cursor: grab;">
-            <svg width="34" height="44" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 4px 6px rgba(56, 38, 46, 0.45));">
+          <div style="position: relative; width: 34px; height: 44px; cursor: grab;">
+            <svg width="34" height="44" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 4px 6px rgba(56, 38, 46, 0.45)); pointer-events: none;">
               <path d="M12 0C5.37258 0 0 5.37258 0 12C0 19.5 10.5 28.5 11.4 29.3C11.75 29.6 12.25 29.6 12.6 29.3C13.5 28.5 24 19.5 24 12C24 5.37258 18.6274 0 12 0Z" fill="#b73d67"/>
               <circle cx="12" cy="11" r="5" fill="#ffffff"/>
               <circle cx="12" cy="11" r="2.5" fill="#b73d67"/>
             </svg>
           </div>
         `,
-        iconSize: [0, 0],
-        iconAnchor: [0, 0],
+        iconSize: [34, 44],
+        iconAnchor: [17, 44],
+        popupAnchor: [0, -44],
       });
 
       const marker = L.marker([initialLat, initialLng], {
         draggable: true,
+        autoPan: true,
         icon: customPinIcon,
       }).addTo(map);
 
+      // Event: Pin drag start
+      marker.on('dragstart', () => {
+        isDraggingRef.current = true;
+      });
+
       // Event: Pin dragged
-      marker.on('dragend', () => {
+      const onMarkerMoveEnd = () => {
+        isDraggingRef.current = false;
         const position = marker.getLatLng();
         setCurrentCoords({ lat: position.lat, lng: position.lng });
         handleGeocodeAndSelect(position.lat, position.lng);
-      });
+      };
+
+      marker.on('dragend', onMarkerMoveEnd);
 
       // Event: Click on map to place pin
       map.on('click', (e) => {
@@ -268,6 +285,7 @@ export default function DeliveryMapPicker({
   // Sync external coords (e.g. from GPS button) to map marker
   useEffect(() => {
     if (!coords || !mapRef.current || !markerRef.current) return;
+    if (isDraggingRef.current) return;
     const currentPos = markerRef.current.getLatLng();
     const isDifferent =
       Math.abs(currentPos.lat - coords.lat) > 0.0001 ||
