@@ -623,10 +623,10 @@ function PaymentPendingContent() {
                     <span>{language === 'my' ? 'ဆိုင်သို့ တိုက်ရိုက် ဆက်သွယ်မည်' : 'Contact Us'}</span>
                   </Link>
                   <a
-                    href="tel:09880123456"
+                    href="tel:09967638888"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-rose-300 text-rose-900 text-[12px] font-bold rounded-lg hover:bg-rose-100 transition-colors shadow-2xs"
                   >
-                    <span>09-880123456</span>
+                    <span>09 967 638 888</span>
                   </a>
                 </div>
               </div>

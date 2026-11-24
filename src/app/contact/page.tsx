@@ -81,7 +81,9 @@ export default function HelpAndContactPage() {
                 </span>
                 <div className="min-w-0">
                   <p className="text-[10.5px] sm:text-[11px] text-[#7a6870] uppercase font-bold">{language === 'my' ? 'ဖုန်းဟော့လိုင်း' : 'Hotline Phone'}</p>
-                  <p className="font-semibold">09 765 432 100</p>
+                  <a href="tel:09967638888" className="font-semibold hover:text-[#b73d67] transition-colors block">
+                    09 967 638 888
+                  </a>
                 </div>
               </div>
 
