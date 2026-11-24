@@ -29,12 +29,12 @@ export default function FloatingCartBar() {
     !pathname.startsWith('/payment');
 
   const bottomPosition = hasBottomNav
-    ? 'bottom-[calc(66px+env(safe-area-inset-bottom,0px))] md:bottom-6'
-    : 'bottom-[calc(16px+env(safe-area-inset-bottom,0px))] md:bottom-6';
+    ? 'bottom-[calc(66px+env(safe-area-inset-bottom,0px))] lg:bottom-6'
+    : 'bottom-[calc(16px+env(safe-area-inset-bottom,0px))] lg:bottom-6';
 
   return (
     <div
-      className={`fixed z-50 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] max-w-[420px] md:max-w-xl transition-all duration-300 ease-out transform ${
+      className={`fixed z-50 left-1/2 -translate-x-1/2 w-[calc(100%-24px)] max-w-[420px] sm:max-w-md lg:max-w-xl transition-all duration-300 ease-out transform ${
         isVisible
           ? 'translate-y-0 opacity-100 pointer-events-auto'
           : 'translate-y-20 opacity-0 pointer-events-none'

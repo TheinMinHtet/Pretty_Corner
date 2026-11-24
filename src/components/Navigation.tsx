@@ -19,8 +19,8 @@ export default function Navigation() {
   const isContact = pathname.startsWith('/contact') || pathname.startsWith('/about') || pathname.startsWith('/faq') || pathname.startsWith('/policies');
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 w-full bg-white/98 backdrop-blur-md z-40 border-t border-[#eedfe5] shadow-lg pb-[env(safe-area-inset-bottom,0px)]">
-      <div className="h-[54px] sm:h-[58px] max-w-md mx-auto flex items-center justify-around px-0.5 sm:px-1">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 w-full bg-white/98 backdrop-blur-md z-40 border-t border-[#eedfe5] shadow-lg pb-[env(safe-area-inset-bottom,0px)]">
+      <div className="h-[54px] sm:h-[58px] max-w-md sm:max-w-lg mx-auto flex items-center justify-around px-0.5 sm:px-2">
         {/* Home Tab */}
         <Link
           href="/"

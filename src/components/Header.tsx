@@ -32,11 +32,11 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Center Nav Links (md and above) */}
-        <nav className="hidden md:flex items-center gap-5 lg:gap-8 text-[14px]">
+        {/* Center Nav Links (lg and above: prevents squishing/wrapping on tablet/intermediate viewports) */}
+        <nav className="hidden lg:flex items-center gap-6 xl:gap-8 text-[14px] whitespace-nowrap">
           <Link
             href="/"
-            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
+            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 whitespace-nowrap ${
               isHome ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
             }`}
           >
@@ -48,7 +48,7 @@ export default function Header() {
 
           <Link
             href="/shop"
-            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
+            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 whitespace-nowrap ${
               isShop ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
             }`}
           >
@@ -60,7 +60,7 @@ export default function Header() {
 
           <Link
             href="/order-lookup"
-            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
+            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 whitespace-nowrap ${
               isTrack ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
             }`}
           >
@@ -72,7 +72,7 @@ export default function Header() {
 
           <Link
             href="/contact"
-            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 ${
+            className={`font-medium transition-colors hover:text-[#b73d67] relative py-1 whitespace-nowrap ${
               isContact ? 'text-[#b73d67] font-bold' : 'text-[#38262e]'
             }`}
           >

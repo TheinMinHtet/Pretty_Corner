@@ -99,8 +99,8 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
         </div>
       </div>
 
-      {/* 2. Bottom Copyright Bar - Clears bottom navigation on mobile */}
-      <div className={`border-t border-[#eedfe5] bg-white py-3.5 px-5 sm:px-6 lg:px-8 ${hasBottomNav ? 'pb-[92px] md:pb-3.5' : 'pb-3.5'}`}>
+      {/* 2. Bottom Copyright Bar - Clears bottom navigation on mobile & tablet */}
+      <div className={`border-t border-[#eedfe5] bg-white py-3.5 px-5 sm:px-6 lg:px-8 ${hasBottomNav ? 'pb-[92px] lg:pb-3.5' : 'pb-3.5'}`}>
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-2 text-[11.5px] sm:text-[12px] text-[#7a6870] text-center sm:text-left">
           <p>© {new Date().getFullYear()} Pretty Corner. {t.allRightsReserved}</p>
           <p className="text-[#a4929a]">
