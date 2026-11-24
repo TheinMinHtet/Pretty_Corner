@@ -247,10 +247,10 @@ export default function HomePage() {
           </div>
 
           {/* Right Side Content */}
-          <div className="w-full md:w-auto md:max-w-md flex flex-col justify-center items-start gap-3">
-            <div>
+          <div className="w-full md:w-auto md:max-w-md flex flex-col justify-center items-center text-center gap-3">
+            <div className="w-full text-center">
               <h4
-                className={`font-serif font-medium leading-[1.48] text-[#38262e] ${
+                className={`font-serif font-medium leading-[1.48] text-[#38262e] text-center ${
                   language === 'my'
                     ? 'text-[14px] min-[380px]:text-[15.5px] sm:text-[18px]'
                     : 'text-[18px] min-[380px]:text-[20px] sm:text-[24px]'
