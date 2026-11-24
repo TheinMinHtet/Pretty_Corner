@@ -55,8 +55,8 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
 
           {/* Columns 2 & 3: Grouped together in a centered, balanced container on mobile */}
           <div className="w-full md:col-span-2 grid grid-cols-2 gap-4 sm:gap-8 lg:gap-12 max-w-[320px] min-[360px]:max-w-[340px] sm:max-w-none mx-auto sm:mx-0 pt-1 sm:pt-0">
-            {/* Column 2: Customer Care */}
-            <div className="flex flex-col items-start text-left">
+            {/* Column 2: Customer Care (Indented with left padding on mobile for optical symmetry) */}
+            <div className="flex flex-col items-start text-left pl-5 min-[360px]:pl-7 min-[400px]:pl-9 sm:pl-0">
               <h4 className="font-serif text-[14.5px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight">
                 {t.customerCare}
               </h4>
