@@ -17,6 +17,7 @@ export interface Product {
   subtitle?: string;
   price: number;
   stockQuantity?: number;
+  lowStockThreshold?: number;
   sizes?: ProductSize[];
   image: string;
   gallery: string[];

@@ -99,8 +99,8 @@ export function calculatePricing(
                 matched?.slug === target ||
                 matched?.id === target ||
                 (matched?.databaseId && matched.databaseId === target))) ||
-              (promo.featuredProductIds &&
-                promo.featuredProductIds.includes(item.productId))
+            (promo.featuredProductIds &&
+              promo.featuredProductIds.includes(item.productId))
           );
           break;
         }
@@ -283,6 +283,78 @@ export function findCatalogProduct(
   );
 }
 
+export const DEFAULT_LOW_STOCK_THRESHOLD = 10;
+
+export interface CartAvailabilityAdjustment {
+  itemId: string;
+  productId: string;
+  name: string;
+  previousQuantity: number;
+  newQuantity: number;
+  availableStock: number;
+}
+
+export function getAvailableStock(
+  product?: Pick<Product, 'inStock' | 'stockQuantity'> | null
+): number | undefined {
+  if (!product) return undefined;
+  if (product.inStock === false) return 0;
+  if (typeof product.stockQuantity === 'number' && Number.isFinite(product.stockQuantity)) {
+    return Math.max(0, Math.floor(product.stockQuantity));
+  }
+  return undefined;
+}
+
+export function isProductLowStock(
+  product?: Pick<Product, 'inStock' | 'stockQuantity' | 'lowStockThreshold'> | null
+): boolean {
+  if (!product || isProductOutOfStock(product)) return false;
+  const available = getAvailableStock(product);
+  if (available === undefined || available <= 0) return false;
+  const threshold = product.lowStockThreshold ?? DEFAULT_LOW_STOCK_THRESHOLD;
+  return available <= threshold;
+}
+
+export function reconcileCartWithStock(
+  cart: CartItem[],
+  products: Product[]
+): {
+  updatedCart: CartItem[];
+  adjustments: CartAvailabilityAdjustment[];
+} {
+  const adjustments: CartAvailabilityAdjustment[] = [];
+  let changed = false;
+
+  const updatedCart = cart.map((item) => {
+    const catalogProduct = findCatalogProduct(products, item.productId);
+    const availableStock = getAvailableStock(catalogProduct);
+    if (availableStock === undefined || availableStock <= 0) {
+      return item;
+    }
+    if (item.quantity > availableStock) {
+      changed = true;
+      adjustments.push({
+        itemId: item.id,
+        productId: item.productId,
+        name: item.name,
+        previousQuantity: item.quantity,
+        newQuantity: availableStock,
+        availableStock,
+      });
+      return {
+        ...item,
+        quantity: availableStock,
+      };
+    }
+    return item;
+  });
+
+  return {
+    updatedCart: changed ? updatedCart : cart,
+    adjustments,
+  };
+}
+
 /**
  * Adds a product to the cart with variant selection, returning an immutable new cart array.
  */
@@ -304,18 +376,30 @@ export function addCartItem(
     return cart;
   }
 
+  const maxStock = getAvailableStock(product);
   const sizeLabel = chosenSize?.name || '';
   const itemPrice = chosenSize?.price ?? product.price;
   const itemId = buildCartItemId(product.id, sizeLabel);
   const existingIndex = cart.findIndex((item) => item.id === itemId);
 
   if (existingIndex > -1) {
+    const currentQty = cart[existingIndex].quantity;
+    const targetQty =
+      maxStock !== undefined ? Math.min(maxStock, currentQty + quantity) : currentQty + quantity;
+    if (targetQty <= currentQty) {
+      return cart;
+    }
     const updated = [...cart];
     updated[existingIndex] = {
       ...updated[existingIndex],
-      quantity: updated[existingIndex].quantity + quantity,
+      quantity: targetQty,
     };
     return updated;
+  }
+
+  const initialQty = maxStock !== undefined ? Math.min(maxStock, quantity) : quantity;
+  if (initialQty <= 0) {
+    return cart;
   }
 
   return [
@@ -326,7 +410,7 @@ export function addCartItem(
       name: product.name,
       size: sizeLabel,
       price: itemPrice,
-      quantity,
+      quantity: initialQty,
       image: product.image,
       category: product.category,
     },
@@ -339,12 +423,16 @@ export function addCartItem(
 export function updateCartItemQuantity(
   cart: CartItem[],
   itemId: string,
-  delta: number
+  delta: number,
+  maxQuantity?: number
 ): CartItem[] {
   return cart
     .map((item) => {
       if (item.id === itemId) {
-        const newQty = item.quantity + delta;
+        let newQty = item.quantity + delta;
+        if (delta > 0 && maxQuantity !== undefined) {
+          newQty = Math.min(maxQuantity, newQty);
+        }
         return newQty > 0 ? { ...item, quantity: newQty } : null;
       }
       return item;

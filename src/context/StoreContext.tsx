@@ -14,6 +14,9 @@ import {
   validatePromoCode,
   isProductOutOfStock,
   findCatalogProduct,
+  getAvailableStock,
+  reconcileCartWithStock,
+  CartAvailabilityAdjustment,
   LineItemPricing,
   CartPricingSummary,
 } from '@/lib/cart/CartEngine';
@@ -32,7 +35,8 @@ interface StoreContextType {
   t: TranslationSchema;
   products: Product[];
   productsLoading: boolean;
-  refreshProducts: () => Promise<void>;
+  refreshProducts: (options?: { silent?: boolean }) => Promise<void>;
+  refreshProductsSilently: () => Promise<void>;
   promotions: Promotion[];
   promotionsLoading: boolean;
   refreshPromotions: () => Promise<void>;
@@ -40,6 +44,8 @@ interface StoreContextType {
   socialChannels: SocialChannel[];
   refreshSocialChannels: () => Promise<void>;
   cart: CartItem[];
+  cartAdjustments: CartAvailabilityAdjustment[];
+  dismissCartAdjustments: () => void;
   orders: Order[];
   selectedTownship: TownshipOption;
   searchQuery: string;
@@ -98,7 +104,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (typeof window !== 'undefined') {
         try {
           localStorage.setItem('pretty_corner_orders', JSON.stringify(next.slice(0, 50)));
-        } catch {}
+        } catch { }
       }
       return next;
     });
@@ -115,7 +121,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         } else {
           localStorage.removeItem('pretty_corner_active_pending_order');
         }
-      } catch {}
+      } catch { }
     }
   }, []);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -136,7 +142,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       }
       const savedCart = localStorage.getItem('pretty_corner_cart');
       if (savedCart) {
-        setCart(JSON.parse(savedCart));
+        const parsedCart = JSON.parse(savedCart) as CartItem[];
+        cartRef.current = parsedCart;
+        setCart(parsedCart);
       }
       const savedOrders = localStorage.getItem('pretty_corner_orders');
       if (savedOrders) {
@@ -150,7 +158,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (savedPromo) {
         setAppliedPromoState(JSON.parse(savedPromo));
       }
-    } catch {}
+    } catch { }
   }, []);
 
   const setAppliedPromo = useCallback((promo: Promotion | null) => {
@@ -162,7 +170,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         } else {
           sessionStorage.removeItem('pretty_corner_applied_promo');
         }
-      } catch {}
+      } catch { }
     }
   }, []);
 
@@ -181,17 +189,53 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
   }, [repo]);
 
-  const refreshProducts = useCallback(async () => {
-    setProductsLoading(true);
+  const [cartAdjustments, setCartAdjustments] = useState<CartAvailabilityAdjustment[]>([]);
+  const cartRef = React.useRef<CartItem[]>(cart);
+  useEffect(() => {
+    cartRef.current = cart;
+  }, [cart]);
+
+  const dismissCartAdjustments = useCallback(() => {
+    setCartAdjustments([]);
+  }, []);
+
+  const applyFetchedProducts = useCallback((fetched: Product[]) => {
+    setProducts(fetched);
+    setProductsLoading(false);
+    if (fetched.length === 0) return;
+
+    const { updatedCart, adjustments } = reconcileCartWithStock(cartRef.current, fetched);
+    if (adjustments.length > 0) {
+      cartRef.current = updatedCart;
+      setCart(updatedCart);
+      try {
+        localStorage.setItem('pretty_corner_cart', JSON.stringify(updatedCart));
+      } catch { }
+      setCartAdjustments(adjustments);
+    }
+  }, []);
+
+  const refreshProducts = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) {
+      setProductsLoading(true);
+    }
     try {
       const fetched = await repo.getProducts();
-      setProducts(fetched);
+      applyFetchedProducts(fetched);
     } catch (err) {
       console.warn('Failed to load products:', err);
-    } finally {
       setProductsLoading(false);
     }
-  }, [repo]);
+  }, [repo, applyFetchedProducts]);
+
+  const refreshProductsSilently = useCallback(async () => {
+    try {
+      const fetched = await repo.getProducts();
+      applyFetchedProducts(fetched);
+    } catch (err) {
+      console.warn('Failed to refresh products:', err);
+    }
+  }, [repo, applyFetchedProducts]);
 
   const refreshSocialChannels = useCallback(async () => {
     try {
@@ -219,14 +263,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     repo.getProducts()
       .then((fetched) => {
         if (!ignore) {
-          setProducts(fetched);
-          setProductsLoading(false);
+          applyFetchedProducts(fetched);
         }
       })
       .catch((err) => {
         console.warn('Failed to load products:', err);
         if (!ignore) setProductsLoading(false);
       });
+
+    const handleVisibilityOrFocus = () => {
+      if (typeof document === 'undefined' || document.visibilityState === 'visible') {
+        void refreshProductsSilently();
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', handleVisibilityOrFocus);
+      document.addEventListener('visibilitychange', handleVisibilityOrFocus);
+    }
 
     repo.getPromotions()
       .then((data) => {
@@ -262,8 +315,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       ignore = true;
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('focus', handleVisibilityOrFocus);
+        document.removeEventListener('visibilitychange', handleVisibilityOrFocus);
+      }
     };
-  }, [repo]);
+  }, [repo, applyFetchedProducts, refreshProductsSilently]);
 
 
   const setLanguage = (lang: Language) => {
@@ -279,7 +336,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
     try {
       localStorage.setItem('pretty_corner_lang', lang);
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -294,10 +351,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [language]);
 
   const saveCartToStorage = (updatedCart: CartItem[]) => {
+    cartRef.current = updatedCart;
     setCart(updatedCart);
     try {
       localStorage.setItem('pretty_corner_cart', JSON.stringify(updatedCart));
-    } catch {}
+    } catch { }
   };
 
   const addToCart = (productId: string, sizeName?: string, quantity: number = 1) => {
@@ -309,6 +367,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateCartQuantity = (itemId: string, delta: number) => {
+    let maxStock: number | undefined;
     if (delta > 0) {
       const targetItem = cart.find((i) => i.id === itemId);
       if (targetItem) {
@@ -316,9 +375,13 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         if (catalogProduct && isProductOutOfStock(catalogProduct)) {
           return;
         }
+        maxStock = getAvailableStock(catalogProduct);
+        if (maxStock !== undefined && targetItem.quantity >= maxStock) {
+          return;
+        }
       }
     }
-    const updated = updateCartItemQuantity(cart, itemId, delta);
+    const updated = updateCartItemQuantity(cart, itemId, delta, maxStock);
     saveCartToStorage(updated);
   };
 
@@ -332,7 +395,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (prev.length === 0) return prev;
       try {
         localStorage.setItem('pretty_corner_cart', JSON.stringify([]));
-      } catch {}
+      } catch { }
       return [];
     });
   }, []);
@@ -422,7 +485,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           }
         }
       }
-    } catch {}
+    } catch { }
   }, [promotions, appliedPromo, setAppliedPromo]);
 
   const applyPromoCode = (code: string): { success: boolean; message: string } => {
@@ -485,7 +548,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         if (typeof window !== 'undefined') {
           try {
             localStorage.removeItem('pretty_corner_active_pending_order');
-          } catch {}
+          } catch { }
         }
         return null;
       }
@@ -496,7 +559,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       try {
         localStorage.removeItem('mmpay_pending_tx');
         sessionStorage.removeItem(`pretty_corner_mmpay_active_${cleanId}`);
-      } catch {}
+      } catch { }
 
       void fetch('/api/orders/cancel', {
         method: 'POST',
@@ -556,7 +619,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           if (typeof window !== 'undefined') {
             try {
               localStorage.removeItem('pretty_corner_active_pending_order');
-            } catch {}
+            } catch { }
           }
           return null;
         }
@@ -582,6 +645,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         products,
         productsLoading,
         refreshProducts,
+        refreshProductsSilently,
         promotions,
         promotionsLoading,
         refreshPromotions,
@@ -589,6 +653,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         socialChannels,
         refreshSocialChannels,
         cart,
+        cartAdjustments,
+        dismissCartAdjustments,
         orders,
         selectedTownship,
         searchQuery,

@@ -67,6 +67,11 @@ export type TranslationSchema = Record<
   | 'soldOutBtn'
   | 'outOfStockBagNotice'
   | 'removeOutOfStockToCheckout'
+  | 'onlyLeftInStock'
+  | 'alreadyInBagLimit'
+  | 'cartAvailabilityBannerTitle'
+  | 'cartQtyAdjustedDetail'
+  | 'cartItemUnavailableDetail'
   | 'back'
   | 'backToShop'
   | 'backToShopping'
@@ -278,6 +283,11 @@ export const translations: Record<Language, TranslationSchema> = {
     soldOutBtn: 'Out of Stock',
     outOfStockBagNotice: 'Some items in your bag are currently out of stock. Please remove them to proceed.',
     removeOutOfStockToCheckout: 'Remove out-of-stock items before checkout',
+    onlyLeftInStock: 'Only {count} left in stock.',
+    alreadyInBagLimit: '({count} already in your bag)',
+    cartAvailabilityBannerTitle: 'Some items in your cart have changed due to availability.',
+    cartQtyAdjustedDetail: 'Adjusted from {from} to {to} (only {stock} left in stock)',
+    cartItemUnavailableDetail: 'Currently out of stock — please remove before checkout',
 
     // Product Details View
     back: 'Back',
@@ -500,6 +510,11 @@ export const translations: Record<Language, TranslationSchema> = {
     soldOutBtn: 'ပစ္စည်းကုန်',
     outOfStockBagNotice: 'သင့်စျေးဝယ်အိတ်ထဲတွင် ပစ္စည်းကုန်နေသော အရာများ ပါဝင်နေပါသည်။ ငွေရှင်းရန် ၎င်းတို့ကို ဖယ်ရှားပေးပါ။',
     removeOutOfStockToCheckout: 'ငွေမရှင်းမီ ပစ္စည်းကုန်နေသည်များကို ဖယ်ရှားပေးပါ',
+    onlyLeftInStock: 'လက်ကျန် {count} ခုသာ ကျန်ပါတော့သည်။',
+    alreadyInBagLimit: '(စျေးဝယ်အိတ်ထဲတွင် {count} ခု ရှိပြီးသားဖြစ်ပါသည်)',
+    cartAvailabilityBannerTitle: 'ပစ္စည်းလက်ကျန် အပြောင်းအလဲကြောင့် သင့်စျေးဝယ်အိတ်အတွင်းရှိ အချို့ပစ္စည်းများကို ပြင်ဆင်ထားပါသည်။',
+    cartQtyAdjustedDetail: '{from} ခုမှ {to} ခုသို့ လျှော့ချထားပါသည် (လက်ကျန် {stock} ခုသာ ကျန်ရှိသည်)',
+    cartItemUnavailableDetail: 'လက်ရှိ ပစ္စည်းကုန်နေပါသည် — ငွေမရှင်းမီ ဖယ်ရှားပေးပါ',
 
     // Product Details View
     back: 'ရှေ့သို့ပြန်သွားမည်',
