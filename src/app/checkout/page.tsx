@@ -11,8 +11,6 @@ import OrderingStepBar from '@/components/OrderingStepBar';
 const SlideToConfirm = dynamic(() => import('@/components/SlideToConfirm'), { ssr: false });
 import { validatePhoneNumber } from '@/lib/validation';
 import { getAddressResolver } from '@/lib/location/MyanmarAddressResolver';
-import { MOCK_TOWNSHIPS } from '@/lib/mockData';
-import { TOWNSHIP_GEO_METAS } from '@/lib/location';
 import { CheckoutMapSkeleton, CheckoutPageSkeleton } from '@/components/Skeletons';
 
 const DeliveryMapPicker = dynamic(() => import('@/components/DeliveryMapPicker'), {
@@ -140,17 +138,6 @@ export default function CheckoutPage() {
       setGpsErrorMsg(resolver.mapGeolocationError(err, language));
     } finally {
       setIsLocating(false);
-    }
-  };
-
-  const handleTownshipChange = (townshipName: string) => {
-    const found = MOCK_TOWNSHIPS.find((tw) => tw.name === townshipName);
-    if (!found) return;
-    setSelectedTownship(found);
-
-    const meta = TOWNSHIP_GEO_METAS.find((m) => m.name === found.name);
-    if (meta) {
-      setPinCoords({ lat: meta.lat, lng: meta.lng });
     }
   };
 
@@ -415,44 +402,6 @@ export default function CheckoutPage() {
                       </span>
                     </p>
                   )}
-                </div>
-
-                {/* Delivery Township Selector (Auto-detected from map or manually chosen) */}
-                <div className="sm:col-span-2">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label htmlFor="checkout-township" className="block text-[12px] font-bold text-[#38262e]">
-                      {t.township}
-                    </label>
-                    <span className="text-[11px] text-[#7a6870]">
-                      {language === 'my'
-                        ? 'မြေပုံမှ အလိုအလျောက် သတ်မှတ်ပါသည် (မတိကျပါက ပြောင်းနိုင်ပါသည်)'
-                        : 'Auto-set from map (you can change anytime)'}
-                    </span>
-                  </div>
-
-                  <div className="relative">
-                    <select
-                      id="checkout-township"
-                      value={selectedTownship?.name || MOCK_TOWNSHIPS[0].name}
-                      onChange={(e) => handleTownshipChange(e.target.value)}
-                      className="w-full h-[46px] px-3.5 pr-10 bg-white border border-[#eedfe5] rounded-[9px] text-[13.5px] sm:text-[14px] text-[#38262e] outline-none focus:border-[#b73d67] transition-colors appearance-none cursor-pointer shadow-2xs font-medium"
-                    >
-                      {MOCK_TOWNSHIPS.map((township) => {
-                        const meta = TOWNSHIP_GEO_METAS.find((m) => m.name === township.name);
-                        const displayName = language === 'my' && meta ? meta.townshipMy : (meta ? meta.townshipEn : township.name);
-                        return (
-                          <option key={township.name} value={township.name}>
-                            {displayName} ({township.fee.toLocaleString()} MMK · {township.zone})
-                          </option>
-                        );
-                      })}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3.5 pointer-events-none text-[#7a6870]">
-                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="sm:col-span-2">
