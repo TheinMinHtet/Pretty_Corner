@@ -109,15 +109,27 @@ export default function HeroBannerSlider() {
               <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
 
               <div className="relative z-10">
-                {/* Confident, Font-Black Display Headline */}
-                <h1 className="font-serif font-black leading-[1.12] text-[#22131b] tracking-tight text-[23px] min-[360px]:text-[27px] sm:text-[38px] md:text-[48px] lg:text-[56px]">
+                {/* Responsive Display Headline with Burmese Typography Tuning */}
+                <h1
+                  className={`font-serif tracking-tight text-[#22131b] ${
+                    language === 'my'
+                      ? 'font-semibold text-[17px] min-[360px]:text-[19px] min-[400px]:text-[21px] sm:text-[26px] md:text-[32px] lg:text-[38px] leading-[1.32]'
+                      : 'font-bold text-[23px] min-[360px]:text-[27px] sm:text-[38px] md:text-[48px] lg:text-[56px] leading-[1.12]'
+                  }`}
+                >
                   {t.heroTitleLine1}
                   <br />
                   {t.heroTitleLine2}
                 </h1>
 
                 {/* Supporting Copy */}
-                <p className="font-sans text-[12px] min-[360px]:text-[13.5px] sm:text-[15.5px] font-normal text-[#422c36] leading-snug sm:leading-relaxed mt-2 sm:mt-3">
+                <p
+                  className={`font-sans text-[#422c36] ${
+                    language === 'my'
+                      ? 'text-[11.5px] min-[360px]:text-[12.5px] sm:text-[14px] leading-relaxed mt-1.5 sm:mt-2.5 font-normal'
+                      : 'text-[12px] min-[360px]:text-[13.5px] sm:text-[15.5px] leading-snug sm:leading-relaxed mt-2 sm:mt-3 font-normal'
+                  }`}
+                >
                   {t.heroDescription}
                 </p>
               </div>
