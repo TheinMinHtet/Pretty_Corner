@@ -8,6 +8,8 @@ import {
   buildCartItemId,
   validatePromoCode,
   isProductOutOfStock,
+  isProductLowStock,
+  reconcileCartWithStock,
 } from '../CartEngine';
 import { CartItem, Product, Promotion } from '../../types';
 
@@ -334,6 +336,36 @@ describe('CartEngine', () => {
 
       const cartAfterFlagOut = addCartItem([], flagOutOfStockProduct, undefined, 1);
       assert.equal(cartAfterFlagOut.length, 0);
+    });
+
+    test('isProductLowStock, addCartItem cap, and reconcileCartWithStock auto-correct over-stock carts', () => {
+      const lowStockProd: Product = {
+        ...sampleProducts[0],
+        id: 'prod-low',
+        stockQuantity: 5,
+        lowStockThreshold: 10,
+        inStock: true,
+      };
+      assert.equal(isProductLowStock(lowStockProd), true);
+
+      // Trying to add 7 caps cleanly at 5
+      let cart = addCartItem([], lowStockProd, undefined, 7);
+      assert.equal(cart[0].quantity, 5);
+
+      // Trying to add 2 more keeps it capped at 5
+      cart = addCartItem(cart, lowStockProd, undefined, 2);
+      assert.equal(cart[0].quantity, 5);
+
+      // Reconcile stale cart with 7 -> reduces to 5 and reports adjustment
+      const staleCart: CartItem[] = [
+        { id: 'prod-low', productId: 'prod-low', name: 'Alpha Serum', size: '', price: 30000, quantity: 7, image: '' },
+      ];
+      const { updatedCart, adjustments } = reconcileCartWithStock(staleCart, [lowStockProd]);
+      assert.equal(updatedCart[0].quantity, 5);
+      assert.equal(adjustments.length, 1);
+      assert.equal(adjustments[0].previousQuantity, 7);
+      assert.equal(adjustments[0].newQuantity, 5);
+      assert.equal(adjustments[0].availableStock, 5);
     });
   });
 

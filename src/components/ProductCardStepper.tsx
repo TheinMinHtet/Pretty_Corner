@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useStore } from '@/context/StoreContext';
-import { findCatalogProduct, isProductOutOfStock } from '@/lib/cart/CartEngine';
+import { findCatalogProduct, getAvailableStock, isProductOutOfStock } from '@/lib/cart/CartEngine';
 
 interface ProductCardStepperProps {
   productId: string;
@@ -22,6 +22,8 @@ export default function ProductCardStepper({
   const quantity = isMounted ? getProductQuantity(productId, sizeName) : 0;
   const catalogProduct = findCatalogProduct(products, productId);
   const outOfStock = Boolean(isOutOfStock ?? isProductOutOfStock(catalogProduct));
+  const maxStock = getAvailableStock(catalogProduct);
+  const atStockLimit = maxStock !== undefined && quantity >= maxStock;
 
   if (quantity === 0) {
     if (outOfStock) {
@@ -93,7 +95,8 @@ export default function ProductCardStepper({
       </span>
       <button
         type="button"
-        disabled={outOfStock}
+        disabled={outOfStock || atStockLimit}
+        title={atStockLimit && maxStock !== undefined ? t.onlyLeftInStock.replace('{count}', String(maxStock)) : undefined}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();

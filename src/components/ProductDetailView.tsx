@@ -7,17 +7,26 @@ import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { Product } from '@/lib/types';
 import LazyImage from '@/components/LazyImage';
-import { findCatalogProduct, isProductOutOfStock } from '@/lib/cart/CartEngine';
+import {
+  findCatalogProduct,
+  getAvailableStock,
+  isProductLowStock,
+  isProductOutOfStock,
+} from '@/lib/cart/CartEngine';
 
 export default function ProductDetailView({ product }: { product: Product }) {
   const router = useRouter();
-  const { addToCart, products, t } = useStore();
+  const { addToCart, products, getProductQuantity, isMounted, t } = useStore();
 
   const liveProduct =
     findCatalogProduct(products, product.id) ||
     (product.slug ? findCatalogProduct(products, product.slug) : undefined);
   const currentProduct = liveProduct || product;
   const isOutOfStock = isProductOutOfStock(currentProduct);
+  const isLowStock = isProductLowStock(currentProduct);
+  const maxStock = getAvailableStock(currentProduct);
+  const inCartQty = isMounted ? getProductQuantity(currentProduct.id) : 0;
+  const remainingStock = maxStock !== undefined ? Math.max(0, maxStock - inCartQty) : undefined;
 
   const [selectedGalleryIdx, setSelectedGalleryIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -25,12 +34,28 @@ export default function ProductDetailView({ product }: { product: Product }) {
   const [openHowToUse, setOpenHowToUse] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
+  const effectiveQuantity =
+    isOutOfStock || remainingStock === 0
+      ? 0
+      : remainingStock !== undefined
+        ? Math.min(quantity, remainingStock)
+        : quantity;
+
+  const reachedStockLimit =
+    !isOutOfStock &&
+    maxStock !== undefined &&
+    remainingStock !== undefined &&
+    (remainingStock === 0 || effectiveQuantity >= remainingStock);
+
   const unitPrice = currentProduct.price;
-  const totalPrice = unitPrice * quantity;
+  const totalPrice = unitPrice * Math.max(1, effectiveQuantity);
 
   const handleAddToCart = () => {
-    if (isOutOfStock) return;
-    addToCart(currentProduct.id, '', quantity);
+    if (isOutOfStock || remainingStock === 0) return;
+    const qtyToAdd = remainingStock !== undefined ? Math.min(effectiveQuantity, remainingStock) : effectiveQuantity;
+    if (qtyToAdd <= 0) return;
+    addToCart(currentProduct.id, '', qtyToAdd);
+    setQuantity(1);
     setIsAdded(true);
     setTimeout(() => {
       setIsAdded(false);
@@ -150,13 +175,17 @@ export default function ProductDetailView({ product }: { product: Product }) {
             </h1>
 
             {/* Price & Stock */}
-            <div className="flex items-baseline gap-3 mt-3">
+            <div className="flex flex-wrap items-baseline gap-2.5 sm:gap-3 mt-3">
               <span className="text-[22px] sm:text-[26px] font-bold text-[#b73d67]">
                 {unitPrice.toLocaleString()} MMK
               </span>
               {isOutOfStock ? (
                 <span className="text-[12px] text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-2.5 py-0.5 rounded font-semibold">
                   {t.outOfStock}
+                </span>
+              ) : isLowStock && maxStock !== undefined ? (
+                <span className="text-[12px] text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded font-semibold">
+                  {t.onlyLeftInStock.replace('{count}', String(maxStock))}
                 </span>
               ) : (
                 <span className="text-[12px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium">
@@ -176,23 +205,28 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {/* Quantity Selector */}
                 <div
                   className={`h-[46px] sm:h-[52px] w-[76px] sm:w-[110px] border border-[#eedfe5] rounded-[10px] flex items-center justify-between px-1.5 sm:px-3 text-[#38262e] shrink-0 ${
-                    isOutOfStock ? 'bg-[#faf7f8] opacity-60' : 'bg-white'
+                    isOutOfStock || remainingStock === 0 ? 'bg-[#faf7f8] opacity-60' : 'bg-white'
                   }`}
                 >
                   <button
                     type="button"
-                    disabled={isOutOfStock}
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-1 hover:text-[#b73d67] text-[18px] sm:text-[20px] font-medium cursor-pointer disabled:cursor-not-allowed disabled:hover:text-[#38262e]"
+                    disabled={isOutOfStock || remainingStock === 0 || effectiveQuantity <= 1}
+                    onClick={() => setQuantity(Math.max(1, effectiveQuantity - 1))}
+                    className="p-1 hover:text-[#b73d67] text-[18px] sm:text-[20px] font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-[#38262e]"
                   >
                     −
                   </button>
-                  <span className="text-[13.5px] sm:text-[16px] font-semibold">{isOutOfStock ? 0 : quantity}</span>
+                  <span className="text-[13.5px] sm:text-[16px] font-semibold">
+                    {effectiveQuantity}
+                  </span>
                   <button
                     type="button"
-                    disabled={isOutOfStock}
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="p-1 hover:text-[#b73d67] text-[18px] sm:text-[20px] font-medium cursor-pointer disabled:cursor-not-allowed disabled:hover:text-[#38262e]"
+                    disabled={isOutOfStock || reachedStockLimit}
+                    onClick={() => {
+                      if (remainingStock !== undefined && effectiveQuantity >= remainingStock) return;
+                      setQuantity(effectiveQuantity + 1);
+                    }}
+                    className="p-1 hover:text-[#b73d67] text-[18px] sm:text-[20px] font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:text-[#38262e]"
                   >
                     +
                   </button>
@@ -201,10 +235,10 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {/* Big Add to Bag Button */}
                 <button
                   type="button"
-                  disabled={isOutOfStock}
+                  disabled={isOutOfStock || remainingStock === 0}
                   onClick={handleAddToCart}
                   className={`flex-1 min-w-0 h-[46px] sm:h-[52px] px-2 sm:px-4 rounded-[10px] font-bold text-[12px] min-[360px]:text-[13px] sm:text-[15px] transition-all flex items-center justify-center gap-1 sm:gap-2 whitespace-nowrap ${
-                    isOutOfStock
+                    isOutOfStock || remainingStock === 0
                       ? 'bg-[#ebe3e6] text-[#8a7880] border border-[#dfd3d8] cursor-not-allowed shadow-none'
                       : isAdded
                         ? 'bg-emerald-600 hover:bg-emerald-700 text-white active:scale-[0.98] shadow-sm cursor-pointer'
@@ -228,6 +262,17 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   )}
                 </button>
               </div>
+
+              {!isOutOfStock && reachedStockLimit && maxStock !== undefined && (
+                <p className="mt-2.5 text-[12.5px] font-semibold text-[#b73d67]" role="alert">
+                  {t.onlyLeftInStock.replace('{count}', String(maxStock))}
+                  {inCartQty > 0 && (
+                    <span className="text-[#7a6870] font-normal ml-1.5">
+                      {t.alreadyInBagLimit.replace('{count}', String(inCartQty))}
+                    </span>
+                  )}
+                </p>
+              )}
             </div>
 
             {/* Accordions: Why We Love It & How to Use */}

@@ -1,12 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import LazyImage from '@/components/LazyImage';
 import { BagPageSkeleton } from '@/components/Skeletons';
-import { findCatalogProduct, isProductOutOfStock } from '@/lib/cart/CartEngine';
+import CartAvailabilityBanner from '@/components/CartAvailabilityBanner';
+import {
+  findCatalogProduct,
+  getAvailableStock,
+  isProductLowStock,
+  isProductOutOfStock,
+} from '@/lib/cart/CartEngine';
 
 export default function ShoppingBagPage() {
   const router = useRouter();
@@ -14,6 +20,7 @@ export default function ShoppingBagPage() {
     cart,
     products,
     productsLoading,
+    refreshProductsSilently,
     updateCartQuantity,
     removeFromCart,
     cartCount,
@@ -29,6 +36,10 @@ export default function ShoppingBagPage() {
     t,
     language,
   } = useStore();
+
+  useEffect(() => {
+    void refreshProductsSilently();
+  }, [refreshProductsSilently]);
 
   const hasOutOfStockItem =
     !productsLoading &&
@@ -90,6 +101,7 @@ export default function ShoppingBagPage() {
 
       {/* Main Content Area - Responsive 2-Column Grid */}
       <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-2">
+        <CartAvailabilityBanner />
         {cart.length > 0 ? (
           <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-start">
             {/* Left Column: Bag Line Items (col-span-12 on mobile, col-span-7 or 8 on desktop) */}
@@ -102,6 +114,9 @@ export default function ShoppingBagPage() {
                 const catalogProduct = findCatalogProduct(products, item.productId);
                 const itemOutOfStock =
                   !productsLoading && Boolean(catalogProduct && isProductOutOfStock(catalogProduct));
+                const maxStock = !productsLoading ? getAvailableStock(catalogProduct) : undefined;
+                const itemLowStock = !productsLoading && Boolean(catalogProduct && isProductLowStock(catalogProduct));
+                const atStockLimit = maxStock !== undefined && item.quantity >= maxStock;
 
                 return (
                   <div key={item.id} className="py-4 sm:py-5 flex gap-3 sm:gap-6 items-center">
@@ -129,6 +144,11 @@ export default function ShoppingBagPage() {
                           {itemOutOfStock && (
                             <span className="inline-flex items-center text-[10px] sm:text-[11px] font-bold text-[#b73d67] bg-[#fceef2] px-2 py-0.5 rounded border border-[#f5d9e3]">
                               {t.outOfStock}
+                            </span>
+                          )}
+                          {!itemOutOfStock && itemLowStock && maxStock !== undefined && (
+                            <span className="inline-flex items-center text-[10px] sm:text-[11px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                              {t.onlyLeftInStock.replace('{count}', String(maxStock))}
                             </span>
                           )}
                         </div>
@@ -175,7 +195,8 @@ export default function ShoppingBagPage() {
                           </button>
                           <span className="text-[14px] font-semibold">{item.quantity}</span>
                           <button
-                            disabled={itemOutOfStock}
+                            disabled={itemOutOfStock || atStockLimit}
+                            title={atStockLimit && maxStock !== undefined ? t.onlyLeftInStock.replace('{count}', String(maxStock)) : undefined}
                             onClick={() => updateCartQuantity(item.id, 1)}
                             className="px-1 text-[18px] font-medium hover:text-[#b73d67] cursor-pointer disabled:opacity-35 disabled:cursor-not-allowed"
                           >

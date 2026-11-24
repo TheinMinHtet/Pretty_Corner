@@ -12,6 +12,7 @@ const SlideToConfirm = dynamic(() => import('@/components/SlideToConfirm'), { ss
 import { validatePhoneNumber } from '@/lib/validation';
 import { getAddressResolver } from '@/lib/location/MyanmarAddressResolver';
 import { CheckoutMapSkeleton, CheckoutPageSkeleton } from '@/components/Skeletons';
+import CartAvailabilityBanner from '@/components/CartAvailabilityBanner';
 import { findCatalogProduct, isProductOutOfStock } from '@/lib/cart/CartEngine';
 
 const DeliveryMapPicker = dynamic(() => import('@/components/DeliveryMapPicker'), {
@@ -25,6 +26,7 @@ export default function CheckoutPage() {
     cart,
     products,
     productsLoading,
+    refreshProductsSilently,
     cartCount,
     cartSubtotal,
     discount,
@@ -83,7 +85,8 @@ export default function CheckoutPage() {
   // Ensure submitting state resets if customer navigates back to checkout
   useEffect(() => {
     setIsSubmitting(false);
-  }, []);
+    void refreshProductsSilently();
+  }, [refreshProductsSilently]);
 
   // Rule 04: Duplicate Prevention - warning on refresh while form is submitting
   useEffect(() => {
@@ -286,6 +289,7 @@ export default function CheckoutPage() {
         noValidate
         className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-2"
       >
+        <CartAvailabilityBanner />
         <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-start">
           {/* Left Column: Delivery Form & Payment Methods */}
           <div className="md:col-span-7 lg:col-span-8 space-y-5 sm:space-y-6">
