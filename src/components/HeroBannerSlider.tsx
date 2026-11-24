@@ -201,7 +201,7 @@ export default function HeroBannerSlider() {
                       className={`inline-flex items-center gap-2 mb-1.5 transition-all duration-600 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
                         }`}
                     >
-                      <span className="inline-block font-sans text-[10px] min-[360px]:text-[11px] sm:text-[12px] font-bold tracking-[1.5px] sm:tracking-[2px] text-[#b73d67] uppercase bg-white/85 backdrop-blur-xs px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full border border-[#f1d3df] shadow-2xs">
+                      <span className="inline-block font-sans text-[8.5px] min-[340px]:text-[9.5px] min-[380px]:text-[10.5px] sm:text-[12px] font-bold tracking-[0.6px] min-[360px]:tracking-[1px] sm:tracking-[1.8px] text-[#b73d67] uppercase bg-white/85 backdrop-blur-xs px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full border border-[#f1d3df] shadow-2xs whitespace-nowrap">
                         {badgeText}
                       </span>
                     </div>
@@ -227,7 +227,7 @@ export default function HeroBannerSlider() {
                     {/* Coupon Code Pill */}
                     {promo.code && (
                       <div
-                        className={`mt-2.5 sm:mt-4 inline-flex items-center gap-1.5 sm:gap-2 bg-white/90 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-[#eedfe5] shadow-xs transition-all duration-700 delay-250 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                        className={`mt-2.5 sm:mt-4 inline-flex items-center gap-1.5 sm:gap-2 bg-white/90 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-[#eedfe5] shadow-xs transition-all duration-700 delay-250 ease-out whitespace-nowrap ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                           }`}
                       >
                         <span className="text-[10px] min-[360px]:text-[11.5px] sm:text-[12px] font-medium text-[#7a6870]">Use Code:</span>
