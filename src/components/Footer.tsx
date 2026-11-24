@@ -11,11 +11,11 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
 
   return (
     <footer className="w-full bg-[#fdfafb] border-t border-[#eedfe5] mt-auto">
-      {/* 1. Main Footer Grid: Balanced layout with Customer Care & Payment side-by-side on mobile */}
+      {/* 1. Main Footer Grid: Balanced layout with Customer Care & Payment side-by-side and centered on mobile */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-7 sm:pt-9 pb-6 sm:pb-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 lg:gap-12 items-start">
+        <div className="flex flex-col md:grid md:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 items-start">
           {/* Column 1: Brand & Follow Us (Full-width on mobile, 1 col on desktop) */}
-          <div className="col-span-2 md:col-span-1 flex flex-col items-center sm:items-start text-center sm:text-left">
+          <div className="w-full md:col-span-1 flex flex-col items-center sm:items-start text-center sm:text-left">
             <Link href="/" className="inline-block group">
               <span className="font-serif text-[24px] sm:text-[28px] lg:text-[30px] font-medium text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
                 {t.brandName}
@@ -53,44 +53,47 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
             </div>
           </div>
 
-          {/* Column 2: Customer Care (Side-by-side on mobile) */}
-          <div className="col-span-1 flex flex-col items-start text-left pt-1 sm:pt-0">
-            <h4 className="font-serif text-[14.5px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight">
-              {t.customerCare}
-            </h4>
-            <ul className="space-y-1.5 sm:space-y-2 text-[12px] sm:text-[13px] text-[#7a6870] leading-snug">
-              <li>
-                <Link href="/about" className="hover:text-[#b73d67] transition-colors inline-block py-0.5">
-                  {t.aboutUs}
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="hover:text-[#b73d67] transition-colors inline-block py-0.5">
-                  {t.faqs}
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-[#b73d67] transition-colors inline-block py-0.5">
-                  {t.navContact}
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {/* Columns 2 & 3: Grouped together in a centered, balanced container on mobile */}
+          <div className="w-full md:col-span-2 grid grid-cols-2 gap-4 sm:gap-8 lg:gap-12 max-w-[320px] min-[360px]:max-w-[340px] sm:max-w-none mx-auto sm:mx-0 pt-1 sm:pt-0">
+            {/* Column 2: Customer Care */}
+            <div className="flex flex-col items-start text-left">
+              <h4 className="font-serif text-[14.5px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight">
+                {t.customerCare}
+              </h4>
+              <ul className="space-y-1.5 sm:space-y-2 text-[12px] sm:text-[13px] text-[#7a6870] leading-snug">
+                <li>
+                  <Link href="/about" className="hover:text-[#b73d67] transition-colors inline-block py-0.5">
+                    {t.aboutUs}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faq" className="hover:text-[#b73d67] transition-colors inline-block py-0.5">
+                    {t.faqs}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="hover:text-[#b73d67] transition-colors inline-block py-0.5">
+                    {t.navContact}
+                  </Link>
+                </li>
+              </ul>
+            </div>
 
-          {/* Column 3: Payment & Delivery (Side-by-side on mobile) */}
-          <div className="col-span-1 flex flex-col items-start text-left pt-1 sm:pt-0">
-            <h4 className="font-serif text-[14.5px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight">
-              {t.paymentAndDelivery}
-            </h4>
-            <div className="flex flex-col sm:flex-row sm:flex-wrap items-start gap-1.5 sm:gap-2 text-[10.5px] sm:text-[12px] font-medium text-[#38262e] max-w-full">
-              <span className="bg-white border border-[#eedfe5] px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 truncate max-w-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] shrink-0" />
-                <span className="truncate">{t.mobileBanking}</span>
-              </span>
-              <span className="bg-white border border-[#eedfe5] px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 truncate max-w-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#3b775d] shrink-0" />
-                <span className="truncate">{t.cod}</span>
-              </span>
+            {/* Column 3: Payment & Delivery */}
+            <div className="flex flex-col items-start text-left">
+              <h4 className="font-serif text-[14.5px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight">
+                {t.paymentAndDelivery}
+              </h4>
+              <div className="flex flex-col sm:flex-row sm:flex-wrap items-start gap-1.5 sm:gap-2 text-[10.5px] sm:text-[12px] font-medium text-[#38262e] max-w-full">
+                <span className="bg-white border border-[#eedfe5] px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 truncate max-w-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] shrink-0" />
+                  <span className="truncate">{t.mobileBanking}</span>
+                </span>
+                <span className="bg-white border border-[#eedfe5] px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 truncate max-w-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#3b775d] shrink-0" />
+                  <span className="truncate">{t.cod}</span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
