@@ -115,7 +115,7 @@ export default function HomePage() {
           <h3
             className={`font-serif font-medium text-[#38262e] ${
               language === 'my'
-                ? 'text-[17px] sm:text-[23px]'
+                ? 'text-[15.5px] sm:text-[21px]'
                 : 'text-[20px] sm:text-[28px]'
             }`}
           >
@@ -153,7 +153,7 @@ export default function HomePage() {
             <h3
               className={`font-serif font-medium text-[#38262e] leading-tight ${
                 language === 'my'
-                  ? 'text-[16.5px] sm:text-[25px]'
+                  ? 'text-[15px] sm:text-[22.5px]'
                   : 'text-[19px] sm:text-[32px]'
               }`}
             >
@@ -252,7 +252,7 @@ export default function HomePage() {
               <h4
                 className={`font-serif font-medium leading-[1.48] text-[#38262e] ${
                   language === 'my'
-                    ? 'text-[15.5px] min-[380px]:text-[17px] sm:text-[20px]'
+                    ? 'text-[14px] min-[380px]:text-[15.5px] sm:text-[18px]'
                     : 'text-[18px] min-[380px]:text-[20px] sm:text-[24px]'
                 }`}
               >

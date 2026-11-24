@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useStore } from '@/context/StoreContext';
 
 export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolean }) {
-  const { t, socialLinks } = useStore();
+  const { t, socialLinks, language } = useStore();
   const facebookUrl = socialLinks?.facebook || 'https://facebook.com/prettycornermm';
   const tiktokUrl = socialLinks?.tiktok || 'https://www.tiktok.com/@prettycorner';
 
@@ -57,7 +57,13 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
           <div className="w-full md:col-span-2 grid grid-cols-2 gap-6 min-[380px]:gap-8 sm:gap-8 lg:gap-12 max-w-md sm:max-w-none mx-auto sm:mx-0 pt-1 sm:pt-0">
             {/* Column 2: Customer Care */}
             <div className="flex flex-col items-start text-left">
-              <h4 className="font-serif text-[14px] min-[360px]:text-[14.5px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight whitespace-nowrap">
+              <h4
+                className={`font-serif font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight whitespace-nowrap ${
+                  language === 'my'
+                    ? 'text-[12.5px] min-[360px]:text-[13px] sm:text-[15px]'
+                    : 'text-[14px] min-[360px]:text-[14.5px] sm:text-[17px]'
+                }`}
+              >
                 {t.customerCare}
               </h4>
               <ul className="space-y-1.5 sm:space-y-2 text-[11.5px] min-[360px]:text-[12px] sm:text-[13px] text-[#7a6870] leading-snug">
@@ -81,7 +87,13 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
 
             {/* Column 3: Payment & Delivery (Flush right on mobile for even edge balance) */}
             <div className="flex flex-col items-end sm:items-start text-right sm:text-left justify-self-end sm:justify-self-start">
-              <h4 className="font-serif text-[14px] min-[360px]:text-[14.5px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight whitespace-nowrap">
+              <h4
+                className={`font-serif font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight whitespace-nowrap ${
+                  language === 'my'
+                    ? 'text-[12.5px] min-[360px]:text-[13px] sm:text-[15px]'
+                    : 'text-[14px] min-[360px]:text-[14.5px] sm:text-[17px]'
+                }`}
+              >
                 {t.paymentAndDelivery}
               </h4>
               <div className="flex flex-col sm:flex-row sm:flex-wrap items-end sm:items-start gap-1.5 sm:gap-2 text-[10.5px] sm:text-[12px] font-medium text-[#38262e] max-w-full">
