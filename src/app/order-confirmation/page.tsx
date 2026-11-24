@@ -564,10 +564,6 @@ function OrderConfirmationContent() {
           {t.viewOrderReceipt}
         </Link>
 
-        <p className="text-[11px] text-center text-[#7a6870]">
-          {t.saveOrderIdHint}
-        </p>
-
         <div className="text-center pt-2">
           <Link
             href="/shop"

@@ -382,7 +382,11 @@ export default function CheckoutPage() {
 
                   {gpsErrorMsg && (
                     <p className="text-[#b73d67] text-[11.5px] font-medium mt-1.5 flex items-center gap-1.5">
-                      <span className="shrink-0">⚠</span>
+                      <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                      </svg>
                       <span>{gpsErrorMsg}</span>
                     </p>
                   )}
@@ -508,7 +512,7 @@ export default function CheckoutPage() {
                           </div>
                           {isDiscounted ? (
                             <span className="text-[10px] text-[#b73d67] font-semibold">
-                              ✨ Promo applied (-{appliedPromo?.discountPercentage}%)
+                              Promo applied (-{appliedPromo?.discountPercentage}%)
                             </span>
                           ) : (
                             appliedPromo && (

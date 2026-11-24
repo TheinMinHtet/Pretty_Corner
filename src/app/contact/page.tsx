@@ -59,8 +59,8 @@ export default function HelpAndContactPage() {
               </svg>
               <span>
                 {language === 'my'
-                  ? '⚠️ ဘဏ်စကားဝှက် သို့မဟုတ် OTP နံပါတ်များကို ကျွန်ုပ်တို့ဘက်မှ ဘယ်တော့မှ မတောင်းဆိုပါ။'
-                  : '⚠️ We never ask for banking passwords or OTP codes.'}
+                  ? 'ဘဏ်စကားဝှက် သို့မဟုတ် OTP နံပါတ်များကို ကျွန်ုပ်တို့ဘက်မှ ဘယ်တော့မှ မတောင်းဆိုပါ။'
+                  : 'We never ask for banking passwords or OTP codes.'}
               </span>
             </div>
           </div>
@@ -78,7 +78,9 @@ export default function HelpAndContactPage() {
             <div className="space-y-3 text-[14px] text-[#38262e]">
               <div className="flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[#b73d67] shadow-xs">
-                  📞
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+                  </svg>
                 </span>
                 <div>
                   <p className="text-[11px] text-[#7a6870] uppercase font-bold">{language === 'my' ? 'ဖုန်းဟော့လိုင်း' : 'Hotline Phone'}</p>
@@ -88,7 +90,9 @@ export default function HelpAndContactPage() {
 
               <div className="flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[#b73d67] shadow-xs">
-                  💬
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                  </svg>
                 </span>
                 <div>
                   <p className="text-[11px] text-[#7a6870] uppercase font-bold">Viber & Telegram</p>
@@ -98,7 +102,10 @@ export default function HelpAndContactPage() {
 
               <div className="flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-[#b73d67] shadow-xs">
-                  🕒
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
                 </span>
                 <div>
                   <p className="text-[11px] text-[#7a6870] uppercase font-bold">{language === 'my' ? 'ဝန်ဆောင်မှုပေးချိန်' : 'Operating Hours'}</p>

@@ -121,7 +121,7 @@ export default function ShoppingBagPage() {
                                 {item.price.toLocaleString()} MMK
                               </span>
                               <span className="inline-flex items-center text-[10px] sm:text-[11px] font-bold text-[#b73d67] bg-[#fceef2] px-2 py-0.5 rounded-full border border-[#f5d9e3]">
-                                ✨ {appliedPromo?.code} (-{appliedPromo?.discountPercentage}%)
+                                {appliedPromo?.code} (-{appliedPromo?.discountPercentage}%)
                               </span>
                             </>
                           ) : (
@@ -208,7 +208,7 @@ export default function ShoppingBagPage() {
                             </div>
                             {isDiscounted ? (
                               <span className="text-[10px] text-[#b73d67] font-semibold">
-                                ✨ Promo applied (-{appliedPromo?.discountPercentage}%)
+                                Promo applied (-{appliedPromo?.discountPercentage}%)
                               </span>
                             ) : (
                               appliedPromo && (

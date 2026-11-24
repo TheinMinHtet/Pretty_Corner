@@ -626,7 +626,7 @@ function PaymentPendingContent() {
                     href="tel:09880123456"
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-rose-300 text-rose-900 text-[12px] font-bold rounded-lg hover:bg-rose-100 transition-colors shadow-2xs"
                   >
-                    <span>📞 09-880123456</span>
+                    <span>09-880123456</span>
                   </a>
                 </div>
               </div>

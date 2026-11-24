@@ -61,7 +61,7 @@ export default function OrderLookupPage() {
             }`}>
               {t.findReceipt}
             </h2>
-            <p className="text-[12.5px] min-[380px]:text-[13px] text-[#7a6870] mt-2.5 sm:mt-3 leading-[1.82]">
+            <p className="text-[12.5px] min-[380px]:text-[13px] font-bold text-[#38262e] mt-2.5 sm:mt-3 leading-[1.82]">
               {t.findReceiptSubtitle}
             </p>
           </div>
@@ -83,9 +83,6 @@ export default function OrderLookupPage() {
                 placeholder={t.orderIdPlaceholder}
                 className="w-full h-[48px] px-3.5 bg-white border border-[#eedfe5] rounded-[10px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67] font-sans"
               />
-              <p className="text-[12px] text-[#7a6870] mt-2 leading-[1.75]">
-                {t.saveOrderIdHint}
-              </p>
             </div>
 
             <button

@@ -471,7 +471,7 @@ function ShopContent() {
 
             {isPromoFiltered && (
               <span className="inline-flex items-center gap-1.5 bg-[#fceef2] text-[#b73d67] text-[12px] font-bold px-3 py-1 rounded-full border border-[#f5d9e3] shadow-2xs">
-                <span>✨ {promoBadgeLabel} ({filteredProducts.length} {filteredProducts.length === 1 ? (t.productCountSingular || 'item') : (t.productsCount || 'items')})</span>
+                <span>{promoBadgeLabel} ({filteredProducts.length} {filteredProducts.length === 1 ? (t.productCountSingular || 'item') : (t.productsCount || 'items')})</span>
                 <button
                   type="button"
                   onClick={clearPromoFilter}

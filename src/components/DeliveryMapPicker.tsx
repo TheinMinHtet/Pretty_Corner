@@ -156,7 +156,7 @@ export default function DeliveryMapPicker({
           markerRef.current
             .bindPopup(
               `<div style="font-family: inherit; font-size: 12px; color: #38262e; padding: 2px 4px;">
-                <b style="color: #b73d67;">📍 ${language === 'my' ? 'ပို့ဆောင်မည့်နေရာ' : 'Delivery Pin'}</b><br/>
+                <b style="color: #b73d67;">${language === 'my' ? 'ပို့ဆောင်မည့်နေရာ' : 'Delivery Pin'}</b><br/>
                 <span style="display:inline-block; margin-top:2px;">${resolved}</span>
               </div>`,
               { closeButton: false, offset: [0, -36] }
@@ -372,9 +372,10 @@ export default function DeliveryMapPicker({
                     onClick={() => handleSelectSuggestion(item)}
                     className="w-full px-3.5 py-2.5 text-left hover:bg-[#fceef2]/60 flex items-center gap-2.5 transition-colors cursor-pointer group"
                   >
-                    <span className="text-[#b73d67] shrink-0 text-sm group-hover:scale-110 transition-transform">
-                      📍
-                    </span>
+                    <svg className="w-4 h-4 text-[#b73d67] shrink-0 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
                     <div className="min-w-0 flex-1">
                       <p className="text-[13px] font-semibold text-[#38262e] truncate">{item.name}</p>
                       {item.secondary && (
