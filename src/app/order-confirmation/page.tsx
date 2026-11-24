@@ -427,6 +427,15 @@ function OrderConfirmationContent() {
           </span>
         </div>
 
+        {order.phone && (
+          <div className="flex justify-between items-center text-[12.5px] sm:text-[13px] py-1 gap-2">
+            <span className="text-[#7a6870] shrink-0">{t.phone.replace(' *', '')}</span>
+            <span className="font-bold text-[#38262e] text-right font-mono">
+              {order.phone}
+            </span>
+          </div>
+        )}
+
         {/* If unpaid MMQR and NOT cancelled, show button to pay now */}
         {!isCOD && order.paymentStatus !== 'paid' && order.paymentStatus !== 'cancelled' && (
           <div className="mt-3 p-3.5 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between gap-3">
@@ -530,13 +539,29 @@ function OrderConfirmationContent() {
           </span>
         </div>
 
-        <div className="mt-4 pt-2">
-          <p className="text-[13px] font-bold text-[#38262e]">
-            {t.deliveringTo} {order.customerName}
+        <div className="mt-4 pt-3 border-t border-[#eedfe5]/70 bg-[#fcf9fa] border border-[#eedfe5] rounded-[12px] p-3.5">
+          <span className="block text-[11px] font-bold tracking-[1px] text-[#7a6870] uppercase">
+            {t.deliveringTo}
+          </span>
+          <p className="text-[13.5px] font-bold text-[#38262e] mt-1">
+            {order.customerName}
           </p>
-          <p className="text-[12px] text-[#7a6870] mt-0.5">
+          {order.phone && (
+            <p className="text-[12.5px] font-medium text-[#b73d67] mt-0.5 flex items-center gap-1.5 font-mono">
+              <svg className="w-3.5 h-3.5 text-[#b73d67] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+              </svg>
+              <span>{order.phone}</span>
+            </p>
+          )}
+          <p className="text-[12px] text-[#7a6870] mt-1 leading-relaxed">
             {order.deliveryAddress}
           </p>
+          {order.landmarkNote && (
+            <p className="text-[11.5px] text-[#917d85] italic mt-0.5">
+              ({order.landmarkNote})
+            </p>
+          )}
         </div>
 
         {/* Receipt Action Card (Download JPEG) */}
