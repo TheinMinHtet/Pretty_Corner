@@ -429,13 +429,7 @@ export default function DeliveryMapPicker({
               <span className="text-emerald-700 font-medium truncate">
                 ✓ {pinnedAddress}
               </span>
-            ) : (
-              <span>
-                {language === 'my'
-                  ? '💡 မြေပုံပေါ်တွင် နှိပ်၍ သို့မဟုတ် အမှတ်အသားကို ရွှေ့ပါ'
-                  : '💡 Click anywhere on map or drag pin to your doorstep'}
-              </span>
-            )}
+            ) : null}
           </div>
           <span className="font-mono text-[10px] text-[#a89aa0] shrink-0 ml-2">
             {currentCoords.lat.toFixed(4)}, {currentCoords.lng.toFixed(4)}
@@ -455,15 +449,6 @@ export default function DeliveryMapPicker({
             </span>
           </div>
         )}
-      </div>
-
-      {/* Bottom Hint */}
-      <div className="px-3.5 py-1.5 bg-[#fceef2]/40 text-[#7a6870] text-[11px] flex items-center justify-between">
-        <span>
-          {language === 'my'
-            ? '📌 မြေပုံပေါ်တွင် ရွေးချယ်ပြီးသည်နှင့် အထက်ပါ လိပ်စာကွက်လပ်တွင် အလိုအလျောက် ဖြည့်ပေးပါမည်'
-            : '📌 Pinned location immediately auto-fills the delivery address field above'}
-        </span>
       </div>
     </div>
   );

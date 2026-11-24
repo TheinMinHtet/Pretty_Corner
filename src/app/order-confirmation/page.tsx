@@ -344,43 +344,45 @@ function OrderConfirmationContent() {
         </p>
 
         {/* Order reference card */}
-        <div className="w-full bg-[#fcf9fa] border border-[#eedfe5] rounded-[10px] p-4 mt-6 flex items-center justify-between text-left">
-          <div>
-            <span className="block text-[10px] font-bold tracking-[1.2px] text-[#7a6870] uppercase">
-              {t.yourOrderRef}
-            </span>
-            <span className="block text-[19px] font-bold text-[#38262e] mt-0.5">
-              {order.id}
-            </span>
+        <div className="w-full bg-[#fcf9fa] border border-[#eedfe5] rounded-[12px] p-4 mt-6 flex flex-col gap-2.5 shadow-xs text-left">
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="block text-[11px] font-bold tracking-[1.2px] text-[#7a6870] uppercase">
+                {t.yourOrderRef}
+              </span>
+              <span className="block text-[20px] font-mono font-bold text-[#38262e] mt-0.5 select-all">
+                {order.id}
+              </span>
+            </div>
+
+            <button
+              onClick={handleCopy}
+              className="p-2 text-[#7a6870] hover:text-[#b73d67] transition-colors relative cursor-pointer"
+              title="Copy order reference"
+            >
+              {copied ? (
+                <span className="text-[11px] font-bold text-[#3b775d]">{t.copied}</span>
+              ) : (
+                <svg className="w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                </svg>
+              )}
+            </button>
           </div>
 
-          <button
-            onClick={handleCopy}
-            className="p-2 text-[#7a6870] hover:text-[#b73d67] transition-colors relative cursor-pointer"
-            title="Copy order reference"
-          >
-            {copied ? (
-              <span className="text-[11px] font-bold text-[#3b775d]">{t.copied}</span>
-            ) : (
-              <svg className="w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-              </svg>
-            )}
-          </button>
-        </div>
-
-        <div className="w-full mt-2 flex items-center justify-center gap-1.5 text-[11px] text-[#7a6870]">
-          <svg className="w-3.5 h-3.5 text-[#b73d67] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
-            <polyline points="17 21 17 13 7 13 7 21" />
-            <polyline points="7 3 7 8 15 8" />
-          </svg>
-          <span>
-            {language === 'my'
-              ? 'အမှာစာအခြေအနေနှင့် ပြေစာစစ်ဆေးရန် ဤ Order ID ကို သိမ်းဆည်းထားပေးပါ။'
-              : 'Please save this Order ID to check your order status & receipt.'}
-          </span>
+          <div className="pt-2 border-t border-[#eedfe5]/70 flex items-center justify-center gap-1.5 text-[12px] font-medium text-[#b73d67]">
+            <svg className="w-4 h-4 text-[#b73d67] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            <span>
+              {language === 'my'
+                ? 'အမှာစာအခြေအနေနှင့် ပြေစာစစ်ဆေးရန် ဤ Order ID ကို သိမ်းဆည်းထားပေးပါ။'
+                : 'Please save this Order ID to check your order status & receipt.'}
+            </span>
+          </div>
         </div>
       </section>
 

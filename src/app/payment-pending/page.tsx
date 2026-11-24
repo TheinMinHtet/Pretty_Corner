@@ -545,12 +545,8 @@ function PaymentPendingContent() {
           {t.oneLastStep}
         </h2>
 
-        <p className="font-sans text-[13px] sm:text-[14px] text-[#7a6870] mt-2.5 sm:mt-3 leading-[1.82]">
-          {t.completePaymentSecurely}<br />{paymentMethod || 'MMQR'}.
-        </p>
-
         {/* Provider Payment Card */}
-        <div className="w-full bg-[#fcf9fa] border border-[#eedfe5] rounded-[12px] p-5 mt-5 flex flex-col items-center">
+        <div className="w-full bg-[#fcf9fa] border border-[#eedfe5] rounded-[14px] p-5 mt-5 flex flex-col items-center shadow-xs">
           <span className="font-sans text-[21px] font-bold text-[#38262e]">
             {paymentMethod || 'Mobile Banking'}
           </span>
@@ -560,21 +556,27 @@ function PaymentPendingContent() {
           <span className="font-sans text-[30px] font-bold text-[#b73d67] mt-1">
             {totalAmount.toLocaleString()} MMK
           </span>
-          <span className="text-[12px] text-[#7a6870] mt-1.5 font-medium">
-            {t.orderRef}: {currentId}
-          </span>
 
-          <div className="mt-2.5 pt-2.5 border-t border-[#eedfe5]/70 w-full flex items-center justify-center gap-1.5 text-[11px] text-[#7a6870]">
-            <svg className="w-3.5 h-3.5 text-[#b73d67] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
-              <polyline points="17 21 17 13 7 13 7 21" />
-              <polyline points="7 3 7 8 15 8" />
-            </svg>
-            <span>
-              {language === 'my'
-                ? 'အမှာစာအခြေအနေနှင့် ပြေစာစစ်ဆေးရန် ဤ Order ID ကို သိမ်းဆည်းထားပေးပါ။'
-                : 'Please save this Order ID to check your order status & receipt.'}
+          {/* Highlighted Order Reference Banner */}
+          <div className="w-full mt-4 bg-white border border-[#eedfe5] rounded-[10px] p-3 text-center shadow-xs">
+            <span className="block text-[11px] font-bold tracking-wider text-[#7a6870] uppercase">
+              {t.orderRef}
             </span>
+            <span className="block text-[18px] sm:text-[20px] font-mono font-bold text-[#38262e] tracking-tight mt-0.5 select-all">
+              {currentId}
+            </span>
+            <div className="mt-2 pt-2 border-t border-[#eedfe5]/70 flex items-center justify-center gap-1.5 text-[12px] font-medium text-[#b73d67]">
+              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                <polyline points="17 21 17 13 7 13 7 21" />
+                <polyline points="7 3 7 8 15 8" />
+              </svg>
+              <span>
+                {language === 'my'
+                  ? 'အမှာစာအခြေအနေနှင့် ပြေစာစစ်ဆေးရန် ဤ Order ID ကို သိမ်းဆည်းထားပေးပါ။'
+                  : 'Please save this Order ID to check your order status & receipt.'}
+              </span>
+            </div>
           </div>
         </div>
 

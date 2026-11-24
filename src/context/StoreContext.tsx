@@ -269,11 +269,27 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (typeof document !== 'undefined') {
       document.documentElement.lang = lang;
       document.documentElement.setAttribute('data-lang', lang);
+      if (lang === 'my') {
+        document.documentElement.classList.add('lang-my');
+      } else {
+        document.documentElement.classList.remove('lang-my');
+      }
     }
     try {
       localStorage.setItem('pretty_corner_lang', lang);
     } catch {}
   };
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = language;
+      if (language === 'my') {
+        document.documentElement.classList.add('lang-my');
+      } else {
+        document.documentElement.classList.remove('lang-my');
+      }
+    }
+  }, [language]);
 
   const saveCartToStorage = (updatedCart: CartItem[]) => {
     setCart(updatedCart);

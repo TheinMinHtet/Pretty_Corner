@@ -241,7 +241,7 @@ function ShopContent() {
       case 'more':
         return language === 'my' ? 'အခြား အလှပြင်အသုံးအဆောင်များ' : 'Accessories & More';
       default:
-        return language === 'my' ? 'ကုန်ပစ္စည်းများ အားလုံး' : 'The Variety Corner';
+        return t.catAll;
     }
   };
 
@@ -266,7 +266,7 @@ function ShopContent() {
       case 'more':
         return language === 'my' ? 'ပိုးသားအသုံးအဆောင်နှင့် အလှပြင်ကိရိယာများ' : 'Pure mulberry silk scrunchies, cosmetic tools & everyday add-ons.';
       default:
-        return language === 'my' ? 'အရည်အသွေးမြင့် အလှကုန်၊ မိတ်ကပ်၊ အီလက်ထရောနစ်နှင့် နေ့စဉ်သုံးပစ္စည်းများကို စုံလင်စွာ ရွေးချယ်နိုင်ပါသည်။' : 'From genuine skincare & makeup to smart electrical gadgets and variety essentials.';
+        return '';
     }
   };
 
@@ -382,9 +382,11 @@ function ShopContent() {
             }`}>
               {getCategoryTitle()}
             </h1>
-            <p className="font-sans text-[12.5px] sm:text-[14px] text-[#7a6870] mt-2.5 sm:mt-3 max-w-xl leading-[1.82]">
-              {getCategorySubtitle()}
-            </p>
+            {getCategorySubtitle() ? (
+              <p className="font-sans text-[12.5px] sm:text-[14px] text-[#7a6870] mt-1 sm:mt-1.5 max-w-xl leading-[1.82]">
+                {getCategorySubtitle()}
+              </p>
+            ) : null}
           </div>
 
           {/* Search Bar */}

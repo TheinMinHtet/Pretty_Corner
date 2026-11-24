@@ -134,51 +134,6 @@ export default function HeroBannerSlider() {
                 {t.heroDescription}
               </p>
             </div>
-
-            {/* Bottom Actions */}
-            <div className="space-y-3 sm:space-y-4">
-              <div>
-                <Link
-                  href="/shop"
-                  className="inline-flex items-center justify-center gap-2 bg-[#b73d67] hover:bg-[#a13359] text-white text-[13px] sm:text-[15px] font-bold h-[44px] sm:h-[50px] px-6 sm:px-8 rounded-[14px] sm:rounded-[16px] shadow-sm hover:shadow-md active:scale-[0.98] transition-all group/btn"
-                >
-                  <span>{t.heroCta}</span>
-                  <svg
-                    className="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                  </svg>
-                </Link>
-              </div>
-
-              {/* Minimalist Trust Indicator Strip */}
-              <div className="hidden sm:flex items-center gap-4 text-[11.5px] font-medium text-[#705c66] pt-2 border-t border-[#eedfe5]/50">
-                <span className="inline-flex items-center gap-1.5">
-                  <svg className="w-3.5 h-3.5 text-[#b73d67]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  {language === 'my' ? '၁၀၀% စစ်မှန်သော ပစ္စည်းများ' : '100% Authentic Curation'}
-                </span>
-                <span className="w-1 h-1 rounded-full bg-[#eedfe5]" />
-                <span className="inline-flex items-center gap-1.5">
-                  <svg className="w-3.5 h-3.5 text-[#b73d67]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  {language === 'my' ? 'မြန်မာတစ်နိုင်ငံလုံး အမြန်ပို့ဆောင်မှု' : 'Express Delivery across Myanmar'}
-                </span>
-                <span className="w-1 h-1 rounded-full bg-[#eedfe5]" />
-                <span className="inline-flex items-center gap-1.5">
-                  <svg className="w-3.5 h-3.5 text-[#b73d67]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                  {language === 'my' ? 'စိတ်ချရသော ငွေပေးချေမှုစနစ်' : 'COD & Mobile Banking'}
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -198,9 +153,9 @@ export default function HeroBannerSlider() {
         {activePromos.map((promo, idx) => {
           const isActive = idx === currentIndex;
           const bannerImage = promo.imageUrl || '/assets/hero-banner.jpg';
-          const action = evaluatePromotionAction(promo, { language, defaultCta: t.heroCta });
+          const action = evaluatePromotionAction(promo, { language, defaultCta: '' });
           const badgeText = action.badgeLabel;
-          const ctaLabel = action.ctaLabel;
+          const ctaLabel = promo.ctaText || '';
           const ctaDestination = action.destinationUrl;
 
           return (
@@ -289,91 +244,93 @@ export default function HeroBannerSlider() {
                   )}
                 </div>
 
-                {/* Primary CTA Button & Mobile Side-by-Side Indicator Row */}
-                <div
-                  className={`pt-2 sm:pt-4 flex items-center gap-2 sm:block transition-all duration-700 delay-300 ease-out ${
-                    isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                  }`}
-                >
-                  <Link
-                    href={ctaDestination}
-                    onClick={() => {
-                      if (promo.code) {
-                        applyPromoCode(promo.code);
-                      }
-                    }}
-                    className="inline-flex items-center justify-center gap-1.5 bg-[#b73d67] text-white text-[12px] sm:text-[15px] font-bold h-[36px] sm:h-[50px] px-4 sm:px-8 rounded-full sm:rounded-[14px] shadow-sm hover:bg-[#982f53] active:scale-[0.98] transition-all shrink-0 cursor-pointer"
+                {/* Primary CTA Button (only if custom ctaText provided) & Mobile Story Indicator */}
+                {ctaLabel ? (
+                  <div
+                    className={`pt-2 sm:pt-4 flex items-center gap-2 sm:block transition-all duration-700 delay-300 ease-out ${
+                      isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                    }`}
                   >
-                    <span>{ctaLabel}</span>
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
-                  </Link>
-
-                  {/* MOBILE-ONLY: Side-by-side Vertically Centered Story Indicator */}
-                  {totalSlides > 1 && (
-                    <div
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
+                    <Link
+                      href={ctaDestination}
+                      onClick={() => {
+                        if (promo.code) {
+                          applyPromoCode(promo.code);
+                        }
                       }}
-                      className="sm:hidden inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-[#eedfe5] shadow-2xs shrink-0 select-none"
+                      className="inline-flex items-center justify-center gap-1.5 bg-[#b73d67] text-white text-[12px] sm:text-[15px] font-bold h-[36px] sm:h-[50px] px-4 sm:px-8 rounded-full sm:rounded-[14px] shadow-sm hover:bg-[#982f53] active:scale-[0.98] transition-all shrink-0 cursor-pointer"
                     >
-                      {/* Segmented Progress Story Bars for Mobile */}
-                      <div className="flex items-center gap-1">
-                        {activePromos.map((_, pIdx) => {
-                          const isCurrent = pIdx === currentIndex;
-                          const isPast = pIdx < currentIndex;
-                          return (
-                            <button
-                              key={pIdx}
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                goToSlide(pIdx);
-                              }}
-                              aria-label={`Jump to promotion slide ${pIdx + 1}`}
-                              className="py-0.5 px-0.5 flex items-center cursor-pointer focus:outline-none"
-                            >
-                              <div
-                                className={`h-1.5 rounded-full overflow-hidden transition-all duration-300 ${
-                                  isCurrent ? 'w-5 bg-[#eedfe5]' : 'w-2 bg-[#eedfe5]/75'
-                                }`}
-                              >
-                                {isCurrent && (
-                                  <div
-                                    key={`prog-mob-${currentIndex}-${cycleCount}`}
-                                    className="h-full bg-[#b73d67] rounded-full animate-hero-progress origin-left"
-                                    style={{
-                                      animationPlayState: isPaused ? 'paused' : 'running',
-                                    }}
-                                  />
-                                )}
-                                {isPast && (
-                                  <div className="h-full w-full bg-[#b73d67] rounded-full" />
-                                )}
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
+                      <span>{ctaLabel}</span>
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                      </svg>
+                    </Link>
 
-                      {/* Mobile Slide Index Counter */}
-                      <div className="flex items-center gap-1 pl-1 border-l border-[#eedfe5] text-[10px] font-mono font-bold text-[#514149] leading-none">
-                        <span>
-                          0{currentIndex + 1}/0{totalSlides}
-                        </span>
-                        {isPaused && (
-                          <span
-                            className="w-1.5 h-1.5 rounded-full bg-[#b73d67] animate-pulse"
-                            title={language === 'my' ? 'ခေတ္တရပ်ထားသည်' : 'Paused'}
-                          />
-                        )}
+                    {/* MOBILE-ONLY: Side-by-side Vertically Centered Story Indicator */}
+                    {totalSlides > 1 && (
+                      <div
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                        className="sm:hidden inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-[#eedfe5] shadow-2xs shrink-0 select-none"
+                      >
+                        {/* Segmented Progress Story Bars for Mobile */}
+                        <div className="flex items-center gap-1">
+                          {activePromos.map((_, pIdx) => {
+                            const isCurrent = pIdx === currentIndex;
+                            const isPast = pIdx < currentIndex;
+                            return (
+                              <button
+                                key={pIdx}
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  goToSlide(pIdx);
+                                }}
+                                aria-label={`Jump to promotion slide ${pIdx + 1}`}
+                                className="py-0.5 px-0.5 flex items-center cursor-pointer focus:outline-none"
+                              >
+                                <div
+                                  className={`h-1.5 rounded-full overflow-hidden transition-all duration-300 ${
+                                    isCurrent ? 'w-5 bg-[#eedfe5]' : 'w-2 bg-[#eedfe5]/75'
+                                  }`}
+                                >
+                                  {isCurrent && (
+                                    <div
+                                      key={`prog-mob-${currentIndex}-${cycleCount}`}
+                                      className="h-full bg-[#b73d67] rounded-full animate-hero-progress origin-left"
+                                      style={{
+                                        animationPlayState: isPaused ? 'paused' : 'running',
+                                      }}
+                                    />
+                                  )}
+                                  {isPast && (
+                                    <div className="h-full w-full bg-[#b73d67] rounded-full" />
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Mobile Slide Index Counter */}
+                        <div className="flex items-center gap-1 pl-1 border-l border-[#eedfe5] text-[10px] font-mono font-bold text-[#514149] leading-none">
+                          <span>
+                            0{currentIndex + 1}/0{totalSlides}
+                          </span>
+                          {isPaused && (
+                            <span
+                              className="w-1.5 h-1.5 rounded-full bg-[#b73d67] animate-pulse"
+                              title={language === 'my' ? 'ခေတ္တရပ်ထားသည်' : 'Paused'}
+                            />
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                ) : null}
               </div>
             </div>
           );

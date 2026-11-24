@@ -237,15 +237,9 @@ export default function HomePage() {
           {/* Right Side Content */}
           <div className="w-full md:w-auto md:max-w-md flex flex-col justify-center items-start gap-3">
             <div>
-              <span className="inline-block text-[10.5px] min-[380px]:text-[11px] font-bold text-[#b73d67] bg-white/90 px-2.5 py-0.5 rounded-full border border-[#eedfe5] mb-2">
-                {t.storeLocationBadge}
-              </span>
               <h4 className="font-serif text-[18px] min-[380px]:text-[20px] sm:text-[24px] font-medium leading-[1.48] text-[#38262e]">
                 {t.storeLocationHeading}
               </h4>
-              <p className="text-[12.5px] min-[380px]:text-[13px] sm:text-[14px] text-[#7a6870] leading-[1.82] mt-2.5 sm:mt-3 max-w-prose">
-                {t.storeLocationDescription}
-              </p>
             </div>
           </div>
         </div>

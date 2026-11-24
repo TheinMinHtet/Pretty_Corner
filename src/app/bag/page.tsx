@@ -71,13 +71,11 @@ export default function ShoppingBagPage() {
           }`}>
           {t.bagTitle}
         </h1>
-        <p className="font-sans text-[12.5px] min-[380px]:text-[13px] sm:text-[14px] text-[#7a6870] mt-2.5 sm:mt-3 leading-[1.82]">
-          {cart.length > 0
-            ? language === 'my'
-              ? `အိမ်အရောက်ပို့ဆောင်ရန် ပစ္စည်း ${cart.length} မျိုး အသင့်ရှိပါသည်။`
-              : `${cart.length} lovely ${cart.length === 1 ? 'find' : 'finds'} ready for doorstep delivery.`
-            : t.bagSubtitleEmpty}
-        </p>
+        {cart.length === 0 && (
+          <p className="font-sans text-[13px] sm:text-[15px] text-[#7a6870] mt-1">
+            {t.bagSubtitleEmpty}
+          </p>
+        )}
       </div>
 
       {/* Main Content Area - Responsive 2-Column Grid */}
