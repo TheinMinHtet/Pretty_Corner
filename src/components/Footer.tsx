@@ -11,25 +11,25 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
 
   return (
     <footer className="w-full bg-[#fdfafb] border-t border-[#eedfe5] mt-auto">
-      {/* 1. Main Footer Grid: Balanced 3-column layout */}
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 pt-7 sm:pt-9 pb-6 sm:pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 items-start">
-          {/* Column 1: Brand & Follow Us */}
-          <div className="flex flex-col items-center sm:items-start text-center sm:text-left">
+      {/* 1. Main Footer Grid: Balanced layout with Customer Care & Payment side-by-side on mobile */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-7 sm:pt-9 pb-6 sm:pb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 items-start">
+          {/* Column 1: Brand & Follow Us (Full-width on mobile, 1 col on desktop) */}
+          <div className="col-span-2 md:col-span-1 flex flex-col items-center sm:items-start text-center sm:text-left">
             <Link href="/" className="inline-block group">
-              <span className="font-serif text-[26px] sm:text-[28px] lg:text-[30px] font-medium text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
+              <span className="font-serif text-[24px] sm:text-[28px] lg:text-[30px] font-medium text-[#38262e] tracking-tight group-hover:text-[#b73d67] transition-colors">
                 {t.brandName}
               </span>
             </Link>
-            <p className="text-[12.5px] sm:text-[13px] text-[#7a6870] mt-2 leading-relaxed max-w-xs sm:max-w-none">
+            <p className="text-[12px] sm:text-[13px] text-[#7a6870] mt-2 leading-relaxed max-w-xs sm:max-w-none">
               {t.footerDescription}
             </p>
-            <div className="flex items-center gap-2.5 text-[12px] font-medium text-[#38262e] mt-4">
+            <div className="flex items-center gap-2.5 text-[12px] font-medium text-[#38262e] mt-3.5 sm:mt-4">
               <a
                 href={facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-white border border-[#eedfe5] hover:border-[#1877f2] hover:text-[#1877f2] px-3 py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 transition-all cursor-pointer group"
+                className="bg-white border border-[#eedfe5] hover:border-[#1877f2] hover:text-[#1877f2] px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 transition-all cursor-pointer group text-[11.5px] sm:text-[12px]"
                 title="Follow us on Facebook"
               >
                 <svg className="w-3.5 h-3.5 fill-[#1877f2]" viewBox="0 0 24 24">
@@ -42,7 +42,7 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
                 href={tiktokUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-white border border-[#eedfe5] hover:border-[#000000] hover:text-[#000000] px-3 py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 transition-all cursor-pointer group"
+                className="bg-white border border-[#eedfe5] hover:border-[#000000] hover:text-[#000000] px-2.5 sm:px-3 py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 transition-all cursor-pointer group text-[11.5px] sm:text-[12px]"
                 title="Follow us on TikTok"
               >
                 <svg className="w-3.5 h-3.5 fill-[#000000]" viewBox="0 0 24 24">
@@ -53,17 +53,12 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
             </div>
           </div>
 
-          {/* Column 2: Customer Care */}
-          <div className="flex flex-col items-center sm:items-start text-center sm:text-left pt-2 sm:pt-0">
-            <h4 className="font-serif text-[15px] sm:text-[17px] font-semibold text-[#38262e] mb-2.5 sm:mb-3 tracking-tight">
+          {/* Column 2: Customer Care (Side-by-side on mobile) */}
+          <div className="col-span-1 flex flex-col items-start text-left pt-1 sm:pt-0">
+            <h4 className="font-serif text-[14.5px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight">
               {t.customerCare}
             </h4>
-            <ul className="space-y-2 text-[12.5px] sm:text-[13px] text-[#7a6870] leading-snug">
-              <li>
-                <Link href="/order-lookup" className="hover:text-[#b73d67] transition-colors inline-block py-0.5 font-medium text-[#38262e]">
-                  {t.navReceipt}
-                </Link>
-              </li>
+            <ul className="space-y-1.5 sm:space-y-2 text-[12px] sm:text-[13px] text-[#7a6870] leading-snug">
               <li>
                 <Link href="/about" className="hover:text-[#b73d67] transition-colors inline-block py-0.5">
                   {t.aboutUs}
@@ -75,11 +70,6 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
                 </Link>
               </li>
               <li>
-                <Link href="/policies/terms" className="hover:text-[#b73d67] transition-colors inline-block py-0.5">
-                  {t.termsAndConditions}
-                </Link>
-              </li>
-              <li>
                 <Link href="/contact" className="hover:text-[#b73d67] transition-colors inline-block py-0.5">
                   {t.navContact}
                 </Link>
@@ -87,18 +77,18 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
             </ul>
           </div>
 
-          {/* Column 3: Payment & Delivery */}
-          <div className="flex flex-col items-center sm:items-start text-center sm:text-left pt-2 sm:pt-0">
-            <h4 className="font-serif text-[15px] sm:text-[17px] font-semibold text-[#38262e] mb-2.5 sm:mb-3 tracking-tight">
+          {/* Column 3: Payment & Delivery (Side-by-side on mobile) */}
+          <div className="col-span-1 flex flex-col items-start text-left pt-1 sm:pt-0">
+            <h4 className="font-serif text-[14.5px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight">
               {t.paymentAndDelivery}
             </h4>
-            <div className="flex flex-row flex-wrap justify-center sm:justify-start gap-2 text-[11.5px] sm:text-[12px] font-medium text-[#38262e]">
-              <span className="bg-white border border-[#eedfe5] px-3 py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67]" />
+            <div className="flex flex-col sm:flex-row sm:flex-wrap items-start gap-1.5 sm:gap-2 text-[11px] sm:text-[12px] font-medium text-[#38262e]">
+              <span className="bg-white border border-[#eedfe5] px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 whitespace-nowrap">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] shrink-0" />
                 {t.mobileBanking}
               </span>
-              <span className="bg-white border border-[#eedfe5] px-3 py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#3b775d]" />
+              <span className="bg-white border border-[#eedfe5] px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 whitespace-nowrap">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#3b775d] shrink-0" />
                 {t.cod}
               </span>
             </div>
