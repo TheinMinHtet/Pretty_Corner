@@ -88,44 +88,37 @@ export default function HeroBannerSlider() {
 
   // State 0: Fallback to default editorial hero if no active promotions
   if (totalSlides === 0) {
-    const quickCategories = [
-      { name: t.catSkincare, href: '/shop?category=skincare' },
-      { name: t.catElectrical, href: '/shop?category=electrical' },
-      { name: t.catMakeup, href: '/shop?category=makeup' },
-      { name: t.catLenses, href: '/shop?category=lenses' },
-    ];
-
     return (
       <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 md:pt-6">
-        <div className="relative w-full h-[360px] sm:h-[440px] md:h-[500px] lg:h-[540px] rounded-[24px] sm:rounded-[36px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs group select-none">
-          {/* Editorial Background Image with Subtle Ambient Drift on Hover */}
+        <div className="relative w-full h-[360px] sm:h-[440px] md:h-[490px] lg:h-[520px] rounded-[24px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs group select-none">
+          {/* Editorial Background Image with Subtle, Calm Ken Burns Transition */}
           <Image
             src="/assets/hero-banner.jpg"
-            alt="Pretty Corner Hero"
+            alt="Pretty Corner"
             fill
             priority
             sizes="(max-width: 768px) 100vw, 1280px"
-            className="object-cover pointer-events-none transition-transform duration-[7000ms] ease-out group-hover:scale-105"
+            className="object-cover object-right md:object-center pointer-events-none transition-transform duration-[8000ms] ease-out group-hover:scale-[1.02] opacity-80 sm:opacity-85"
           />
 
-          {/* Layered Perplexity-Style Luminous Gradient Masks */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 md:via-white/60 to-transparent pointer-events-none" />
-          <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/40 to-transparent pointer-events-none" />
+          {/* Calming Luminous Gradient Masks */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#faf7f8] via-[#faf7f8]/90 md:via-[#faf7f8]/75 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#faf7f8]/95 via-transparent to-transparent pointer-events-none" />
 
           {/* Hero Content Shell */}
-          <div className="absolute inset-0 p-5 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-between z-10">
+          <div className="absolute inset-0 p-6 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-between z-10">
             <div className="max-w-xl">
               {/* Frosted Capsule Brand Badge */}
-              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1 rounded-full bg-white/90 backdrop-blur-md border border-[#f1d3df] shadow-2xs">
-                <span className="w-2 h-2 rounded-full bg-[#b73d67] animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1 rounded-full bg-white/90 backdrop-blur-md border border-[#f1d3df] shadow-2xs mb-2.5 sm:mb-3.5">
+                <span className="w-2 h-2 rounded-full bg-[#b73d67]" />
                 <span className="font-sans text-[10.5px] sm:text-[12px] font-bold tracking-[1.5px] sm:tracking-[2px] text-[#b73d67] uppercase">
                   {t.heroBadge}
                 </span>
               </div>
 
-              {/* Bold, Font-Black Display Headline */}
-              <h2
-                className={`font-serif font-black leading-[1.08] text-[#22131b] tracking-tight mt-2.5 sm:mt-4 ${
+              {/* Confident, Font-Black Display Headline */}
+              <h1
+                className={`font-serif font-black leading-[1.08] text-[#22131b] tracking-tight ${
                   language === 'my'
                     ? 'text-[24px] sm:text-[34px] md:text-[42px] lg:text-[48px]'
                     : 'text-[30px] sm:text-[44px] md:text-[54px] lg:text-[60px]'
@@ -134,20 +127,20 @@ export default function HeroBannerSlider() {
                 {t.heroTitleLine1}
                 <br />
                 {t.heroTitleLine2}
-              </h2>
+              </h1>
 
-              {/* Refined Supporting Copy */}
+              {/* Supporting Copy */}
               <p className="font-sans text-[13.5px] sm:text-[16px] font-normal text-[#422c36] leading-relaxed mt-2.5 sm:mt-3.5 max-w-lg line-clamp-2 sm:line-clamp-none">
                 {t.heroDescription}
               </p>
             </div>
 
-            {/* Bottom Actions & Category Jump Chips */}
+            {/* Bottom Actions */}
             <div className="space-y-3 sm:space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
+              <div>
                 <Link
                   href="/shop"
-                  className="inline-flex items-center justify-center gap-2 bg-[#b73d67] text-white text-[13px] sm:text-[15px] font-bold h-[44px] sm:h-[50px] px-6 sm:px-8 rounded-[14px] sm:rounded-[16px] shadow-sm hover:bg-[#a33259] hover:shadow-md active:scale-[0.98] transition-all group/btn"
+                  className="inline-flex items-center justify-center gap-2 bg-[#b73d67] hover:bg-[#a13359] text-white text-[13px] sm:text-[15px] font-bold h-[44px] sm:h-[50px] px-6 sm:px-8 rounded-[14px] sm:rounded-[16px] shadow-sm hover:shadow-md active:scale-[0.98] transition-all group/btn"
                 >
                   <span>{t.heroCta}</span>
                   <svg
@@ -160,26 +153,13 @@ export default function HeroBannerSlider() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                   </svg>
                 </Link>
-
-                {/* Direct Category Jump Chips */}
-                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                  {quickCategories.map((cat) => (
-                    <Link
-                      key={cat.href}
-                      href={cat.href}
-                      className="inline-flex items-center text-[11px] sm:text-[12.5px] font-semibold text-[#422c36] hover:text-[#b73d67] bg-white/85 hover:bg-white backdrop-blur-xs border border-[#eedfe5] hover:border-[#b73d67]/40 px-3 py-1 sm:py-1.5 rounded-full shadow-2xs transition-all active:scale-[0.97]"
-                    >
-                      {cat.name}
-                    </Link>
-                  ))}
-                </div>
               </div>
 
               {/* Minimalist Trust Indicator Strip */}
-              <div className="hidden sm:flex items-center gap-4 text-[11.5px] font-medium text-[#6e5862] pt-1">
+              <div className="hidden sm:flex items-center gap-4 text-[11.5px] font-medium text-[#705c66] pt-2 border-t border-[#eedfe5]/50">
                 <span className="inline-flex items-center gap-1.5">
                   <svg className="w-3.5 h-3.5 text-[#b73d67]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M5 13l4 4L19 7" />
                   </svg>
                   {language === 'my' ? '၁၀၀% စစ်မှန်သော ပစ္စည်းများ' : '100% Authentic Curation'}
                 </span>
@@ -278,7 +258,7 @@ export default function HeroBannerSlider() {
                   {/* Subtitle / Description */}
                   {promo.subtitle && (
                     <p
-                      className={`font-sans text-[12px] sm:text-[16px] font-medium text-[#2e1d25] leading-snug sm:leading-relaxed mt-1 sm:mt-3 max-w-md line-clamp-2 sm:line-clamp-none transition-all duration-700 delay-200 ease-out ${
+                      className={`font-sans text-[12.5px] sm:text-[16px] font-medium text-[#2e1d25] leading-relaxed mt-2.5 sm:mt-3.5 max-w-md line-clamp-2 sm:line-clamp-none transition-all duration-700 delay-200 ease-out ${
                         isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                       }`}
                     >

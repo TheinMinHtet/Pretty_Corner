@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
@@ -11,6 +12,7 @@
     --brand-surface: #fcf9fa;
     --brand-surface-subtle: #f7f4f5;
     --brand-border: #eedfe5;
+    --font-myanmar: 'Noto Sans Myanmar', 'Pyidaungsu', 'Myanmar Text', 'Padauk', sans-serif;
   }
 
   body {
@@ -27,6 +29,116 @@
 
 .font-sans {
   font-family: var(--font-dmsans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.font-myanmar {
+  font-family: var(--font-myanmar), -apple-system, sans-serif;
+}
+
+/* ==========================================================================
+   Myanmar Typography & UX Enhancements
+   ========================================================================== */
+html[lang="my"] body,
+[data-lang="my"] body {
+  font-family: var(--font-myanmar), var(--font-dmsans), sans-serif;
+  line-height: 1.75;
+}
+
+html[lang="my"] .font-serif,
+[data-lang="my"] .font-serif {
+  font-family: var(--font-myanmar), var(--font-cormorant), Georgia, serif;
+}
+
+html[lang="my"] .font-sans,
+[data-lang="my"] .font-sans {
+  font-family: var(--font-myanmar), var(--font-dmsans), sans-serif;
+}
+
+/* Prevent uppercase tracking from breaking Burmese conjuncts and diacritics */
+html[lang="my"] .tracking-wider,
+html[lang="my"] .tracking-widest,
+html[lang="my"] .tracking-\[1\.2px\],
+html[lang="my"] .tracking-\[2px\],
+[data-lang="my"] .tracking-wider,
+[data-lang="my"] .tracking-widest {
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+/* Burmese Headings & Paragraphs spacing balance */
+html[lang="my"] h1,
+html[lang="my"] h2,
+html[lang="my"] h3,
+html[lang="my"] h4,
+[data-lang="my"] h1,
+[data-lang="my"] h2,
+[data-lang="my"] h3,
+[data-lang="my"] h4 {
+  line-height: 1.48;
+  text-wrap: balance;
+  letter-spacing: normal !important;
+}
+
+/* Ensure distinct optical separation between headings and following paragraphs */
+html[lang="my"] h1 + p,
+html[lang="my"] h2 + p,
+html[lang="my"] h3 + p,
+html[lang="my"] h4 + p,
+[data-lang="my"] h1 + p,
+[data-lang="my"] h2 + p,
+[data-lang="my"] h3 + p,
+[data-lang="my"] h4 + p {
+  margin-top: 0.75rem !important;
+  line-height: 1.82 !important;
+  word-spacing: 0.04em;
+}
+
+/* Consecutive paragraphs spacing */
+html[lang="my"] p + p,
+[data-lang="my"] p + p {
+  margin-top: 0.85rem !important;
+}
+
+html[lang="my"] p,
+[data-lang="my"] p {
+  text-wrap: pretty;
+  line-height: 1.82 !important;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Compact mobile view (≤ 380px) responsive typographic scaling */
+@media (max-width: 380px) {
+  html[lang="my"] h1 {
+    font-size: clamp(20px, 6vw, 24px) !important;
+    line-height: 1.45 !important;
+  }
+  html[lang="my"] h2 {
+    font-size: clamp(17px, 5.2vw, 21px) !important;
+    line-height: 1.45 !important;
+  }
+  html[lang="my"] h3 {
+    font-size: clamp(15px, 4.8vw, 18px) !important;
+    line-height: 1.45 !important;
+  }
+  html[lang="my"] h4 {
+    font-size: clamp(14px, 4.4vw, 16px) !important;
+    line-height: 1.45 !important;
+  }
+  html[lang="my"] p {
+    font-size: 13px !important;
+    line-height: 1.8 !important;
+  }
+  html[lang="my"] h1 + p,
+  html[lang="my"] h2 + p,
+  html[lang="my"] h3 + p,
+  html[lang="my"] h4 + p,
+  [data-lang="my"] h1 + p,
+  [data-lang="my"] h2 + p,
+  [data-lang="my"] h3 + p,
+  [data-lang="my"] h4 + p {
+    margin-top: 0.65rem !important;
+  }
 }
 
 /* Hide scrollbar for category pills / horizontal scroll */

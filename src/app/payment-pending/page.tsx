@@ -521,7 +521,7 @@ function PaymentPendingContent() {
 
   return (
     <div className="w-full max-w-2xl mx-auto px-2.5 sm:px-6 py-4 md:py-8 flex flex-col min-h-full pb-12">
-      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-3 min-[360px]:p-4 sm:p-8 flex flex-col">
+      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-[24px] sm:rounded-2xl p-3 min-[360px]:p-4 sm:p-8 flex flex-col">
         {/* Step indicator */}
         <div className="mb-4">
           <OrderingStepBar currentStep={2} orderId={cleanId} />
@@ -537,15 +537,15 @@ function PaymentPendingContent() {
           </svg>
         </div>
 
-        <h2 className={`font-serif font-medium leading-tight text-[#38262e] ${
+        <h2 className={`font-serif font-medium leading-[1.45] text-[#38262e] ${
           language === 'my'
-            ? 'text-[25px] sm:text-[29px]'
-            : 'text-[34px]'
+            ? 'text-[19px] min-[380px]:text-[22px] sm:text-[28px]'
+            : 'text-[24px] sm:text-[34px]'
         }`}>
           {t.oneLastStep}
         </h2>
 
-        <p className="font-sans text-[14px] text-[#7a6870] mt-2 leading-relaxed">
+        <p className="font-sans text-[13px] sm:text-[14px] text-[#7a6870] mt-2.5 sm:mt-3 leading-[1.82]">
           {t.completePaymentSecurely}<br />{paymentMethod || 'MMQR'}.
         </p>
 

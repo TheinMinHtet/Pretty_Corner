@@ -240,14 +240,14 @@ export default function CheckoutPage() {
 
         <div className="md:grid md:grid-cols-12 md:gap-10 lg:gap-12 items-center">
           <div className="md:col-span-7 lg:col-span-8">
-            <h1 className={`font-serif font-medium text-[#38262e] ${
+            <h1 className={`font-serif font-medium text-[#38262e] leading-snug ${
               language === 'my'
-                ? 'text-[24px] sm:text-[30px]'
-                : 'text-[30px] sm:text-[38px]'
+                ? 'text-[20px] min-[380px]:text-[24px] sm:text-[30px]'
+                : 'text-[26px] sm:text-[38px]'
             }`}>
               {t.checkoutTitle}
             </h1>
-            <p className="font-sans text-[13px] sm:text-[15px] text-[#7a6870] mt-1">
+            <p className="font-sans text-[12.5px] sm:text-[14px] text-[#7a6870] mt-2.5 sm:mt-3 leading-[1.82]">
               {t.checkoutSubtitle}
             </p>
           </div>
@@ -278,8 +278,8 @@ export default function CheckoutPage() {
           {/* Left Column: Delivery Form & Payment Methods */}
           <div className="md:col-span-7 lg:col-span-8 space-y-5 sm:space-y-6">
             {/* Step 1: Contact Details */}
-            <div className="bg-white p-4 sm:p-6 rounded-2xl border border-[#eedfe5]">
-              <h2 className="font-serif text-[24px] sm:text-[26px] font-medium text-[#38262e] mb-4">
+            <div className="bg-white p-4 min-[380px]:p-5 sm:p-6 rounded-[24px] sm:rounded-2xl border border-[#eedfe5]">
+              <h2 className="font-serif text-[17px] min-[380px]:text-[19px] sm:text-[22px] font-medium text-[#38262e] mb-3 sm:mb-4 leading-snug">
                 {t.contactAndDelivery}
               </h2>
 
@@ -415,11 +415,11 @@ export default function CheckoutPage() {
             </div>
 
             {/* Step 2: Payment Method Selector */}
-            <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#eedfe5]">
-              <h2 className="font-serif text-[24px] sm:text-[26px] font-medium text-[#38262e] mb-2">
+            <div className="bg-white p-4 min-[380px]:p-5 sm:p-6 rounded-[24px] sm:rounded-2xl border border-[#eedfe5]">
+              <h2 className="font-serif text-[17px] min-[380px]:text-[19px] sm:text-[22px] font-medium text-[#38262e] mb-2 sm:mb-2.5 leading-snug">
                 {t.paymentMethod}
               </h2>
-              <p className="text-[13px] text-[#7a6870] mb-4">
+              <p className="text-[12.5px] sm:text-[13px] text-[#7a6870] mb-4 leading-[1.82]">
                 {t.choosePaymentMethod}
               </p>
 

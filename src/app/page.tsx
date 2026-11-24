@@ -221,9 +221,9 @@ export default function HomePage() {
 
       {/* 6. Address Card Banner */}
       <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-8 sm:pb-12">
-        <div className="bg-[#fceef2] rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-[#eedfe5]">
+        <div className="bg-[#fceef2] rounded-[28px] sm:rounded-2xl p-4 min-[380px]:p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-5 sm:gap-6 border border-[#eedfe5]">
           {/* Address Card Image */}
-          <div className="w-full md:max-w-2xl bg-white rounded-xl shadow-xs overflow-hidden border border-[#eedfe5]/80">
+          <div className="w-full md:max-w-2xl bg-white rounded-[20px] sm:rounded-xl shadow-xs overflow-hidden border border-[#eedfe5]/80">
             <LazyImage
               src="/assets/address-card-demo.png"
               alt="Pretty Corner Address Card"
@@ -237,13 +237,13 @@ export default function HomePage() {
           {/* Right Side Content */}
           <div className="w-full md:w-auto md:max-w-md flex flex-col justify-center items-start gap-3">
             <div>
-              <span className="inline-block text-[11px] uppercase tracking-wider font-bold text-[#b73d67] bg-white/80 px-2.5 py-0.5 rounded-full border border-[#eedfe5] mb-1.5">
+              <span className="inline-block text-[10.5px] min-[380px]:text-[11px] font-bold text-[#b73d67] bg-white/90 px-2.5 py-0.5 rounded-full border border-[#eedfe5] mb-2">
                 {t.storeLocationBadge}
               </span>
-              <h4 className="font-serif text-[20px] sm:text-[24px] font-medium leading-snug text-[#38262e]">
+              <h4 className="font-serif text-[18px] min-[380px]:text-[20px] sm:text-[24px] font-medium leading-[1.48] text-[#38262e]">
                 {t.storeLocationHeading}
               </h4>
-              <p className="text-[13px] text-[#7a6870] leading-relaxed mt-1">
+              <p className="text-[12.5px] min-[380px]:text-[13px] sm:text-[14px] text-[#7a6870] leading-[1.82] mt-2.5 sm:mt-3 max-w-prose">
                 {t.storeLocationDescription}
               </p>
             </div>
