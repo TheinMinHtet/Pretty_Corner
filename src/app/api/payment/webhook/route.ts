@@ -125,3 +125,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+export async function GET() {
+  return NextResponse.json(
+    {
+      status: 'active',
+      service: 'Pretty Corner Payment Webhook',
+      endpoint: '/api/payment/webhook',
+      domain: 'https://prettycornershopmm.com',
+      timestamp: new Date().toISOString(),
+    },
+    { status: 200 }
+  );
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-mmpay-nonce, x-mmpay-signature',
+    },
+  });
+}

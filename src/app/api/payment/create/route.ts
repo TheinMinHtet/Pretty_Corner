@@ -64,9 +64,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const callbackUrl = `${
-      process.env.NEXT_PUBLIC_SITE_URL || 'https://pretty-corner.vercel.app'
-    }/api/payment/webhook`;
+    const host = req.headers.get('host') || req.headers.get('x-forwarded-host');
+    const proto = req.headers.get('x-forwarded-proto') || 'https';
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      (host ? `${proto}://${host}` : 'https://prettycornershopmm.com');
+    const callbackUrl = `${siteUrl}/api/payment/webhook`;
 
     const payResponse = await sdk.pay({
       orderId: cleanId,

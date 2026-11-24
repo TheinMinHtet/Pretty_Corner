@@ -19,9 +19,15 @@ function getAdminClient() {
 
 function corsHeaders(req?: NextRequest) {
   const origin = req?.headers.get('origin');
-  const allowedOrigin = process.env.NEXT_PUBLIC_SITE_URL || 'https://pretty-corner.vercel.app';
+  const allowedOrigin = process.env.NEXT_PUBLIC_SITE_URL || 'https://prettycornershopmm.com';
   let allowOrigin = allowedOrigin;
-  if (origin && (origin === allowedOrigin || origin.startsWith('http://localhost:'))) {
+  if (
+    origin &&
+    (origin === allowedOrigin ||
+      origin === 'https://prettycornershopmm.com' ||
+      origin.endsWith('.vercel.app') ||
+      origin.startsWith('http://localhost:'))
+  ) {
     allowOrigin = origin;
   }
   return {

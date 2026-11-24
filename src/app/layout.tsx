@@ -22,6 +22,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://prettycornershopmm.com'),
   title: 'Pretty Corner | Beauty, Electrical Gadgets & Everyday Variety',
   description: 'A curated corner for all your favorites. Authentic cosmetics, smart electrical devices, and everyday lifestyle finds delivered across Myanmar.',
 };

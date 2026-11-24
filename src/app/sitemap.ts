@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { fetchStorefrontProducts, fetchStorefrontPromotions } from '@/lib/api';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://pretty-corner.vercel.app';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://prettycornershopmm.com';
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {

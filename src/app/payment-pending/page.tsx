@@ -355,12 +355,18 @@ function PaymentPendingContent() {
             }
           }, 100);
         } else {
+          const siteOrigin =
+            typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost')
+              ? window.location.origin
+              : (process.env.NEXT_PUBLIC_SITE_URL || 'https://prettycornershopmm.com');
+          const webhookCallbackUrl = `${siteOrigin}/api/payment/webhook`;
+
           await mmpay.showPaymentModal(
             {
               orderId: targetId,
               amount: amountToPay,
               nonce: Date.now().toString(),
-              callbackUrl: 'https://pretty-corner.vercel.app/api/payment/webhook',
+              callbackUrl: webhookCallbackUrl,
             },
             handleSDKResult
           );
