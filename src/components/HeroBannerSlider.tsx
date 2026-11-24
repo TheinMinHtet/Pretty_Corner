@@ -90,7 +90,7 @@ export default function HeroBannerSlider() {
   if (totalSlides === 0) {
     return (
       <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 md:pt-6">
-        <div className="relative w-full h-[350px] min-[360px]:h-[380px] sm:h-[450px] md:h-[500px] lg:h-[540px] rounded-[20px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs group select-none">
+        <div className="relative w-full h-[360px] min-[360px]:h-[390px] min-[400px]:h-[410px] sm:h-[480px] md:h-[520px] lg:h-[550px] rounded-[20px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs group select-none">
           {/* Editorial Background Image with Subtle, Calm Ken Burns Transition */}
           <Image
             src="/assets/hero-banner.jpg"
@@ -102,9 +102,9 @@ export default function HeroBannerSlider() {
           />
 
           {/* Hero Content Shell */}
-          <div className="absolute inset-0 p-3 min-[360px]:p-4.5 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-between z-10">
-            {/* Molten Glass / Translucent Liquid Sheen Container behind Hero Text (Generous & Balanced across all screen sizes) */}
-            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 min-[360px]:p-5.5 sm:p-7 md:p-8 w-full max-w-[340px] min-[380px]:max-w-[390px] min-[440px]:max-w-[450px] sm:max-w-[520px] md:max-w-[580px] bg-white/60 backdrop-blur-2xl backdrop-saturate-200 border border-white/80 shadow-[0_16px_40px_-8px_rgba(56,38,46,0.18),0_4px_16px_rgba(183,61,103,0.12),inset_0_1px_2px_rgba(255,255,255,0.9)]">
+          <div className="absolute inset-0 p-3 min-[360px]:p-4 sm:p-7 md:p-10 lg:p-14 flex flex-col justify-between z-10">
+            {/* Molten Glass / Translucent Liquid Sheen Container behind Hero Text (shrink-0 ensures no flex squeeze) */}
+            <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 min-[360px]:p-5 sm:p-6 md:p-7 w-full max-w-[340px] min-[380px]:max-w-[390px] min-[440px]:max-w-[450px] sm:max-w-[520px] md:max-w-[580px] bg-white/60 backdrop-blur-2xl backdrop-saturate-200 border border-white/80 shadow-[0_16px_40px_-8px_rgba(56,38,46,0.18),0_4px_16px_rgba(183,61,103,0.12),inset_0_1px_2px_rgba(255,255,255,0.9)] shrink-0">
               {/* Subtle glass reflection sheen */}
               <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
 
@@ -150,7 +150,7 @@ export default function HeroBannerSlider() {
   return (
     <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 md:pt-6">
       <div
-        className="relative w-full h-[350px] min-[360px]:h-[380px] sm:h-[450px] md:h-[500px] lg:h-[540px] rounded-[20px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs select-none"
+        className="relative w-full h-[360px] min-[360px]:h-[390px] min-[400px]:h-[410px] sm:h-[480px] md:h-[520px] lg:h-[550px] rounded-[20px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs select-none"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={handleTouchStart}
@@ -186,19 +186,19 @@ export default function HeroBannerSlider() {
 
               {/* Slide Content with Staggered Entrance Animations and Guaranteed Clearance Above Story Navigation */}
               <div
-                className={`absolute inset-0 p-3 min-[360px]:p-4.5 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-between ${
-                  totalSlides > 1 ? 'sm:pb-24 md:pb-28 lg:pb-32' : ''
+                className={`absolute inset-0 p-3 min-[360px]:p-4 sm:p-7 md:p-10 lg:p-14 flex flex-col justify-between ${
+                  totalSlides > 1 ? 'sm:pb-18 md:pb-20 lg:pb-22' : ''
                 }`}
               >
-                {/* Molten Glass / Translucent Liquid Sheen Container behind Hero Text (Generous & Balanced across all screen sizes) */}
-                <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 min-[360px]:p-5.5 sm:p-7 md:p-8 w-full max-w-[340px] min-[380px]:max-w-[390px] min-[440px]:max-w-[450px] sm:max-w-[520px] md:max-w-[580px] bg-white/60 backdrop-blur-2xl backdrop-saturate-200 border border-white/80 shadow-[0_16px_40px_-8px_rgba(56,38,46,0.18),0_4px_16px_rgba(183,61,103,0.12),inset_0_1px_2px_rgba(255,255,255,0.9)]">
+                {/* Molten Glass / Translucent Liquid Sheen Container behind Hero Text (shrink-0 ensures no flex squeeze or clipping) */}
+                <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 min-[360px]:p-5 sm:p-6 md:p-7 w-full max-w-[340px] min-[380px]:max-w-[390px] min-[440px]:max-w-[450px] sm:max-w-[520px] md:max-w-[580px] bg-white/60 backdrop-blur-2xl backdrop-saturate-200 border border-white/80 shadow-[0_16px_40px_-8px_rgba(56,38,46,0.18),0_4px_16px_rgba(183,61,103,0.12),inset_0_1px_2px_rgba(255,255,255,0.9)] shrink-0">
                   {/* Subtle glass reflection sheen */}
                   <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
 
                   <div className="relative z-10">
                     {/* Banner Badge Tag */}
                     <div
-                      className={`inline-flex items-center gap-2 mb-1.5 transition-all duration-600 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
+                      className={`inline-flex items-center gap-2 mb-1 sm:mb-1.5 transition-all duration-600 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
                         }`}
                     >
                       <span className="inline-block font-sans text-[8.5px] min-[340px]:text-[9.5px] min-[380px]:text-[10.5px] sm:text-[12px] font-bold tracking-[0.6px] min-[360px]:tracking-[1px] sm:tracking-[1.8px] text-[#b73d67] uppercase bg-white/85 backdrop-blur-xs px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full border border-[#f1d3df] shadow-2xs whitespace-nowrap">
@@ -208,7 +208,7 @@ export default function HeroBannerSlider() {
 
                     {/* Headline Title */}
                     <h2
-                      className={`font-serif font-medium leading-[1.14] text-[#38262e] mt-1 sm:mt-2 text-[23px] min-[360px]:text-[27px] sm:text-[38px] md:text-[48px] lg:text-[56px] transition-all duration-700 delay-100 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                      className={`font-serif font-medium leading-[1.14] text-[#38262e] mt-1 sm:mt-1.5 text-[23px] min-[360px]:text-[27px] sm:text-[38px] md:text-[48px] lg:text-[56px] transition-all duration-700 delay-100 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                         }`}
                     >
                       {promo.title}
@@ -217,7 +217,7 @@ export default function HeroBannerSlider() {
                     {/* Subtitle / Description */}
                     {promo.subtitle && (
                       <p
-                        className={`font-sans text-[12px] min-[360px]:text-[13px] sm:text-[15.5px] font-medium text-[#2e1d25] leading-snug sm:leading-relaxed mt-1.5 sm:mt-3 max-w-[480px] line-clamp-2 sm:line-clamp-none transition-all duration-700 delay-200 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                        className={`font-sans text-[12px] min-[360px]:text-[13px] sm:text-[15.5px] font-medium text-[#2e1d25] leading-snug sm:leading-relaxed mt-1.5 sm:mt-2.5 max-w-[480px] line-clamp-2 sm:line-clamp-none transition-all duration-700 delay-200 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                           }`}
                       >
                         {promo.subtitle}
@@ -227,7 +227,7 @@ export default function HeroBannerSlider() {
                     {/* Coupon Code Pill */}
                     {promo.code && (
                       <div
-                        className={`mt-2.5 sm:mt-4 inline-flex items-center gap-1.5 sm:gap-2 bg-white/90 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-[#eedfe5] shadow-xs transition-all duration-700 delay-250 ease-out whitespace-nowrap ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                        className={`mt-2 min-[360px]:mt-2.5 sm:mt-3.5 inline-flex items-center gap-1.5 sm:gap-2 bg-white/90 backdrop-blur-md px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-[#eedfe5] shadow-xs transition-all duration-700 delay-250 ease-out whitespace-nowrap ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                           }`}
                       >
                         <span className="text-[10px] min-[360px]:text-[11.5px] sm:text-[12px] font-medium text-[#7a6870]">Use Code:</span>
@@ -339,7 +339,7 @@ export default function HeroBannerSlider() {
 
         {/* DESKTOP/LAPTOP-ONLY: Dedicated Story Progress Bar & Navigation (Guaranteed Clearance with Zero Collision) */}
         {totalSlides > 1 && (
-          <div className="hidden sm:flex absolute sm:bottom-6 md:bottom-8 lg:bottom-9 sm:left-8 md:left-12 lg:left-16 z-30 items-center gap-2.5 sm:gap-3 select-none">
+          <div className="hidden sm:flex absolute sm:bottom-5 md:bottom-6 lg:bottom-7 sm:left-7 md:left-10 lg:left-14 z-30 items-center gap-2.5 sm:gap-3 select-none">
             {activePromos.map((_, idx) => {
               const isCurrent = idx === currentIndex;
               const isPast = idx < currentIndex;
