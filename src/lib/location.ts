@@ -456,7 +456,7 @@ export function resolveTownshipMeta(
     }
   }
 
-  // 2. If coordinates are provided, find closest township by geographic distance
+  // 2. If coordinates are provided, find closest township ONLY within reasonable radius (max 15 km)
   if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat !== 0 && lng !== 0) {
     let closestMeta: TownshipGeoMeta | null = null;
     let minDistance = Infinity;
@@ -469,7 +469,8 @@ export function resolveTownshipMeta(
       }
     }
 
-    if (closestMeta) {
+    // Only assign a predefined Yangon/Mandalay township if the pin is actually within 15 km of it
+    if (closestMeta && minDistance <= 15) {
       return closestMeta;
     }
   }
@@ -570,20 +571,70 @@ export function formatFormalMyanmarAddress({
   } else if (state) {
     cleanState = state.trim();
     if (isMm) {
-      if (cleanState.includes('ရန်ကုန်') || cleanState.includes('Yangon')) {
+      if (cleanState.includes('ရန်ကုန်') || /yangon/i.test(cleanState)) {
         cleanState = 'ရန်ကုန်တိုင်းဒေသကြီး';
-      } else if (cleanState.includes('မန္တလေး') || cleanState.includes('Mandalay')) {
+      } else if (cleanState.includes('မန္တလေး') || /mandalay/i.test(cleanState)) {
         cleanState = 'မန္တလေးတိုင်းဒေသကြီး';
+      } else if (cleanState.includes('စစ်ကိုင်း') || /sagaing/i.test(cleanState)) {
+        cleanState = 'စစ်ကိုင်းတိုင်းဒေသကြီး';
+      } else if (cleanState.includes('ပဲခူး') || /bago/i.test(cleanState)) {
+        cleanState = 'ပဲခူးတိုင်းဒေသကြီး';
+      } else if (cleanState.includes('မကွေး') || /magway/i.test(cleanState)) {
+        cleanState = 'မကွေးတိုင်းဒေသကြီး';
+      } else if (cleanState.includes('ဧရာဝတီ') || /ayeyarwady|irrawaddy/i.test(cleanState)) {
+        cleanState = 'ဧရာဝတီတိုင်းဒေသကြီး';
+      } else if (cleanState.includes('တနင်္သာရီ') || /tanintharyi|tenasserim/i.test(cleanState)) {
+        cleanState = 'တနင်္သာရီတိုင်းဒေသကြီး';
+      } else if (cleanState.includes('ကရင်') || /kayin|karen/i.test(cleanState)) {
+        cleanState = 'ကရင်ပြည်နယ်';
+      } else if (cleanState.includes('ကယား') || /kayah/i.test(cleanState)) {
+        cleanState = 'ကယားပြည်နယ်';
+      } else if (cleanState.includes('ကချင်') || /kachin/i.test(cleanState)) {
+        cleanState = 'ကချင်ပြည်နယ်';
+      } else if (cleanState.includes('ချင်း') || /chin/i.test(cleanState)) {
+        cleanState = 'ချင်းပြည်နယ်';
+      } else if (cleanState.includes('မွန်') || /mon/i.test(cleanState)) {
+        cleanState = 'မွန်ပြည်နယ်';
+      } else if (cleanState.includes('ရခိုင်') || /rakhine|arakan/i.test(cleanState)) {
+        cleanState = 'ရခိုင်ပြည်နယ်';
+      } else if (cleanState.includes('ရှမ်း') || /shan/i.test(cleanState)) {
+        cleanState = 'ရှမ်းပြည်နယ်';
+      } else if (cleanState.includes('နေပြည်တော်') || /naypyidaw|nay pyi taw/i.test(cleanState)) {
+        cleanState = 'ပြည်ထောင်စုနယ်မြေ (နေပြည်တော်)';
       }
     } else {
       if (/yangon/i.test(cleanState)) {
         cleanState = 'Yangon Region';
       } else if (/mandalay/i.test(cleanState)) {
         cleanState = 'Mandalay Region';
+      } else if (/sagaing/i.test(cleanState)) {
+        cleanState = 'Sagaing Region';
+      } else if (/bago/i.test(cleanState)) {
+        cleanState = 'Bago Region';
+      } else if (/magway/i.test(cleanState)) {
+        cleanState = 'Magway Region';
+      } else if (/ayeyarwady|irrawaddy/i.test(cleanState)) {
+        cleanState = 'Ayeyarwady Region';
+      } else if (/tanintharyi|tenasserim/i.test(cleanState)) {
+        cleanState = 'Tanintharyi Region';
+      } else if (/kayin|karen/i.test(cleanState)) {
+        cleanState = 'Kayin State';
+      } else if (/kayah/i.test(cleanState)) {
+        cleanState = 'Kayah State';
+      } else if (/kachin/i.test(cleanState)) {
+        cleanState = 'Kachin State';
+      } else if (/chin/i.test(cleanState)) {
+        cleanState = 'Chin State';
+      } else if (/mon/i.test(cleanState)) {
+        cleanState = 'Mon State';
+      } else if (/rakhine|arakan/i.test(cleanState)) {
+        cleanState = 'Rakhine State';
+      } else if (/shan/i.test(cleanState)) {
+        cleanState = 'Shan State';
+      } else if (/naypyidaw|nay pyi taw/i.test(cleanState)) {
+        cleanState = 'Naypyidaw Union Territory';
       }
     }
-  } else {
-    cleanState = isMm ? 'ရန်ကုန်တိုင်းဒေသကြီး' : 'Yangon Region';
   }
 
   const separator = isMm ? '၊ ' : ', ';
@@ -750,7 +801,13 @@ export async function reverseGeocodeHighPrecision(
           addr.county ||
           addr.suburb;
 
-        const rawState = addr.state || addr.city || 'Yangon';
+        const rawState =
+          addr.state ||
+          addr.region ||
+          addr.province ||
+          addr.state_district ||
+          addr.city ||
+          '';
 
         const matchedMeta = resolveTownshipMeta(lat, lng, rawTownship || ward);
         const matchedTownship = matchedMeta
@@ -808,7 +865,7 @@ export async function reverseGeocodeHighPrecision(
       const stateName =
         (adminList as AdminEntity[]).find((a) => a.adminLevel === 4)?.name ||
         bdcData.principalSubdivision ||
-        'Yangon';
+        '';
 
       const matchedMeta = resolveTownshipMeta(lat, lng, townshipName || wardName);
       const matchedTownship = matchedMeta
@@ -832,19 +889,23 @@ export async function reverseGeocodeHighPrecision(
     }
   } catch {}
 
-  // 3. Fallback based purely on closest coordinate township
+  // 3. Fallback based on closest coordinate township only if nearby (within 15km)
   const matchedMeta = resolveTownshipMeta(lat, lng);
-  const matchedTownship = matchedMeta
-    ? MOCK_TOWNSHIPS.find((t) => t.name === matchedMeta.name) || null
-    : null;
+  if (matchedMeta) {
+    const matchedTownship = MOCK_TOWNSHIPS.find((t) => t.name === matchedMeta.name) || null;
+    const formalAddress = formatFormalMyanmarAddress({
+      language,
+      matchedMeta,
+    });
+    return {
+      formattedAddress: formalAddress,
+      township: matchedTownship,
+    };
+  }
 
-  const formalAddress = formatFormalMyanmarAddress({
-    language,
-    matchedMeta,
-  });
-
+  // 4. If pin is outside supported delivery zones and external geocoder failed, return raw coordinates
   return {
-    formattedAddress: formalAddress,
-    township: matchedTownship,
+    formattedAddress: `GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+    township: null,
   };
 }
