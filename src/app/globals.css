@@ -55,16 +55,16 @@ html[lang="my"] body,
 html[lang="my"] .font-serif,
 [data-lang="my"] .font-serif,
 .lang-my .font-serif {
-  font-family: var(--font-myanmar), var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-cormorant), var(--font-myanmar), Georgia, serif;
 }
 
 html[lang="my"] .font-sans,
 [data-lang="my"] .font-sans,
 .lang-my .font-sans {
-  font-family: var(--font-myanmar), var(--font-dmsans), sans-serif;
+  font-family: var(--font-dmsans), var(--font-myanmar), sans-serif;
 }
 
-/* Headings scale proportionally with English while keeping the same margins and weights */
+/* Headings retain full visual scale and weight matching English design */
 html[lang="my"] h1,
 html[lang="my"] h2,
 html[lang="my"] h3,
@@ -77,8 +77,7 @@ html[lang="my"] h4,
 .lang-my h2,
 .lang-my h3,
 .lang-my h4 {
-  font-size: 0.94em;
-  line-height: 1.38;
+  line-height: 1.35;
   letter-spacing: normal !important;
 }
 

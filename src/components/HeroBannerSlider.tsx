@@ -110,13 +110,7 @@ export default function HeroBannerSlider() {
 
               <div className="relative z-10">
                 {/* Confident, Font-Black Display Headline */}
-                <h1
-                  className={`font-serif font-black leading-[1.1] text-[#22131b] tracking-tight ${
-                    language === 'my'
-                      ? 'text-[18px] min-[360px]:text-[22px] sm:text-[34px] md:text-[42px] lg:text-[48px]'
-                      : 'text-[20px] min-[360px]:text-[24px] sm:text-[36px] md:text-[48px] lg:text-[58px]'
-                  }`}
-                >
+                <h1 className="font-serif font-black leading-[1.1] text-[#22131b] tracking-tight text-[20px] min-[360px]:text-[24px] sm:text-[36px] md:text-[48px] lg:text-[58px]">
                   {t.heroTitleLine1}
                   <br />
                   {t.heroTitleLine2}
@@ -210,10 +204,7 @@ export default function HeroBannerSlider() {
 
                     {/* Headline Title */}
                     <h2
-                      className={`font-serif font-medium leading-[1.12] text-[#38262e] mt-1 sm:mt-2 transition-all duration-700 delay-100 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                        } ${language === 'my'
-                          ? 'text-[18px] min-[360px]:text-[22px] sm:text-[34px] md:text-[42px] lg:text-[48px]'
-                          : 'text-[20px] min-[360px]:text-[24px] sm:text-[38px] md:text-[50px] lg:text-[58px]'
+                      className={`font-serif font-medium leading-[1.12] text-[#38262e] mt-1 sm:mt-2 text-[20px] min-[360px]:text-[24px] sm:text-[38px] md:text-[50px] lg:text-[58px] transition-all duration-700 delay-100 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                         }`}
                     >
                       {promo.title}
