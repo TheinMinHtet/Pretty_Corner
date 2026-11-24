@@ -90,7 +90,7 @@ export default function HeroBannerSlider() {
   if (totalSlides === 0) {
     return (
       <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 md:pt-6">
-        <div className="relative w-full h-[320px] min-[360px]:h-[360px] sm:h-[440px] md:h-[490px] lg:h-[520px] rounded-[20px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs group select-none">
+        <div className="relative w-full h-[340px] min-[360px]:h-[380px] sm:h-[450px] md:h-[500px] lg:h-[540px] rounded-[20px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs group select-none">
           {/* Editorial Background Image with Subtle, Calm Ken Burns Transition */}
           <Image
             src="/assets/hero-banner.jpg"
@@ -104,7 +104,7 @@ export default function HeroBannerSlider() {
           {/* Hero Content Shell */}
           <div className="absolute inset-0 p-3 min-[360px]:p-4 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-between z-10">
             {/* Molten Glass / Translucent Liquid Sheen Container behind Hero Text (Matching Cart Banner) */}
-            <div className="relative overflow-hidden rounded-xl sm:rounded-3xl p-3.5 min-[360px]:p-4.5 sm:p-7 md:p-8 max-w-[280px] min-[360px]:max-w-sm sm:max-w-xl bg-white/60 backdrop-blur-2xl backdrop-saturate-200 border border-white/80 shadow-[0_16px_40px_-8px_rgba(56,38,46,0.18),0_4px_16px_rgba(183,61,103,0.12),inset_0_1px_2px_rgba(255,255,255,0.9)]">
+            <div className="relative overflow-hidden rounded-xl sm:rounded-3xl p-3.5 min-[360px]:p-4.5 sm:p-7 md:p-8 w-full max-w-[290px] min-[360px]:max-w-[340px] sm:max-w-[540px] md:max-w-[580px] bg-white/60 backdrop-blur-2xl backdrop-saturate-200 border border-white/80 shadow-[0_16px_40px_-8px_rgba(56,38,46,0.18),0_4px_16px_rgba(183,61,103,0.12),inset_0_1px_2px_rgba(255,255,255,0.9)]">
               {/* Subtle glass reflection sheen */}
               <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
 
@@ -150,7 +150,7 @@ export default function HeroBannerSlider() {
   return (
     <section className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 md:pt-6">
       <div
-        className="relative w-full h-[320px] min-[360px]:h-[360px] sm:h-[410px] md:h-[480px] lg:h-[520px] rounded-[20px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs select-none"
+        className="relative w-full h-[340px] min-[360px]:h-[380px] sm:h-[450px] md:h-[500px] lg:h-[540px] rounded-[20px] sm:rounded-[32px] overflow-hidden bg-[#faf7f8] border border-[#eedfe5]/70 shadow-xs select-none"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
         onTouchStart={handleTouchStart}
@@ -184,10 +184,14 @@ export default function HeroBannerSlider() {
                 />
               </div>
 
-              {/* Slide Content with Staggered Entrance Animations */}
-              <div className="absolute inset-0 p-3 min-[360px]:p-4 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-between">
-                {/* Molten Glass / Translucent Liquid Sheen Container behind Hero Text (Matching Cart Banner) */}
-                <div className="relative overflow-hidden rounded-xl sm:rounded-3xl p-3.5 min-[360px]:p-4.5 sm:p-7 md:p-8 max-w-[280px] min-[360px]:max-w-sm sm:max-w-xl bg-white/60 backdrop-blur-2xl backdrop-saturate-200 border border-white/80 shadow-[0_16px_40px_-8px_rgba(56,38,46,0.18),0_4px_16px_rgba(183,61,103,0.12),inset_0_1px_2px_rgba(255,255,255,0.9)]">
+              {/* Slide Content with Staggered Entrance Animations and Guaranteed Clearance Above Story Navigation */}
+              <div
+                className={`absolute inset-0 p-3 min-[360px]:p-4 sm:p-8 md:p-12 lg:p-16 flex flex-col justify-between ${
+                  totalSlides > 1 ? 'sm:pb-24 md:pb-28 lg:pb-32' : ''
+                }`}
+              >
+                {/* Molten Glass / Translucent Liquid Sheen Container behind Hero Text (Consistent Across Languages) */}
+                <div className="relative overflow-hidden rounded-xl sm:rounded-3xl p-3.5 min-[360px]:p-4.5 sm:p-7 md:p-8 w-full max-w-[290px] min-[360px]:max-w-[340px] sm:max-w-[540px] md:max-w-[580px] bg-white/60 backdrop-blur-2xl backdrop-saturate-200 border border-white/80 shadow-[0_16px_40px_-8px_rgba(56,38,46,0.18),0_4px_16px_rgba(183,61,103,0.12),inset_0_1px_2px_rgba(255,255,255,0.9)]">
                   {/* Subtle glass reflection sheen */}
                   <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
 
@@ -213,7 +217,7 @@ export default function HeroBannerSlider() {
                     {/* Subtitle / Description */}
                     {promo.subtitle && (
                       <p
-                        className={`font-sans text-[11px] min-[360px]:text-[12.5px] sm:text-[15.5px] font-medium text-[#2e1d25] leading-snug sm:leading-relaxed mt-1.5 sm:mt-3 max-w-md line-clamp-2 sm:line-clamp-none transition-all duration-700 delay-200 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                        className={`font-sans text-[11px] min-[360px]:text-[12.5px] sm:text-[15.5px] font-medium text-[#2e1d25] leading-snug sm:leading-relaxed mt-1.5 sm:mt-3 max-w-[480px] line-clamp-2 sm:line-clamp-none transition-all duration-700 delay-200 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                           }`}
                       >
                         {promo.subtitle}
@@ -333,9 +337,9 @@ export default function HeroBannerSlider() {
           );
         })}
 
-        {/* DESKTOP/LAPTOP-ONLY: Original Dedicated Story Progress Bar & Navigation */}
+        {/* DESKTOP/LAPTOP-ONLY: Dedicated Story Progress Bar & Navigation (Guaranteed Clearance with Zero Collision) */}
         {totalSlides > 1 && (
-          <div className="hidden sm:flex absolute sm:bottom-7 sm:left-10 md:left-12 lg:left-16 z-30 items-center gap-2.5">
+          <div className="hidden sm:flex absolute sm:bottom-6 md:bottom-8 lg:bottom-9 sm:left-8 md:left-12 lg:left-16 z-30 items-center gap-2.5 sm:gap-3 select-none">
             {activePromos.map((_, idx) => {
               const isCurrent = idx === currentIndex;
               const isPast = idx < currentIndex;
@@ -369,14 +373,14 @@ export default function HeroBannerSlider() {
             })}
 
             {/* Slide Index Counter & Live Pause Indicator for Desktop */}
-            <div className="ml-2 flex items-center gap-2 text-[12px] font-bold text-[#38262e]/75">
+            <div className="ml-2 flex items-center gap-2 text-[12px] font-bold text-[#38262e]/75 shrink-0">
               <span className="font-mono tracking-wider">
                 0{currentIndex + 1} / 0{totalSlides}
               </span>
               {isPaused && (
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#b73d67] bg-white/85 backdrop-blur-xs px-2.5 py-0.5 rounded-full border border-[#f1d3df] shadow-2xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] animate-pulse" />
-                  {language === 'my' ? 'ခေတ္တရပ်ထားသည်' : 'Paused'}
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#b73d67] bg-white/90 backdrop-blur-xs px-2.5 py-0.5 rounded-full border border-[#f1d3df] shadow-2xs whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] animate-pulse shrink-0" />
+                  <span>{language === 'my' ? 'ခေတ္တရပ်ထားသည်' : 'Paused'}</span>
                 </span>
               )}
             </div>
