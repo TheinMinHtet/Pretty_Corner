@@ -393,11 +393,6 @@ export default function CheckoutPage() {
                     language={language}
                     isLocatingGps={isLocating}
                     onLocateGps={handleUseCurrentLocation}
-                    selectedTownshipName={
-                      language === 'my'
-                        ? TOWNSHIP_GEO_METAS.find((m) => m.name === selectedTownship?.name)?.townshipMy || selectedTownship?.name
-                        : TOWNSHIP_GEO_METAS.find((m) => m.name === selectedTownship?.name)?.townshipEn || selectedTownship?.name
-                    }
                   />
 
                   {gpsErrorMsg && (
