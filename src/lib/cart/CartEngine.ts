@@ -260,6 +260,29 @@ export function calculatePricing(
   };
 }
 
+export function isProductOutOfStock(
+  product?: Pick<Product, 'inStock' | 'stockQuantity'> | null
+): boolean {
+  if (!product) return false;
+  if (product.stockQuantity !== undefined && product.stockQuantity <= 0) {
+    return true;
+  }
+  return product.inStock === false;
+}
+
+export function findCatalogProduct(
+  products: Product[],
+  productId: string
+): Product | undefined {
+  const normalizedId = productId.trim().toLowerCase();
+  return products.find(
+    (p) =>
+      p.id.toLowerCase() === normalizedId ||
+      p.slug.toLowerCase() === normalizedId ||
+      (p.databaseId && p.databaseId.toLowerCase() === normalizedId)
+  );
+}
+
 /**
  * Adds a product to the cart with variant selection, returning an immutable new cart array.
  */
@@ -269,9 +292,17 @@ export function addCartItem(
   sizeName?: string,
   quantity: number = 1
 ): CartItem[] {
+  if (isProductOutOfStock(product)) {
+    return cart;
+  }
+
   const chosenSize = sizeName
     ? product.sizes?.find((s) => s.name === sizeName) || product.sizes?.[0]
     : product.sizes?.[0];
+
+  if (chosenSize && !chosenSize.inStock) {
+    return cart;
+  }
 
   const sizeLabel = chosenSize?.name || '';
   const itemPrice = chosenSize?.price ?? product.price;

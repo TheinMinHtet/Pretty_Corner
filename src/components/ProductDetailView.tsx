@@ -7,10 +7,17 @@ import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { Product } from '@/lib/types';
 import LazyImage from '@/components/LazyImage';
+import { findCatalogProduct, isProductOutOfStock } from '@/lib/cart/CartEngine';
 
 export default function ProductDetailView({ product }: { product: Product }) {
   const router = useRouter();
-  const { addToCart, t } = useStore();
+  const { addToCart, products, t } = useStore();
+
+  const liveProduct =
+    findCatalogProduct(products, product.id) ||
+    (product.slug ? findCatalogProduct(products, product.slug) : undefined);
+  const currentProduct = liveProduct || product;
+  const isOutOfStock = isProductOutOfStock(currentProduct);
 
   const [selectedGalleryIdx, setSelectedGalleryIdx] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -18,11 +25,12 @@ export default function ProductDetailView({ product }: { product: Product }) {
   const [openHowToUse, setOpenHowToUse] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
-  const unitPrice = product.price;
+  const unitPrice = currentProduct.price;
   const totalPrice = unitPrice * quantity;
 
   const handleAddToCart = () => {
-    addToCart(product.id, '', quantity);
+    if (isOutOfStock) return;
+    addToCart(currentProduct.id, '', quantity);
     setIsAdded(true);
     setTimeout(() => {
       setIsAdded(false);
@@ -62,21 +70,29 @@ export default function ProductDetailView({ product }: { product: Product }) {
           <div className="md:col-span-6 lg:col-span-7">
             <div className="relative w-full h-[360px] sm:h-[440px] md:h-[480px] lg:h-[540px] bg-[#faf7f8] rounded-2xl overflow-hidden">
               <Image
-                src={product.gallery[selectedGalleryIdx] || product.image}
-                alt={product.name}
+                src={currentProduct.gallery[selectedGalleryIdx] || currentProduct.image}
+                alt={currentProduct.name}
                 fill
                 priority
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
-                className="object-cover"
+                className={`object-cover ${isOutOfStock ? 'opacity-75 grayscale-[20%]' : ''}`}
               />
 
-              {/* Bestseller / New Badge */}
-              {product.badge && (
-                <div className="absolute top-[18px] left-[20px] bg-white px-3 py-1 rounded-[6px] shadow-xs">
-                  <span className="text-[#b73d67] text-[11px] font-bold tracking-wider uppercase">
-                    {product.badge}
+              {/* Stock Status / Editorial Badge */}
+              {isOutOfStock ? (
+                <div className="absolute top-[18px] left-[20px] bg-[#38262e]/90 px-3 py-1 rounded-[6px] shadow-xs">
+                  <span className="text-white text-[11px] font-bold tracking-wider uppercase">
+                    {t.outOfStock}
                   </span>
                 </div>
+              ) : (
+                currentProduct.badge && (
+                  <div className="absolute top-[18px] left-[20px] bg-white px-3 py-1 rounded-[6px] shadow-xs">
+                    <span className="text-[#b73d67] text-[11px] font-bold tracking-wider uppercase">
+                      {currentProduct.badge}
+                    </span>
+                  </div>
+                )
               )}
 
             {/* Gallery Dots (mobile & desktop) */}
@@ -138,31 +154,45 @@ export default function ProductDetailView({ product }: { product: Product }) {
               <span className="text-[22px] sm:text-[26px] font-bold text-[#b73d67]">
                 {unitPrice.toLocaleString()} MMK
               </span>
-              <span className="text-[12px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium">
-                In stock
-              </span>
+              {isOutOfStock ? (
+                <span className="text-[12px] text-[#b73d67] bg-[#fceef2] border border-[#f5d9e3] px-2.5 py-0.5 rounded font-semibold">
+                  {t.outOfStock}
+                </span>
+              ) : (
+                <span className="text-[12px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-medium">
+                  {t.inStockLabel}
+                </span>
+              )}
             </div>
 
             {/* Short Description */}
             <p className="text-[14px] sm:text-[15px] text-[#7a6870] leading-relaxed mt-3">
-              {product.description}
+              {currentProduct.description}
             </p>
 
             {/* Purchase Controls (Quantity + Add to Bag) */}
             <div className="mt-6 pt-6 border-t border-[#eedfe5]">
               <div className="flex items-center gap-2 sm:gap-4">
                 {/* Quantity Selector */}
-                <div className="h-[46px] sm:h-[52px] w-[76px] sm:w-[110px] border border-[#eedfe5] rounded-[10px] flex items-center justify-between px-1.5 sm:px-3 text-[#38262e] bg-white shrink-0">
+                <div
+                  className={`h-[46px] sm:h-[52px] w-[76px] sm:w-[110px] border border-[#eedfe5] rounded-[10px] flex items-center justify-between px-1.5 sm:px-3 text-[#38262e] shrink-0 ${
+                    isOutOfStock ? 'bg-[#faf7f8] opacity-60' : 'bg-white'
+                  }`}
+                >
                   <button
+                    type="button"
+                    disabled={isOutOfStock}
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-1 hover:text-[#b73d67] text-[18px] sm:text-[20px] font-medium cursor-pointer"
+                    className="p-1 hover:text-[#b73d67] text-[18px] sm:text-[20px] font-medium cursor-pointer disabled:cursor-not-allowed disabled:hover:text-[#38262e]"
                   >
                     −
                   </button>
-                  <span className="text-[13.5px] sm:text-[16px] font-semibold">{quantity}</span>
+                  <span className="text-[13.5px] sm:text-[16px] font-semibold">{isOutOfStock ? 0 : quantity}</span>
                   <button
+                    type="button"
+                    disabled={isOutOfStock}
                     onClick={() => setQuantity(quantity + 1)}
-                    className="p-1 hover:text-[#b73d67] text-[18px] sm:text-[20px] font-medium cursor-pointer"
+                    className="p-1 hover:text-[#b73d67] text-[18px] sm:text-[20px] font-medium cursor-pointer disabled:cursor-not-allowed disabled:hover:text-[#38262e]"
                   >
                     +
                   </button>
@@ -170,12 +200,20 @@ export default function ProductDetailView({ product }: { product: Product }) {
 
                 {/* Big Add to Bag Button */}
                 <button
+                  type="button"
+                  disabled={isOutOfStock}
                   onClick={handleAddToCart}
-                  className={`flex-1 min-w-0 h-[46px] sm:h-[52px] px-2 sm:px-4 ${
-                    isAdded ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-[#b73d67] hover:bg-[#a33259]'
-                  } text-white rounded-[10px] font-bold text-[12px] min-[360px]:text-[13px] sm:text-[15px] active:scale-[0.98] transition-all flex items-center justify-center gap-1 sm:gap-2 shadow-sm cursor-pointer whitespace-nowrap`}
+                  className={`flex-1 min-w-0 h-[46px] sm:h-[52px] px-2 sm:px-4 rounded-[10px] font-bold text-[12px] min-[360px]:text-[13px] sm:text-[15px] transition-all flex items-center justify-center gap-1 sm:gap-2 whitespace-nowrap ${
+                    isOutOfStock
+                      ? 'bg-[#ebe3e6] text-[#8a7880] border border-[#dfd3d8] cursor-not-allowed shadow-none'
+                      : isAdded
+                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white active:scale-[0.98] shadow-sm cursor-pointer'
+                        : 'bg-[#b73d67] hover:bg-[#a33259] text-white active:scale-[0.98] shadow-sm cursor-pointer'
+                  }`}
                 >
-                  {isAdded ? (
+                  {isOutOfStock ? (
+                    <span className="whitespace-nowrap">{t.outOfStock}</span>
+                  ) : isAdded ? (
                     <>
                       <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                         <path d="M20 6L9 17l-5-5" />

@@ -7,6 +7,7 @@ import {
   removeCartItem,
   buildCartItemId,
   validatePromoCode,
+  isProductOutOfStock,
 } from '../CartEngine';
 import { CartItem, Product, Promotion } from '../../types';
 
@@ -309,6 +310,30 @@ describe('CartEngine', () => {
       const result = removeCartItem(initial, 'item-1');
       assert.equal(result.length, 1);
       assert.equal(result[0].id, 'item-2');
+    });
+
+    test('isProductOutOfStock and addCartItem reject zero-stock products', () => {
+      const zeroStockProduct: Product = {
+        ...sampleProducts[0],
+        id: 'prod-zero',
+        stockQuantity: 0,
+        inStock: true,
+      };
+      const flagOutOfStockProduct: Product = {
+        ...sampleProducts[1],
+        id: 'prod-flag-out',
+        inStock: false,
+      };
+
+      assert.equal(isProductOutOfStock(zeroStockProduct), true);
+      assert.equal(isProductOutOfStock(flagOutOfStockProduct), true);
+      assert.equal(isProductOutOfStock(sampleProducts[0]), false);
+
+      const cartAfterZero = addCartItem([], zeroStockProduct, undefined, 1);
+      assert.equal(cartAfterZero.length, 0);
+
+      const cartAfterFlagOut = addCartItem([], flagOutOfStockProduct, undefined, 1);
+      assert.equal(cartAfterFlagOut.length, 0);
     });
   });
 

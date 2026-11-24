@@ -8,6 +8,7 @@ import { useStore } from '@/context/StoreContext';
 import HeroBannerSlider from '@/components/HeroBannerSlider';
 import LazyImage from '@/components/LazyImage';
 import { ProductGridSkeleton } from '@/components/Skeletons';
+import { isProductOutOfStock } from '@/lib/cart/CartEngine';
 
 const CategoryModal = dynamic(() => import('@/components/CategoryModal'), { ssr: false });
 
@@ -174,6 +175,7 @@ export default function HomePage() {
         ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
           {displayedProducts.map((product) => {
+            const outOfStock = isProductOutOfStock(product);
             return (
               <div key={product.id} className="flex flex-col group">
                 <div className="relative w-full h-[160px] sm:h-[230px] md:h-[260px] lg:h-[280px] bg-[#f9f5f7] rounded-[10px] sm:rounded-[12px] overflow-hidden">
@@ -183,15 +185,23 @@ export default function HomePage() {
                       alt={product.name}
                       fill
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      className={`object-cover transition-transform duration-300 ${
+                        outOfStock ? 'opacity-70 grayscale-[20%]' : 'group-hover:scale-105'
+                      }`}
                     />
                   </Link>
 
-                  {/* Badge */}
-                  {product.badge && (
-                    <span className="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 bg-white text-[#b73d67] text-[9px] sm:text-[11px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-[4px] sm:rounded-[5px] shadow-sm select-none">
-                      {product.badge}
+                  {/* Stock Status / Editorial Badge */}
+                  {outOfStock ? (
+                    <span className="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 bg-[#38262e]/90 text-white text-[9px] sm:text-[11px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-[4px] sm:rounded-[5px] shadow-sm select-none">
+                      {t.outOfStock}
                     </span>
+                  ) : (
+                    product.badge && (
+                      <span className="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 bg-white text-[#b73d67] text-[9px] sm:text-[11px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-[4px] sm:rounded-[5px] shadow-sm select-none">
+                        {product.badge}
+                      </span>
+                    )
                   )}
                 </div>
 
@@ -211,7 +221,7 @@ export default function HomePage() {
                     <p className="text-[12px] sm:text-[15px] font-bold text-[#b73d67] whitespace-nowrap leading-none">
                       {product.price.toLocaleString()} <span className="text-[9.5px] sm:text-[11px] font-medium">MMK</span>
                     </p>
-                    <ProductCardStepper productId={product.id} />
+                    <ProductCardStepper productId={product.id} isOutOfStock={outOfStock} />
                   </div>
                 </div>
               </div>

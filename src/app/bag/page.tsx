@@ -6,11 +6,14 @@ import { useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import LazyImage from '@/components/LazyImage';
 import { BagPageSkeleton } from '@/components/Skeletons';
+import { findCatalogProduct, isProductOutOfStock } from '@/lib/cart/CartEngine';
 
 export default function ShoppingBagPage() {
   const router = useRouter();
   const {
     cart,
+    products,
+    productsLoading,
     updateCartQuantity,
     removeFromCart,
     cartCount,
@@ -26,6 +29,13 @@ export default function ShoppingBagPage() {
     t,
     language,
   } = useStore();
+
+  const hasOutOfStockItem =
+    !productsLoading &&
+    cart.some((item) => {
+      const catalogProduct = findCatalogProduct(products, item.productId);
+      return Boolean(catalogProduct && isProductOutOfStock(catalogProduct));
+    });
 
   const [promoInput, setPromoInput] = useState('');
   const [promoFeedback, setPromoFeedback] = useState<string | null>(null);
@@ -89,6 +99,9 @@ export default function ShoppingBagPage() {
                 const isDiscounted = Boolean(itemPricing && itemPricing.discountAmount > 0);
                 const unitDiscount = isDiscounted ? Math.round(itemPricing!.discountAmount / item.quantity) : 0;
                 const finalUnitPrice = isDiscounted ? item.price - unitDiscount : item.price;
+                const catalogProduct = findCatalogProduct(products, item.productId);
+                const itemOutOfStock =
+                  !productsLoading && Boolean(catalogProduct && isProductOutOfStock(catalogProduct));
 
                 return (
                   <div key={item.id} className="py-4 sm:py-5 flex gap-3 sm:gap-6 items-center">
@@ -98,15 +111,27 @@ export default function ShoppingBagPage() {
                         alt={item.name}
                         fill
                         sizes="(max-width: 640px) 88px, 120px"
-                        className="object-cover"
+                        className={`object-cover ${itemOutOfStock ? 'opacity-65 grayscale-[20%]' : ''}`}
                       />
+                      {itemOutOfStock && (
+                        <span className="absolute top-1.5 left-1.5 bg-[#38262e]/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-[4px] select-none">
+                          {t.outOfStock}
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex-1 flex flex-col justify-between h-[126px] sm:h-[140px] py-1">
                       <div>
-                        <h3 className="font-sans text-[16px] sm:text-[18px] font-bold text-[#38262e] leading-snug line-clamp-1">
-                          {item.name}
-                        </h3>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-sans text-[16px] sm:text-[18px] font-bold text-[#38262e] leading-snug line-clamp-1">
+                            {item.name}
+                          </h3>
+                          {itemOutOfStock && (
+                            <span className="inline-flex items-center text-[10px] sm:text-[11px] font-bold text-[#b73d67] bg-[#fceef2] px-2 py-0.5 rounded border border-[#f5d9e3]">
+                              {t.outOfStock}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-[12px] sm:text-[13px] text-[#7a6870] mt-0.5">
                           {item.size ? `${item.size} · ` : ''}{t.standardPackaging}
                         </p>
@@ -150,8 +175,9 @@ export default function ShoppingBagPage() {
                           </button>
                           <span className="text-[14px] font-semibold">{item.quantity}</span>
                           <button
+                            disabled={itemOutOfStock}
                             onClick={() => updateCartQuantity(item.id, 1)}
-                            className="px-1 text-[18px] font-medium hover:text-[#b73d67] cursor-pointer"
+                            className="px-1 text-[18px] font-medium hover:text-[#b73d67] cursor-pointer disabled:opacity-35 disabled:cursor-not-allowed"
                           >
                             +
                           </button>
@@ -320,12 +346,29 @@ export default function ShoppingBagPage() {
                   </div>
                 </div>
 
-                <Link
-                  href="/checkout"
-                  className="w-full mt-5 h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-sm cursor-pointer"
-                >
-                  {t.checkoutWithTotal} {cartTotal.toLocaleString()} MMK
-                </Link>
+                {hasOutOfStockItem && (
+                  <div className="mt-4 p-3 rounded-xl bg-[#fdf2f5] border border-[#f3ccd8] text-[#842a4b] text-[12px] font-medium leading-relaxed">
+                    {t.outOfStockBagNotice}
+                  </div>
+                )}
+
+                {hasOutOfStockItem ? (
+                  <button
+                    type="button"
+                    disabled
+                    aria-disabled="true"
+                    className="w-full mt-4 h-[52px] bg-[#ebe3e6] text-[#8a7880] border border-[#dfd3d8] rounded-[10px] font-bold text-[14px] flex items-center justify-center cursor-not-allowed px-3 text-center"
+                  >
+                    {t.removeOutOfStockToCheckout}
+                  </button>
+                ) : (
+                  <Link
+                    href="/checkout"
+                    className="w-full mt-5 h-[52px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] flex items-center justify-center hover:bg-[#a33259] active:scale-[0.98] transition-all shadow-sm cursor-pointer"
+                  >
+                    {t.checkoutWithTotal} {cartTotal.toLocaleString()} MMK
+                  </Link>
+                )}
 
                 <div className="text-center mt-3.5">
                   <Link href="/shop" className="text-[13px] font-bold text-[#b73d67] hover:underline">

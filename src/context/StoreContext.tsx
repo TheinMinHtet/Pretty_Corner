@@ -12,6 +12,8 @@ import {
   getItemQuantity,
   calculatePricing,
   validatePromoCode,
+  isProductOutOfStock,
+  findCatalogProduct,
   LineItemPricing,
   CartPricingSummary,
 } from '@/lib/cart/CartEngine';
@@ -299,14 +301,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addToCart = (productId: string, sizeName?: string, quantity: number = 1) => {
-    const product = products.find((p) => p.id === productId || p.slug === productId);
-    if (!product) return;
+    const product = findCatalogProduct(products, productId);
+    if (!product || isProductOutOfStock(product)) return;
 
     const updated = addCartItem(cart, product, sizeName, quantity);
     saveCartToStorage(updated);
   };
 
   const updateCartQuantity = (itemId: string, delta: number) => {
+    if (delta > 0) {
+      const targetItem = cart.find((i) => i.id === itemId);
+      if (targetItem) {
+        const catalogProduct = findCatalogProduct(products, targetItem.productId);
+        if (catalogProduct && isProductOutOfStock(catalogProduct)) {
+          return;
+        }
+      }
+    }
     const updated = updateCartItemQuantity(cart, itemId, delta);
     saveCartToStorage(updated);
   };
@@ -332,6 +343,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   };
 
   const incrementProduct = (productId: string, sizeName?: string) => {
+    const catalogProduct = findCatalogProduct(products, productId);
+    if (catalogProduct && isProductOutOfStock(catalogProduct)) {
+      return;
+    }
+
     const normalizedId = productId.toLowerCase();
     // 1. If item already exists in cart, directly increment it
     const existing = cart.find((i) => {

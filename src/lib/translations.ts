@@ -62,6 +62,11 @@ export type TranslationSchema = Record<
   | 'addBtn'
   | 'addToBag'
   | 'addedToBag'
+  | 'inStockLabel'
+  | 'outOfStock'
+  | 'soldOutBtn'
+  | 'outOfStockBagNotice'
+  | 'removeOutOfStockToCheckout'
   | 'back'
   | 'backToShop'
   | 'backToShopping'
@@ -268,6 +273,11 @@ export const translations: Record<Language, TranslationSchema> = {
     addBtn: '+ Add',
     addToBag: 'Add to Bag',
     addedToBag: 'Added to bag',
+    inStockLabel: 'In stock',
+    outOfStock: 'Out of stock',
+    soldOutBtn: 'Out of Stock',
+    outOfStockBagNotice: 'Some items in your bag are currently out of stock. Please remove them to proceed.',
+    removeOutOfStockToCheckout: 'Remove out-of-stock items before checkout',
 
     // Product Details View
     back: 'Back',
@@ -485,6 +495,11 @@ export const translations: Record<Language, TranslationSchema> = {
     addBtn: '+ ထည့်မည်',
     addToBag: 'အိတ်ထဲထည့်မည်',
     addedToBag: 'အိတ်ထဲထည့်ပြီးပါပြီ',
+    inStockLabel: 'ပစ္စည်းအသင့်ရှိသည်',
+    outOfStock: 'ပစ္စည်းကုန်နေသည်',
+    soldOutBtn: 'ပစ္စည်းကုန်',
+    outOfStockBagNotice: 'သင့်စျေးဝယ်အိတ်ထဲတွင် ပစ္စည်းကုန်နေသော အရာများ ပါဝင်နေပါသည်။ ငွေရှင်းရန် ၎င်းတို့ကို ဖယ်ရှားပေးပါ။',
+    removeOutOfStockToCheckout: 'ငွေမရှင်းမီ ပစ္စည်းကုန်နေသည်များကို ဖယ်ရှားပေးပါ',
 
     // Product Details View
     back: 'ရှေ့သို့ပြန်သွားမည်',

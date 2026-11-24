@@ -12,6 +12,7 @@ const SlideToConfirm = dynamic(() => import('@/components/SlideToConfirm'), { ss
 import { validatePhoneNumber } from '@/lib/validation';
 import { getAddressResolver } from '@/lib/location/MyanmarAddressResolver';
 import { CheckoutMapSkeleton, CheckoutPageSkeleton } from '@/components/Skeletons';
+import { findCatalogProduct, isProductOutOfStock } from '@/lib/cart/CartEngine';
 
 const DeliveryMapPicker = dynamic(() => import('@/components/DeliveryMapPicker'), {
   ssr: false,
@@ -22,6 +23,8 @@ export default function CheckoutPage() {
   const router = useRouter();
   const {
     cart,
+    products,
+    productsLoading,
     cartCount,
     cartSubtotal,
     discount,
@@ -40,6 +43,13 @@ export default function CheckoutPage() {
     language,
     orders,
   } = useStore();
+
+  const hasOutOfStockItem =
+    !productsLoading &&
+    cart.some((item) => {
+      const catalogProduct = findCatalogProduct(products, item.productId);
+      return Boolean(catalogProduct && isProductOutOfStock(catalogProduct));
+    });
 
   const promoItemsCount = pricing?.promoItemsCount ?? (
     lineItemsPricing
@@ -184,6 +194,10 @@ export default function CheckoutPage() {
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isSubmitting) return;
+    if (hasOutOfStockItem) {
+      setFormAlert(t.outOfStockBagNotice);
+      return;
+    }
     const activeEl = typeof document !== 'undefined' ? (document.activeElement as HTMLElement) : null;
     if (activeEl?.getAttribute('data-no-submit') === 'true') {
       return;
@@ -623,6 +637,16 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+              {/* Out-of-stock guard notice */}
+              {hasOutOfStockItem && (
+                <div className="mt-3.5 p-3 rounded-xl bg-[#fdf2f5] border border-[#f3ccd8] text-[#842a4b] text-[12px] flex flex-col gap-1.5 shadow-xs">
+                  <span className="font-medium leading-relaxed">{t.outOfStockBagNotice}</span>
+                  <Link href="/bag" className="text-[12px] font-bold text-[#b73d67] hover:underline w-fit">
+                    ← {t.viewBag}
+                  </Link>
+                </div>
+              )}
+
               {/* Notification around confirm button */}
               {formAlert && (
                 <div className="mt-3.5 p-3 rounded-xl bg-[#fdf2f5] border border-[#f3ccd8] text-[#842a4b] text-[12px] flex items-center justify-between gap-2 shadow-xs animate-in fade-in duration-200">
@@ -643,10 +667,16 @@ export default function CheckoutPage() {
               {/* Place Order CTA Button */}
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className={`w-full ${formAlert ? 'mt-3' : 'mt-5'} h-[50px] bg-[#b73d67] text-white rounded-[10px] font-bold text-[15px] hover:bg-[#a33259] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer whitespace-nowrap disabled:opacity-75`}
+                disabled={isSubmitting || hasOutOfStockItem}
+                className={`w-full ${formAlert || hasOutOfStockItem ? 'mt-3' : 'mt-5'} h-[50px] rounded-[10px] font-bold text-[15px] transition-all flex items-center justify-center gap-2 whitespace-nowrap ${
+                  hasOutOfStockItem
+                    ? 'bg-[#ebe3e6] text-[#8a7880] border border-[#dfd3d8] cursor-not-allowed shadow-none'
+                    : 'bg-[#b73d67] text-white hover:bg-[#a33259] active:scale-[0.98] shadow-sm cursor-pointer disabled:opacity-75'
+                }`}
               >
-                {isSubmitting ? (
+                {hasOutOfStockItem ? (
+                  <span>{t.outOfStock}</span>
+                ) : isSubmitting ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     <span>{language === 'my' ? 'လုပ်ဆောင်နေပါသည်...' : 'Processing...'}</span>

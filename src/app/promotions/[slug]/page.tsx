@@ -7,6 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useStore } from '@/context/StoreContext';
 import { Promotion, Product } from '@/lib/types';
 import LazyImage from '@/components/LazyImage';
+import { isProductOutOfStock } from '@/lib/cart/CartEngine';
 
 const ProductCardStepper = dynamic(() => import('@/components/ProductCardStepper'), {
   ssr: false,
@@ -260,6 +261,7 @@ export default function PromotionHubPage() {
         {eligibleProducts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 pt-5 sm:pt-8">
             {eligibleProducts.map((product) => {
+              const outOfStock = isProductOutOfStock(product);
               const discountedPrice = Math.round(
                 product.price * (1 - Math.min(60, promotion.discountPercentage) / 100)
               );
@@ -276,7 +278,9 @@ export default function PromotionHubPage() {
                         alt={product.name}
                         fill
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        className={`object-cover transition-transform duration-300 ${
+                          outOfStock ? 'opacity-70 grayscale-[20%]' : 'group-hover:scale-105'
+                        }`}
                       />
                     </Link>
 
@@ -284,6 +288,12 @@ export default function PromotionHubPage() {
                     <span className="absolute top-1.5 left-1.5 sm:top-2.5 sm:left-2.5 bg-[#b73d67] text-white text-[9px] sm:text-[11px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-full shadow-2xs select-none">
                       -{promotion.discountPercentage}% OFF
                     </span>
+
+                    {outOfStock && (
+                      <span className="absolute bottom-1.5 left-1.5 sm:bottom-2.5 sm:left-2.5 bg-[#38262e]/90 text-white text-[9px] sm:text-[11px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-full shadow-sm select-none">
+                        {t.outOfStock}
+                      </span>
+                    )}
                   </div>
 
                   {/* Details */}
@@ -308,7 +318,7 @@ export default function PromotionHubPage() {
                           {product.price.toLocaleString()} MMK
                         </span>
                       </div>
-                      <ProductCardStepper productId={product.id} />
+                      <ProductCardStepper productId={product.id} isOutOfStock={outOfStock} />
                     </div>
                   </div>
                 </div>
