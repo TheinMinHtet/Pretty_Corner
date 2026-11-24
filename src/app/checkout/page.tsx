@@ -78,7 +78,7 @@ export default function CheckoutPage() {
   const [promoInput, setPromoInput] = useState('');
   const [promoFeedback, setPromoFeedback] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showCodConfirmModal, setShowCodConfirmModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   // Ensure submitting state resets if customer navigates back to checkout
   useEffect(() => {
@@ -175,9 +175,10 @@ export default function CheckoutPage() {
 
       if (isCashOnDelivery) {
         clearCart();
-        setShowCodConfirmModal(false);
+        setShowConfirmModal(false);
         router.push(`/order-confirmation?orderId=${encodeURIComponent(newOrder.id)}`);
       } else {
+        setShowConfirmModal(false);
         router.push(`/payment-pending?orderId=${encodeURIComponent(newOrder.id)}`);
       }
     } catch (err: any) {
@@ -187,7 +188,7 @@ export default function CheckoutPage() {
         (language === 'my' ? 'အော်ဒါတင်ခြင်း မအောင်မြင်ပါ။ ထပ်မံကြိုးစားပေးပါ။' : 'Order placement failed. Please try again.')
       );
       setIsSubmitting(false);
-      setShowCodConfirmModal(false);
+      setShowConfirmModal(false);
     }
   };
 
@@ -216,13 +217,8 @@ export default function CheckoutPage() {
       return;
     }
 
-    const isCOD = paymentMethod === 'Cash on Delivery';
-    if (isCOD) {
-      // Trigger mobile-first slide to confirm UI
-      setShowCodConfirmModal(true);
-    } else {
-      await processPlaceOrder(false);
-    }
+    // Trigger mobile-first slide to confirm UI for both COD and Mobile Banking
+    setShowConfirmModal(true);
   };
 
   if (!isMounted) {
@@ -701,21 +697,38 @@ export default function CheckoutPage() {
         </div>
       </form>
 
-      {/* Mobile-first draggable confirmation modal for COD */}
-      {showCodConfirmModal && (
+      {/* Mobile-first draggable confirmation modal for COD and Mobile Banking */}
+      {showConfirmModal && (
         <SlideToConfirm
           amount={grandTotal}
           currency="MMK"
-          title={language === 'my' ? 'အော်ဒါ အတည်ပြုချက်' : 'ORDER CONFIRMATION'}
-          subtitle={language === 'my' ? 'ကျသင့်ငွေ (ပစ္စည်းရောက်မှငွေချေ)' : 'Total amount (Cash on Delivery)'}
-          promptText={language === 'my' ? 'အတည်ပြုရန် ညာဘက်ဆွဲပါ' : 'Slide to confirm order'}
+          title={
+            language === 'my'
+              ? (paymentMethod === 'Cash on Delivery' ? 'အော်ဒါ အတည်ပြုချက်' : 'ငွေပေးချေမှု အတည်ပြုချက်')
+              : (paymentMethod === 'Cash on Delivery' ? 'ORDER CONFIRMATION' : 'PAYMENT CONFIRMATION')
+          }
+          subtitle={
+            paymentMethod === 'Cash on Delivery'
+              ? (language === 'my' ? 'ကျသင့်ငွေ (ပစ္စည်းရောက်မှငွေချေ)' : 'Total amount (Cash on Delivery)')
+              : (language === 'my' ? 'ကျသင့်ငွေ (မိုဘိုင်းဘဏ်ငွေပေးချေမှု)' : 'Total amount (Mobile Banking MMQR)')
+          }
+          promptText={
+            paymentMethod === 'Cash on Delivery'
+              ? (language === 'my' ? 'အတည်ပြုရန် ညာဘက်ဆွဲပါ' : 'Slide to confirm order')
+              : (language === 'my' ? 'ငွေပေးချေရန် ညာဘက်ဆွဲပါ' : 'Slide to proceed to payment')
+          }
+          customerName={customerName.trim()}
+          phone={phoneNumber.trim()}
+          address={streetAddress.trim()}
+          landmarkNote={landmarkNote.trim() || undefined}
           cancelText={t.cancel}
           isSubmitting={isSubmitting}
           onConfirm={async () => {
-            await processPlaceOrder(true);
+            const isCOD = paymentMethod === 'Cash on Delivery';
+            await processPlaceOrder(isCOD);
           }}
           onCancel={() => {
-            setShowCodConfirmModal(false);
+            setShowConfirmModal(false);
           }}
         />
       )}

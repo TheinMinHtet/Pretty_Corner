@@ -10,6 +10,10 @@ interface SlideToConfirmProps {
   promptText?: string;
   cancelText?: string;
   isSubmitting?: boolean;
+  customerName?: string;
+  phone?: string;
+  address?: string;
+  landmarkNote?: string;
   onConfirm: () => void | Promise<void>;
   onCancel: () => void | Promise<void>;
 }
@@ -22,6 +26,10 @@ export default function SlideToConfirm({
   promptText = 'Slide to confirm order',
   cancelText = 'Cancel Order',
   isSubmitting = false,
+  customerName,
+  phone,
+  address,
+  landmarkNote,
   onConfirm,
   onCancel,
 }: SlideToConfirmProps) {
@@ -122,7 +130,7 @@ export default function SlideToConfirm({
 
   return (
     <div className="fixed inset-0 z-50 bg-[#38262e]/35 backdrop-blur-md flex items-end sm:items-center justify-center p-3 sm:p-5 transition-all duration-300 animate-in fade-in">
-      <div className="w-full max-w-[400px] bg-white border border-[#eedfe5] rounded-[28px] sm:rounded-[32px] p-5 sm:p-8 shadow-[0_24px_64px_-12px_rgba(56,38,46,0.18)] flex flex-col items-center text-center text-[#38262e] relative overflow-hidden">
+      <div className="w-full max-w-[400px] max-h-[92dvh] overflow-y-auto bg-white border border-[#eedfe5] rounded-[28px] sm:rounded-[32px] p-5 sm:p-7 shadow-[0_24px_64px_-12px_rgba(56,38,46,0.18)] flex flex-col items-center text-center text-[#38262e] relative overflow-hidden">
         {/* Soft background ambient glow */}
         <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-36 bg-[#fceef2] rounded-full blur-2xl pointer-events-none opacity-80" />
 
@@ -141,28 +149,65 @@ export default function SlideToConfirm({
         </button>
 
         {/* Header Badge */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fceef2] border border-[#f5d5e0] text-[#b73d67] text-[10.5px] font-bold tracking-[2px] uppercase mb-4 select-none shadow-2xs">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#fceef2] border border-[#f5d5e0] text-[#b73d67] text-[10.5px] font-bold tracking-[2px] uppercase mb-3 select-none shadow-2xs">
           <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] animate-pulse" />
           {title}
         </div>
 
         {/* Total Amount & Subtitle */}
-        <div className="flex flex-col items-center my-1 sm:my-2">
+        <div className="flex flex-col items-center my-1">
           <div className="flex items-baseline gap-1.5">
-            <span className="text-3xl sm:text-[40px] font-black tracking-tight text-[#38262e] select-none leading-none">
+            <span className="text-3xl sm:text-[38px] font-black tracking-tight text-[#38262e] select-none leading-none">
               {amount.toLocaleString()}
             </span>
             <span className="text-base sm:text-lg font-bold text-[#b73d67] select-none">
               {currency}
             </span>
           </div>
-          <span className="text-[12.5px] text-[#7a6870] font-medium mt-2 select-none">
+          <span className="text-[12px] text-[#7a6870] font-medium mt-1 select-none">
             {subtitle}
           </span>
         </div>
 
+        {/* Delivery Details Recap: Phone & Address */}
+        {(phone || address || customerName) && (
+          <div className="w-full my-3.5 p-3 bg-[#fcf9fa] border border-[#eedfe5] rounded-[16px] text-left text-[12px] flex flex-col gap-1.5 shadow-2xs">
+            {customerName && (
+              <div className="flex items-center gap-2 font-bold text-[#38262e]">
+                <svg className="w-3.5 h-3.5 text-[#b73d67] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span className="truncate">{customerName}</span>
+              </div>
+            )}
+            {phone && (
+              <div className="flex items-center gap-2 font-semibold text-[#b73d67] font-mono">
+                <svg className="w-3.5 h-3.5 text-[#b73d67] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+                </svg>
+                <span>{phone}</span>
+              </div>
+            )}
+            {address && (
+              <div className="flex items-start gap-2 text-[#7a6870] leading-snug">
+                <svg className="w-3.5 h-3.5 text-[#b73d67] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <span className="line-clamp-2">{address}</span>
+              </div>
+            )}
+            {landmarkNote && (
+              <div className="text-[11px] text-[#917d85] italic pl-5.5">
+                ({landmarkNote})
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Draggable Slider Container */}
-        <div className="w-full mt-6">
+        <div className="w-full mt-2 sm:mt-3">
           <div
             ref={trackRef}
             className="w-full h-14 bg-[#fcf9fa] border border-[#eedfe5] rounded-full relative p-1 flex items-center select-none overflow-hidden touch-none shadow-inner"
