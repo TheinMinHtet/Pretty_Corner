@@ -229,17 +229,17 @@ function ShopContent() {
     }
     switch (activeCategory) {
       case 'electrical':
-        return language === 'my' ? 'အီလက်ထရောနစ်နှင့် စမတ်ဂက်ဂျက်များ' : 'Electrical & Smart Gadgets';
+        return 'Electrical & Smart Gadgets';
       case 'skincare':
-        return language === 'my' ? 'အသားအရေထိန်းသိမ်း ပစ္စည်းများ' : 'Skincare Essentials';
+        return 'Skincare Essentials';
       case 'makeup':
-        return language === 'my' ? 'နေ့စဉ်သုံး မိတ်ကပ်ပစ္စည်းများ' : 'Everyday Makeup';
+        return 'Everyday Makeup';
       case 'lifestyle':
-        return language === 'my' ? 'လူနေမှုအသုံးအဆောင် ပစ္စည်းများ' : 'Lifestyle & Variety';
+        return 'Lifestyle & Variety';
       case 'lenses':
-        return language === 'my' ? 'မျက်ကပ်မှန်နှင့် မျက်စိအားဖြည့်ပစ္စည်းများ' : 'Contact Lenses & Eye Care';
+        return 'Contact Lenses & Eye Care';
       case 'more':
-        return language === 'my' ? 'အခြား အလှပြင်အသုံးအဆောင်များ' : 'Accessories & More';
+        return 'Accessories & More';
       default:
         return t.catAll;
     }
