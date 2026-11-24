@@ -73,6 +73,52 @@ function PaymentPendingContent() {
     }
   }, [cleanId]);
 
+  // 03: Universal order cancellation handler - updates DB, state, and clears modal
+  const handleOrderCancellation = useCallback(() => {
+    clearPaymentSession();
+    try {
+      localStorage.removeItem('mmpay_pending_tx');
+    } catch {}
+    if (typeof document !== 'undefined') {
+      document.querySelectorAll('#mmpay-full-modal').forEach((el) => el.remove());
+    }
+    setRemoteOrder((prev) => (prev ? { ...prev, paymentStatus: 'cancelled', fulfillmentStatus: 'cancelled' } : prev));
+    cancelOrder(cleanId);
+    setShowCancelModal(false);
+  }, [cleanId, clearPaymentSession, cancelOrder]);
+
+  // 03: Global interception for MyanMyanPay modal "Stop Process" and force-close actions
+  useEffect(() => {
+    if (typeof window === 'undefined' || !cleanId) return;
+
+    const handleDocumentClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const dangerBtn = target.closest('.mmpay-button-danger');
+      if (dangerBtn) {
+        handleOrderCancellation();
+      }
+    };
+
+    document.addEventListener('click', handleDocumentClick, true);
+
+    const originalClose = (window as any).MMPayCloseModal;
+    (window as any).MMPayCloseModal = async (forceClose?: boolean) => {
+      if (forceClose) {
+        handleOrderCancellation();
+      }
+      if (typeof originalClose === 'function') {
+        try {
+          return await originalClose(forceClose);
+        } catch {}
+      }
+    };
+
+    return () => {
+      document.removeEventListener('click', handleDocumentClick, true);
+    };
+  }, [cleanId, handleOrderCancellation]);
+
   const autoResumedRef = useRef(false);
 
   // 02: State Caching - Auto-resume active QR on page refresh
@@ -113,9 +159,7 @@ function PaymentPendingContent() {
                   updatePaymentStatus(cleanId, 'paid');
                   router.push(`/order-confirmation?orderId=${cleanId}`);
                 } else if (result.cancelled) {
-                  try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
-                  clearPaymentSession();
-                  cancelOrder(cleanId);
+                  handleOrderCancellation();
                 } else if (result.expired) {
                   try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
                   clearPaymentSession();
@@ -175,8 +219,7 @@ function PaymentPendingContent() {
             router.push(`/order-confirmation?orderId=${encodeURIComponent(cleanId)}`);
             return true;
           } else if (data.paymentStatus === 'cancelled') {
-            cancelOrder(cleanId);
-            clearPaymentSession();
+            handleOrderCancellation();
             return true;
           }
         }
@@ -313,9 +356,7 @@ function PaymentPendingContent() {
             updatePaymentStatus(targetId, 'paid');
             router.push(`/order-confirmation?orderId=${targetId}`);
           } else if (result.cancelled) {
-            try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
-            clearPaymentSession();
-            cancelOrder(targetId);
+            handleOrderCancellation();
           } else if (result.expired) {
             try { localStorage.removeItem('mmpay_pending_tx'); } catch {}
             clearPaymentSession();
@@ -419,11 +460,7 @@ function PaymentPendingContent() {
 
   // 03: Transaction Control - Explicit cancellation handler
   const handleConfirmCancelOrder = () => {
-    clearPaymentSession();
-    cancelOrder(cleanId);
-    clearCart();
-    setShowCancelModal(false);
-    router.push('/shop');
+    handleOrderCancellation();
   };
 
   if (!isMounted || remoteLoading) {
@@ -449,38 +486,43 @@ function PaymentPendingContent() {
   // Handle explicitly cancelled order view
   if (activeOrder?.paymentStatus === 'cancelled') {
     return (
-      <div className="w-full max-w-md mx-auto px-4 py-16 text-center">
-        <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-3">
-          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </div>
-        <h3 className="font-serif text-[22px] font-bold text-[#38262e] mb-2">
-          {language === 'my' ? 'အမှာစာ တောင်းဆိုမှု ပယ်ဖျက်ပြီးပါပြီ' : 'Order Request Cancelled'}
-        </h3>
-        <p className="text-[13px] text-[#7a6870] mb-6">
-          {language === 'my'
-            ? `အမှာစာနံပါတ် ${cleanId} ကို ပယ်ဖျက်ထားပါသည်။ ပစ္စည်းများ ပြန်လည်ရွေးချယ်ပြီး အသစ်မှာယူနိုင်ပါသည်။`
-            : `Order #${cleanId} has been cancelled. You can edit your bag or start a new order.`}
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              clearCart();
-              router.push('/shop');
-            }}
-            className="w-full sm:w-auto inline-flex h-[44px] px-6 bg-[#b73d67] text-white rounded-lg items-center justify-center font-bold text-[14px] hover:bg-[#a33259] transition-colors cursor-pointer shadow-xs"
-          >
-            {language === 'my' ? 'ပစ္စည်းများ ကြည့်ရှုဝယ်ယူရန်' : 'Start New Order'}
-          </button>
-          <Link
-            href="/bag"
-            className="w-full sm:w-auto inline-flex h-[44px] px-6 bg-white border border-[#eedfe5] text-[#38262e] rounded-lg items-center justify-center font-bold text-[14px] hover:bg-[#faf7f8] transition-colors cursor-pointer"
-          >
-            {language === 'my' ? 'စျေးဝယ်အိတ် ပြင်ဆင်မည်' : 'Edit Bag'}
-          </Link>
+      <div className="w-full max-w-2xl mx-auto px-2.5 sm:px-6 py-4 md:py-8 flex flex-col min-h-full pb-12">
+        <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-[24px] sm:rounded-2xl p-4 sm:p-8 flex flex-col items-center text-center">
+          <div className="w-full mb-6">
+            <OrderingStepBar currentStep={2} orderId={cleanId} />
+          </div>
+          <div className="w-14 h-14 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-3">
+            <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </div>
+          <h3 className="font-serif text-[22px] font-bold text-[#38262e] mb-2">
+            {language === 'my' ? 'အမှာစာ တောင်းဆိုမှု ပယ်ဖျက်ပြီးပါပြီ' : 'Order Request Cancelled'}
+          </h3>
+          <p className="text-[13px] text-[#7a6870] mb-6 max-w-md">
+            {language === 'my'
+              ? `အမှာစာနံပါတ် ${cleanId} ကို ပယ်ဖျက်ထားပါသည်။ ပစ္စည်းများ ပြန်လည်ရွေးချယ်ပြီး အသစ်မှာယူနိုင်ပါသည်။`
+              : `Order #${cleanId} has been cancelled. You can edit your bag or start a new order.`}
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => {
+                clearCart();
+                router.push('/shop');
+              }}
+              className="w-full sm:w-auto inline-flex h-[44px] px-6 bg-[#b73d67] text-white rounded-lg items-center justify-center font-bold text-[14px] hover:bg-[#a33259] transition-colors cursor-pointer shadow-xs"
+            >
+              {language === 'my' ? 'ပစ္စည်းများ ကြည့်ရှုဝယ်ယူရန်' : 'Start New Order'}
+            </button>
+            <Link
+              href="/bag"
+              className="w-full sm:w-auto inline-flex h-[44px] px-6 bg-white border border-[#eedfe5] text-[#38262e] rounded-lg items-center justify-center font-bold text-[14px] hover:bg-[#faf7f8] transition-colors cursor-pointer"
+            >
+              {language === 'my' ? 'စျေးဝယ်အိတ် ပြင်ဆင်မည်' : 'Edit Bag'}
+            </Link>
+          </div>
         </div>
       </div>
     );

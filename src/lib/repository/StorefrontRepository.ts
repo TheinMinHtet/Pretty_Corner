@@ -462,7 +462,7 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
   ): Promise<Order | null> {
     const cleanId = orderId.trim().toUpperCase();
 
-    // 1. Update Supabase (Server-only authoritative mutation; client browser runtime does not update DB directly)
+    // 1. Update Supabase (Server-only authoritative mutation; client browser runtime calls API routes)
     if (typeof window === 'undefined') {
       let client = supabase;
       try {
@@ -483,6 +483,19 @@ export class HttpAndSupabaseRepositoryAdapter implements StorefrontRepository {
             .eq('id', cleanId);
         } catch (err) {
           console.warn('Failed to update order payment in Supabase:', err);
+        }
+      }
+    } else {
+      // Browser runtime: dispatch authoritative mutations through server endpoints
+      if (status === 'cancelled') {
+        try {
+          await fetch('/api/orders/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId: cleanId }),
+          });
+        } catch (err) {
+          console.warn('Failed to dispatch order cancel endpoint:', err);
         }
       }
     }

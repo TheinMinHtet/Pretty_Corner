@@ -475,6 +475,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       }
       return current;
     });
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('mmpay_pending_tx');
+        sessionStorage.removeItem(`pretty_corner_mmpay_active_${cleanId}`);
+      } catch {}
+
+      void fetch('/api/orders/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: cleanId }),
+      }).catch((err) => {
+        console.warn('Failed to post order cancellation:', err);
+      });
+    }
+
     void repo.updatePaymentStatus(cleanId, 'cancelled');
   }, [repo, setOrders]);
 
