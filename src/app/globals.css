@@ -235,6 +235,13 @@ html[lang="my"] .tracking-\[2px\],
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.08) !important;
 }
 
+/* Remove EN/MM language toggle pill from payment session */
+#mmpay-full-modal .mmpay-toggle-container,
+.mmpay-toggle-container,
+.mmpay-toggle-btn {
+  display: none !important;
+}
+
 @media (max-height: 720px) {
   #mmpay-full-modal .mmpay-qr-view {
     padding: 44px 16px 18px 16px !important;

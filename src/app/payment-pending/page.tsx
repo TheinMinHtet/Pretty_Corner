@@ -125,6 +125,7 @@ function PaymentPendingContent() {
 
               // Reinforce: sync visible timer and QR canvas immediately
               setTimeout(async () => {
+                document.querySelectorAll('.mmpay-toggle-container').forEach((el) => el.remove());
                 const timerEl = document.getElementById('mmpay-countdown-text');
                 if (timerEl && parsed.expireAt) {
                   const remaining = Math.max(0, Math.floor((parsed.expireAt - Date.now()) / 1000));
@@ -370,6 +371,10 @@ function PaymentPendingContent() {
             },
             handleSDKResult
           );
+
+          setTimeout(() => {
+            document.querySelectorAll('.mmpay-toggle-container').forEach((el) => el.remove());
+          }, 50);
 
           // Safeguard: ensure created transaction is cached for continuous timer and refresh restoration
           try {
