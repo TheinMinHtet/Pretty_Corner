@@ -375,14 +375,14 @@ function ShopContent() {
 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
           <div>
-            <h1 className={`font-serif font-medium text-[#38262e] leading-tight ${
+            <h1 className={`font-serif font-medium text-[#38262e] leading-[1.45] ${
               language === 'my'
-                ? 'text-[23px] sm:text-[28px] lg:text-[33px]'
-                : 'text-[28px] sm:text-[36px] lg:text-[42px]'
+                ? 'text-[19px] min-[380px]:text-[22px] sm:text-[28px] lg:text-[33px]'
+                : 'text-[26px] sm:text-[36px] lg:text-[42px]'
             }`}>
               {getCategoryTitle()}
             </h1>
-            <p className="font-sans text-[13px] sm:text-[14px] text-[#7a6870] mt-1 sm:mt-1.5 max-w-xl">
+            <p className="font-sans text-[12.5px] sm:text-[14px] text-[#7a6870] mt-2.5 sm:mt-3 max-w-xl leading-[1.82]">
               {getCategorySubtitle()}
             </p>
           </div>

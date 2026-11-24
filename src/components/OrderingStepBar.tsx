@@ -13,6 +13,8 @@ interface OrderingStepBarProps {
 export default function OrderingStepBar({ currentStep, isCOD = false, orderId }: OrderingStepBarProps) {
   const { t, language } = useStore();
 
+  const deliveryShortLabel = language === 'my' ? 'ပို့ဆောင်' : t.stepDelivery;
+  const paymentShortLabel = language === 'my' ? 'ငွေချေ' : t.stepPayment;
   const confirmMobileLabel = language === 'my' ? 'အတည်ပြု' : 'Confirm';
   const confirmFullLabel = t.stepConfirmation;
 
@@ -20,13 +22,13 @@ export default function OrderingStepBar({ currentStep, isCOD = false, orderId }:
     {
       step: 1,
       label: t.stepDelivery,
-      shortLabel: t.stepDelivery,
+      shortLabel: deliveryShortLabel,
       getHref: () => '/checkout',
     },
     {
       step: 2,
       label: t.stepPayment,
-      shortLabel: t.stepPayment,
+      shortLabel: paymentShortLabel,
       getHref: () => (orderId ? `/payment-pending?orderId=${encodeURIComponent(orderId)}` : '/checkout'),
     },
     {
@@ -41,7 +43,7 @@ export default function OrderingStepBar({ currentStep, isCOD = false, orderId }:
     {
       step: 1,
       label: t.stepDelivery,
-      shortLabel: t.stepDelivery,
+      shortLabel: deliveryShortLabel,
       getHref: () => '/checkout',
     },
     {

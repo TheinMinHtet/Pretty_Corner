@@ -37,6 +37,14 @@ export default function RootLayout({
       className={`${cormorant.variable} ${dmSans.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@300;400;500;600;700;800;900&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
         className="font-sans min-h-screen bg-white text-[#38262e] selection:bg-[#fceef2] selection:text-[#b73d67]"
         suppressHydrationWarning

@@ -302,7 +302,7 @@ function OrderConfirmationContent() {
 
   return (
     <div className="w-full max-w-2xl mx-auto px-2.5 sm:px-6 py-4 md:py-8 flex flex-col min-h-full pb-12">
-      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-3 min-[360px]:p-4 sm:p-8 flex flex-col">
+      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-[24px] sm:rounded-2xl p-3 min-[360px]:p-4 sm:p-8 flex flex-col">
         {/* Step Bar */}
         <div className="mb-4 print:hidden">
           <OrderingStepBar currentStep={isCOD ? 2 : 3} isCOD={isCOD} orderId={order.id} />
@@ -317,15 +317,15 @@ function OrderConfirmationContent() {
           </svg>
         </div>
 
-        <h2 className={`font-serif font-medium leading-tight text-[#38262e] ${
+        <h2 className={`font-serif font-medium leading-[1.45] text-[#38262e] ${
           language === 'my'
-            ? 'text-[24px] sm:text-[28px]'
-            : 'text-[33px]'
+            ? 'text-[18px] min-[380px]:text-[21px] sm:text-[26px]'
+            : 'text-[24px] sm:text-[32px]'
         }`}>
           {t.orderConfirmedJoy}
         </h2>
 
-        <p className="font-sans text-[14px] text-[#7a6870] mt-2 leading-relaxed max-w-[340px]">
+        <p className="font-sans text-[12.5px] min-[380px]:text-[13px] sm:text-[14px] text-[#7a6870] mt-3 sm:mt-3.5 leading-[1.82] max-w-[360px]">
           {order.paymentStatus === 'cancelled'
             ? (language === 'my'
                 ? `ဤအမှာစာ (${order.id}) ကို ပယ်ဖျက်ထားပါသည်။ ပစ္စည်းများ ပြန်လည်ရွေးချယ်ပြီး အသစ်မှာယူနိုင်ပါသည်။`

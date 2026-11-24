@@ -79,7 +79,7 @@ function OrderReceiptContent() {
 
   return (
     <div className="w-full max-w-xl mx-auto px-4 sm:px-6 py-5 md:py-10 flex flex-col min-h-full pb-12">
-      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-6 sm:p-8 flex flex-col">
+      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-[24px] sm:rounded-2xl p-4 min-[380px]:p-6 sm:p-8 flex flex-col">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870] mb-4">
           <Link href="/" className="hover:text-[#38262e]">{t.navHome}</Link>
@@ -100,10 +100,14 @@ function OrderReceiptContent() {
           </div>
 
           <div>
-            <h2 className="font-serif text-[26px] sm:text-[32px] font-medium text-[#38262e]">
+            <h2 className={`font-serif font-medium text-[#38262e] leading-snug ${
+              language === 'my'
+                ? 'text-[19px] min-[380px]:text-[22px] sm:text-[28px]'
+                : 'text-[24px] sm:text-[32px]'
+            }`}>
               {language === 'my' ? 'အမှာစာပြေစာနှင့် ကုန်ကျငွေ' : 'Order Receipt & Summary'}
             </h2>
-            <div className="text-[12px] sm:text-[13px] text-[#7a6870] mt-1 font-medium flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <div className="text-[12px] sm:text-[13px] text-[#7a6870] mt-2.5 sm:mt-3 font-medium flex flex-wrap items-center gap-x-2 gap-y-0.5">
               <span>{t.orderRef}: <strong className="text-[#38262e] font-mono">{activeOrder.id}</strong></span>
               {activeOrder.createdAt && (
                 <>
@@ -205,10 +209,10 @@ function OrderReceiptContent() {
 
           {/* Delivery Recipient Details */}
           <div className="bg-white rounded-xl p-4 sm:p-5 border border-[#eedfe5] shadow-2xs text-[13px] text-[#7a6870]">
-            <h4 className="font-serif text-[18px] font-medium text-[#38262e] mb-2">
+            <h4 className="font-serif text-[18px] font-medium text-[#38262e] mb-2.5 sm:mb-3">
               {t.deliveryDetails}
             </h4>
-            <div className="space-y-1">
+            <div className="space-y-1.5 leading-[1.75]">
               <p><strong className="text-[#38262e]">{t.recipient}:</strong> {activeOrder.customerName}</p>
               <p><strong className="text-[#38262e]">{t.phone.replace(' *', '')}:</strong> {activeOrder.phone}</p>
               <p><strong className="text-[#38262e]">{t.address}:</strong> {activeOrder.deliveryAddress}</p>

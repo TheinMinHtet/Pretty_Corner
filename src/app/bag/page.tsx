@@ -65,13 +65,13 @@ export default function ShoppingBagPage() {
           </button>
         </div>
 
-        <h1 className={`font-serif font-medium text-[#38262e] ${language === 'my'
-            ? 'text-[24px] sm:text-[30px]'
-            : 'text-[30px] sm:text-[38px]'
+        <h1 className={`font-serif font-medium text-[#38262e] leading-snug ${language === 'my'
+            ? 'text-[20px] min-[380px]:text-[24px] sm:text-[30px]'
+            : 'text-[26px] sm:text-[38px]'
           }`}>
           {t.bagTitle}
         </h1>
-        <p className="font-sans text-[13px] sm:text-[15px] text-[#7a6870] mt-1">
+        <p className="font-sans text-[12.5px] min-[380px]:text-[13px] sm:text-[14px] text-[#7a6870] mt-2.5 sm:mt-3 leading-[1.82]">
           {cart.length > 0
             ? language === 'my'
               ? `အိမ်အရောက်ပို့ဆောင်ရန် ပစ္စည်း ${cart.length} မျိုး အသင့်ရှိပါသည်။`

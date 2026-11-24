@@ -39,7 +39,7 @@ export default function OrderLookupPage() {
 
   return (
     <div className="w-full max-w-xl mx-auto px-4 sm:px-6 py-5 md:py-10 flex flex-col min-h-full pb-12">
-      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-2xl p-6 sm:p-8 flex flex-col">
+      <div className="bg-[#faf7f8] border border-[#eedfe5] rounded-[24px] sm:rounded-2xl p-4 min-[380px]:p-6 sm:p-8 flex flex-col">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-[#7a6870] mb-4">
           <Link href="/" className="hover:text-[#38262e]">{t.navHome}</Link>
@@ -54,14 +54,14 @@ export default function OrderLookupPage() {
           </Link>
 
           <div>
-            <h2 className={`font-serif font-medium text-[#38262e] ${
+            <h2 className={`font-serif font-medium text-[#38262e] leading-snug ${
               language === 'my'
-                ? 'text-[24px] sm:text-[27px]'
-                : 'text-[30px]'
+                ? 'text-[19px] min-[380px]:text-[22px] sm:text-[27px]'
+                : 'text-[24px] sm:text-[30px]'
             }`}>
               {t.findReceipt}
             </h2>
-            <p className="text-[13px] text-[#7a6870] mt-1">
+            <p className="text-[12.5px] min-[380px]:text-[13px] text-[#7a6870] mt-2.5 sm:mt-3 leading-[1.82]">
               {t.findReceiptSubtitle}
             </p>
           </div>
@@ -83,7 +83,7 @@ export default function OrderLookupPage() {
                 placeholder={t.orderIdPlaceholder}
                 className="w-full h-[48px] px-3.5 bg-white border border-[#eedfe5] rounded-[10px] text-[14px] text-[#38262e] placeholder-[#a89aa0] outline-none focus:border-[#b73d67] font-sans"
               />
-              <p className="text-[12px] text-[#7a6870] mt-1.5">
+              <p className="text-[12px] text-[#7a6870] mt-2 leading-[1.75]">
                 {t.saveOrderIdHint}
               </p>
             </div>

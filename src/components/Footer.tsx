@@ -12,8 +12,8 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
   return (
     <footer className="w-full bg-[#fdfafb] border-t border-[#eedfe5] mt-auto">
       {/* 1. Main Footer Grid: Classic 3 columns (Left: Brand, Middle: Customer Care, Right: Payment & Delivery) */}
-      <div className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 pt-4 sm:pt-7 lg:pt-9 pb-4 sm:pb-7">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 sm:gap-7 lg:gap-10 items-start">
+      <div className="max-w-6xl mx-auto px-3.5 min-[380px]:px-5 sm:px-6 lg:px-8 pt-4 sm:pt-7 lg:pt-9 pb-4 sm:pb-7">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-7 lg:gap-10 items-start">
           {/* Column 1: Brand */}
           <div className="col-span-2 md:col-span-1 flex flex-col items-center md:items-start text-center md:text-left self-center md:self-start py-2 md:py-0">
             <Link href="/" className="inline-block group text-center md:text-left">
@@ -21,7 +21,7 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
                 {t.brandName}
               </span>
             </Link>
-            <p className="text-[12px] sm:text-[13px] text-[#7a6870] mt-1.5 leading-relaxed">
+            <p className="text-[12px] sm:text-[13px] text-[#7a6870] mt-2.5 leading-[1.82]">
               {t.footerDescription}
             </p>
           </div>
@@ -52,17 +52,17 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
 
           {/* Column 3: Payment & Delivery */}
           <div className="col-span-1">
-            <h4 className="font-serif text-[15px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight">
+            <h4 className="font-serif text-[15px] sm:text-[17px] font-semibold text-[#38262e] mb-1.5 sm:mb-2 tracking-tight">
               {t.paymentAndDelivery}
             </h4>
-            <p className="text-[12px] sm:text-[13px] text-[#7a6870] leading-relaxed mb-2.5">
+            <p className="text-[12px] sm:text-[13px] text-[#7a6870] leading-[1.82] mt-2 mb-2.5">
               {t.doorstepDelivery}
             </p>
-            <div className="flex flex-col sm:flex-row flex-wrap gap-2 text-[11.5px] sm:text-[12px] font-medium text-[#38262e]">
-              <span className="bg-white border border-[#eedfe5] px-2.5 py-1 rounded-[6px] shadow-2xs inline-block w-fit">
+            <div className="flex flex-col min-[360px]:flex-row flex-wrap gap-1.5 min-[360px]:gap-2 text-[11px] sm:text-[12px] font-medium text-[#38262e]">
+              <span className="bg-white border border-[#eedfe5] px-2 py-0.5 min-[380px]:px-2.5 min-[380px]:py-1 rounded-[6px] shadow-2xs inline-block w-fit text-[10.5px] min-[380px]:text-[11.5px]">
                 {t.mobileBanking}
               </span>
-              <span className="bg-white border border-[#eedfe5] px-2.5 py-1 rounded-[6px] shadow-2xs inline-block w-fit">
+              <span className="bg-white border border-[#eedfe5] px-2 py-0.5 min-[380px]:px-2.5 min-[380px]:py-1 rounded-[6px] shadow-2xs inline-block w-fit text-[10.5px] min-[380px]:text-[11.5px]">
                 {t.cod}
               </span>
             </div>
@@ -73,7 +73,7 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
             <h4 className="font-serif text-[15px] sm:text-[17px] font-semibold text-[#38262e] mb-1.5 sm:mb-2 tracking-tight">
               {t.followUs}
             </h4>
-            <p className="text-[12px] sm:text-[13px] text-[#7a6870] leading-relaxed mb-2.5 max-w-xs">
+            <p className="text-[12px] sm:text-[13px] text-[#7a6870] leading-[1.82] mt-2 mb-2.5 max-w-xs">
               {t.followUsDesc}
             </p>
             <div className="flex items-center gap-2 text-[11.5px] sm:text-[12px] font-medium text-[#38262e]">

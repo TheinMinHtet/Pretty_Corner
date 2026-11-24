@@ -120,7 +120,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
           </div>
 
           {/* Right Column: Product Information & Purchase (col-span-12 on mobile, col-span-6 on tablet, col-span-5 on desktop) */}
-          <div className="md:col-span-6 lg:col-span-5 px-5 sm:px-0 pt-6 md:pt-0 flex flex-col">
+          <div className="md:col-span-6 lg:col-span-5 px-3.5 min-[380px]:px-5 sm:px-0 pt-5 md:pt-0 flex flex-col">
             {/* Badge (if exists) */}
             {product.badge && (
               <span className="text-[11px] font-bold tracking-[1px] text-[#b73d67] uppercase mb-1">
@@ -129,7 +129,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
             )}
 
             {/* Product Name */}
-            <h1 className="font-serif text-[30px] sm:text-[36px] lg:text-[40px] font-medium leading-[1.1] text-[#38262e]">
+            <h1 className="font-serif text-[22px] min-[380px]:text-[26px] sm:text-[36px] lg:text-[40px] font-medium leading-[1.3] text-[#38262e]">
               {product.name}
             </h1>
 

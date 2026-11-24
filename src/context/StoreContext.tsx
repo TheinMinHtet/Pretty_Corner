@@ -127,6 +127,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const savedLang = localStorage.getItem('pretty_corner_lang') as Language;
       if (savedLang === 'en' || savedLang === 'my') {
         setLanguageState(savedLang);
+        if (typeof document !== 'undefined') {
+          document.documentElement.lang = savedLang;
+          document.documentElement.setAttribute('data-lang', savedLang);
+        }
       }
       const savedCart = localStorage.getItem('pretty_corner_cart');
       if (savedCart) {
@@ -262,6 +266,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = lang;
+      document.documentElement.setAttribute('data-lang', lang);
+    }
     try {
       localStorage.setItem('pretty_corner_lang', lang);
     } catch {}
