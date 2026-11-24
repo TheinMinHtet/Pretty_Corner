@@ -250,7 +250,7 @@ export default function HeroBannerSlider() {
                 {/* Primary CTA Button (only if custom ctaText provided) & Mobile Story Indicator */}
                 {ctaLabel ? (
                   <div
-                    className={`pt-2 sm:pt-4 flex items-center gap-2 sm:block transition-all duration-700 delay-300 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+                    className={`pt-2 sm:pt-4 flex flex-wrap sm:flex-nowrap items-center gap-1.5 min-[360px]:gap-2 sm:block max-w-full transition-all duration-700 delay-300 ease-out ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                       }`}
                   >
                     <Link
@@ -260,22 +260,22 @@ export default function HeroBannerSlider() {
                           applyPromoCode(promo.code);
                         }
                       }}
-                      className="inline-flex items-center justify-center gap-1.5 bg-[#b73d67] text-white text-[11.5px] min-[360px]:text-[12.5px] sm:text-[15px] font-bold h-[36px] min-[360px]:h-[40px] sm:h-[50px] px-3.5 min-[360px]:px-5 sm:px-8 rounded-full sm:rounded-[14px] shadow-sm hover:bg-[#982f53] active:scale-[0.98] transition-all shrink-0 cursor-pointer"
+                      className="inline-flex items-center justify-center gap-1.5 bg-[#b73d67] text-white text-[10.5px] min-[340px]:text-[11.5px] min-[360px]:text-[12.5px] sm:text-[15px] font-bold h-[34px] min-[360px]:h-[40px] sm:h-[50px] px-2.5 min-[340px]:px-3.5 min-[360px]:px-5 sm:px-8 rounded-full sm:rounded-[14px] shadow-sm hover:bg-[#982f53] active:scale-[0.98] transition-all max-w-[calc(100%-80px)] min-[380px]:max-w-none cursor-pointer"
                     >
-                      <span>{ctaLabel}</span>
-                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <span className="truncate">{ctaLabel}</span>
+                      <svg className="w-3 h-3 min-[360px]:w-3.5 min-[360px]:h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                       </svg>
                     </Link>
 
-                    {/* MOBILE-ONLY: Side-by-side Vertically Centered Story Indicator */}
+                    {/* MOBILE-ONLY: Side-by-side Vertically Centered Story Indicator (Guaranteed Zero Overflow) */}
                     {totalSlides > 1 && (
                       <div
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
                         }}
-                        className="sm:hidden inline-flex items-center gap-1.5 bg-white/90 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-[#eedfe5] shadow-2xs shrink-0 select-none"
+                        className="sm:hidden inline-flex items-center gap-1 min-[360px]:gap-1.5 bg-white/90 backdrop-blur-md px-2 min-[360px]:px-2.5 py-1 min-[360px]:py-1.5 rounded-full border border-[#eedfe5] shadow-2xs shrink-0 select-none"
                       >
                         {/* Segmented Progress Story Bars for Mobile */}
                         <div className="flex items-center gap-1">
@@ -295,7 +295,7 @@ export default function HeroBannerSlider() {
                                 className="py-0.5 px-0.5 flex items-center cursor-pointer focus:outline-none"
                               >
                                 <div
-                                  className={`h-1.5 rounded-full overflow-hidden transition-all duration-300 ${isCurrent ? 'w-5 bg-[#eedfe5]' : 'w-2 bg-[#eedfe5]/75'
+                                  className={`h-1.5 rounded-full overflow-hidden transition-all duration-300 ${isCurrent ? 'w-3.5 min-[360px]:w-5 bg-[#eedfe5]' : 'w-1.5 min-[360px]:w-2 bg-[#eedfe5]/75'
                                     }`}
                                 >
                                   {isCurrent && (
@@ -317,13 +317,13 @@ export default function HeroBannerSlider() {
                         </div>
 
                         {/* Mobile Slide Index Counter */}
-                        <div className="flex items-center gap-1 pl-1 border-l border-[#eedfe5] text-[10px] font-mono font-bold text-[#514149] leading-none">
+                        <div className="flex items-center gap-0.5 min-[360px]:gap-1 pl-1 border-l border-[#eedfe5] text-[9px] min-[360px]:text-[10px] font-mono font-bold text-[#514149] leading-none shrink-0">
                           <span>
                             0{currentIndex + 1}/0{totalSlides}
                           </span>
                           {isPaused && (
                             <span
-                              className="w-1.5 h-1.5 rounded-full bg-[#b73d67] animate-pulse"
+                              className="w-1.5 h-1.5 rounded-full bg-[#b73d67] animate-pulse shrink-0"
                               title={language === 'my' ? 'ခေတ္တရပ်ထားသည်' : 'Paused'}
                             />
                           )}
