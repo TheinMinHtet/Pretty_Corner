@@ -79,12 +79,12 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
               </ul>
             </div>
 
-            {/* Column 3: Payment & Delivery */}
-            <div className="flex flex-col items-start text-left">
+            {/* Column 3: Payment & Delivery (Flush right on mobile for even edge balance) */}
+            <div className="flex flex-col items-end sm:items-start text-right sm:text-left justify-self-end sm:justify-self-start">
               <h4 className="font-serif text-[14px] min-[360px]:text-[14.5px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight whitespace-nowrap">
                 {t.paymentAndDelivery}
               </h4>
-              <div className="flex flex-col sm:flex-row sm:flex-wrap items-start gap-1.5 sm:gap-2 text-[10.5px] sm:text-[12px] font-medium text-[#38262e] max-w-full">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap items-end sm:items-start gap-1.5 sm:gap-2 text-[10.5px] sm:text-[12px] font-medium text-[#38262e] max-w-full">
                 <span className="bg-white border border-[#eedfe5] px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 text-[10.5px] sm:text-[12px] whitespace-nowrap">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] shrink-0" />
                   <span>{t.mobileBanking}</span>
