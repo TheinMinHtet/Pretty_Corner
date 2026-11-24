@@ -421,7 +421,7 @@ export const translations: Record<Language, TranslationSchema> = {
     navShop: 'ပစ္စည်းများ',
     navReceipt: 'ပြေစာ',
     navContact: 'ဆက်သွယ်ရန်',
-    navBag: 'စျေးဝယ်အိတ်',
+    navBag: 'အိတ်',
 
     // Hero Section
     heroBadge: 'စိတ်တိုင်းကျလှပစေမယ့် သီးသန့်ထောင့်စွန်းလေး',
