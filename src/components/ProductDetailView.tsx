@@ -152,14 +152,14 @@ export default function ProductDetailView({ product }: { product: Product }) {
             <div className="mt-6 pt-6 border-t border-[#eedfe5]">
               <div className="flex items-center gap-2 sm:gap-4">
                 {/* Quantity Selector */}
-                <div className="h-[46px] sm:h-[52px] w-[84px] sm:w-[110px] border border-[#eedfe5] rounded-[10px] flex items-center justify-between px-2 sm:px-3 text-[#38262e] bg-white shrink-0">
+                <div className="h-[46px] sm:h-[52px] w-[76px] sm:w-[110px] border border-[#eedfe5] rounded-[10px] flex items-center justify-between px-1.5 sm:px-3 text-[#38262e] bg-white shrink-0">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="p-1 hover:text-[#b73d67] text-[18px] sm:text-[20px] font-medium cursor-pointer"
                   >
                     −
                   </button>
-                  <span className="text-[14px] sm:text-[16px] font-semibold">{quantity}</span>
+                  <span className="text-[13.5px] sm:text-[16px] font-semibold">{quantity}</span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
                     className="p-1 hover:text-[#b73d67] text-[18px] sm:text-[20px] font-medium cursor-pointer"
@@ -171,9 +171,9 @@ export default function ProductDetailView({ product }: { product: Product }) {
                 {/* Big Add to Bag Button */}
                 <button
                   onClick={handleAddToCart}
-                  className={`flex-1 min-w-0 h-[46px] sm:h-[52px] px-2.5 sm:px-4 ${
+                  className={`flex-1 min-w-0 h-[46px] sm:h-[52px] px-2 sm:px-4 ${
                     isAdded ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-[#b73d67] hover:bg-[#a33259]'
-                  } text-white rounded-[10px] font-bold text-[13px] sm:text-[15px] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer whitespace-nowrap`}
+                  } text-white rounded-[10px] font-bold text-[12px] min-[360px]:text-[13px] sm:text-[15px] active:scale-[0.98] transition-all flex items-center justify-center gap-1 sm:gap-2 shadow-sm cursor-pointer whitespace-nowrap`}
                 >
                   {isAdded ? (
                     <>
@@ -185,7 +185,7 @@ export default function ProductDetailView({ product }: { product: Product }) {
                   ) : (
                     <>
                       <span className="whitespace-nowrap">{t.addToBag}</span>
-                      <span className="opacity-90 font-medium whitespace-nowrap text-[12px] sm:text-[14px]">· {totalPrice.toLocaleString()} MMK</span>
+                      <span className="opacity-90 font-medium whitespace-nowrap text-[11px] min-[360px]:text-[12px] sm:text-[14px]">· {totalPrice.toLocaleString()} MMK</span>
                     </>
                   )}
                 </button>

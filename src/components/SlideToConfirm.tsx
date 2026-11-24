@@ -122,7 +122,7 @@ export default function SlideToConfirm({
 
   return (
     <div className="fixed inset-0 z-50 bg-[#38262e]/35 backdrop-blur-md flex items-end sm:items-center justify-center p-3 sm:p-5 transition-all duration-300 animate-in fade-in">
-      <div className="w-full max-w-[400px] bg-white border border-[#eedfe5] rounded-[32px] p-6 sm:p-8 shadow-[0_24px_64px_-12px_rgba(56,38,46,0.18)] flex flex-col items-center text-center text-[#38262e] relative overflow-hidden">
+      <div className="w-full max-w-[400px] bg-white border border-[#eedfe5] rounded-[28px] sm:rounded-[32px] p-5 sm:p-8 shadow-[0_24px_64px_-12px_rgba(56,38,46,0.18)] flex flex-col items-center text-center text-[#38262e] relative overflow-hidden">
         {/* Soft background ambient glow */}
         <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-36 bg-[#fceef2] rounded-full blur-2xl pointer-events-none opacity-80" />
 
@@ -165,7 +165,7 @@ export default function SlideToConfirm({
         <div className="w-full mt-6">
           <div
             ref={trackRef}
-            className="w-full h-15 bg-[#fcf9fa] border border-[#eedfe5] rounded-full relative p-1 flex items-center select-none overflow-hidden touch-none shadow-inner"
+            className="w-full h-14 bg-[#fcf9fa] border border-[#eedfe5] rounded-full relative p-1 flex items-center select-none overflow-hidden touch-none shadow-inner"
           >
             {/* Filled Background Progress */}
             <div
@@ -177,9 +177,9 @@ export default function SlideToConfirm({
               style={{ width: `${Math.max(12, dragProgress * 100)}%` }}
             />
 
-            {/* Hint Text Inside Track */}
+            {/* Hint Text Inside Track (Safe from knob overlap with pl-15) */}
             <div
-              className="w-full pl-14 sm:pl-16 pr-3 text-center text-[12px] sm:text-[13px] font-medium text-[#7a6870] pointer-events-none transition-opacity duration-150 flex items-center justify-center gap-1.5 whitespace-nowrap"
+              className="w-full pl-15 sm:pl-16 pr-3 text-center text-[11px] min-[360px]:text-[12px] sm:text-[13px] font-medium text-[#7a6870] pointer-events-none transition-opacity duration-150 flex items-center justify-center gap-1.5 whitespace-nowrap overflow-hidden text-ellipsis"
               style={{ opacity: Math.max(0, 1 - dragProgress * 1.5) }}
             >
               {isSubmitting ? (
@@ -189,7 +189,7 @@ export default function SlideToConfirm({
                 </span>
               ) : (
                 <>
-                  <span className="whitespace-nowrap">{promptText}</span>
+                  <span className="whitespace-nowrap truncate">{promptText}</span>
                   <svg className="w-3.5 h-3.5 text-[#b73d67]/70 animate-pulse hidden sm:inline shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
@@ -208,7 +208,7 @@ export default function SlideToConfirm({
                 transform: `translateX(${knobOffsetPx}px)`,
                 transition: isDragging ? 'none' : 'transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1)',
               }}
-              className={`absolute left-1 top-1 bottom-1 w-13 h-13 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing shrink-0 z-10 transition-colors shadow-[0_4px_14px_rgba(183,61,103,0.25)] ${
+              className={`absolute left-1 top-1 bottom-1 w-12 h-12 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing shrink-0 z-10 transition-colors shadow-[0_3px_10px_rgba(183,61,103,0.22)] ${
                 confirmed
                   ? 'bg-emerald-500 text-white shadow-[0_4px_14px_rgba(16,185,129,0.35)]'
                   : isSubmitting

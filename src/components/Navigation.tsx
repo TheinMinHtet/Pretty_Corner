@@ -82,17 +82,17 @@ export default function Navigation() {
           href="/order-lookup"
           aria-label={t.navReceipt}
           title={t.navReceipt}
-          className={`flex flex-col items-center justify-center flex-1 min-w-[56px] max-w-[76px] py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 max-w-[60px] sm:max-w-[68px] py-0.5 sm:py-1 transition-colors ${
             isReceipt ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
-          <svg className="w-[22px] h-[22px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-[20px] h-[20px] sm:w-[22px] sm:h-[22px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z" />
             <path d="M8 7h8" />
             <path d="M8 11h8" />
             <path d="M8 15h5" />
           </svg>
-          <span className={`text-[10px] sm:text-[10.5px] mt-0.5 tracking-tight whitespace-nowrap text-center ${isReceipt ? 'font-bold' : 'font-medium'}`}>
+          <span className={`text-[9.5px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 text-center ${isReceipt ? 'font-bold' : 'font-medium'}`}>
             {t.navReceipt}
           </span>
         </Link>

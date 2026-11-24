@@ -674,10 +674,10 @@ export default function CheckoutPage() {
         <SlideToConfirm
           amount={grandTotal}
           currency="MMK"
-          title="ORDER CONFIRMATION"
-          subtitle="Total amount (Cash on Delivery)"
-          promptText="Slide to confirm order"
-          cancelText="Cancel"
+          title={language === 'my' ? 'အော်ဒါ အတည်ပြုချက်' : 'ORDER CONFIRMATION'}
+          subtitle={language === 'my' ? 'ကျသင့်ငွေ (ပစ္စည်းရောက်မှငွေချေ)' : 'Total amount (Cash on Delivery)'}
+          promptText={language === 'my' ? 'အတည်ပြုရန် ညာဘက်ဆွဲပါ' : 'Slide to confirm order'}
+          cancelText={t.cancel}
           isSubmitting={isSubmitting}
           onConfirm={async () => {
             await processPlaceOrder(true);

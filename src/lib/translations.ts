@@ -419,7 +419,7 @@ export const translations: Record<Language, TranslationSchema> = {
     // Navigation & Tabs
     navHome: 'ပင်မ',
     navShop: 'ပစ္စည်းများ',
-    navReceipt: 'ပြေစာကြည့်ရန်',
+    navReceipt: 'ပြေစာ',
     navContact: 'ဆက်သွယ်ရန်',
     navBag: 'စျေးဝယ်အိတ်',
 

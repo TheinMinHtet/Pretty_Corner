@@ -31,81 +31,40 @@
   font-family: var(--font-dmsans), "Pyidaungsu", "Padauk", "Myanmar Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Myanmar Typography Enhancements:
-   Myanmar script occupies larger vertical space and width per character.
-   When Myanmar language is active (`lang="my"` or `.lang-my`), we slightly scale down
-   font size and improve line-height and word-break so sentences remain balanced and uncluttered. */
-html[lang="my"],
-.lang-my {
-  font-size: 91.5%;
-  line-height: 1.6;
-  letter-spacing: -0.01em;
-  word-break: break-word;
-}
-
-html[lang="my"] h1,
-.lang-my h1 {
-  font-size: 0.9em;
-  line-height: 1.35;
-}
-
-html[lang="my"] h2,
-.lang-my h2 {
-  font-size: 0.9em;
-  line-height: 1.4;
-}
-
-html[lang="my"] h3,
-.lang-my h3 {
-  font-size: 0.92em;
-  line-height: 1.45;
-}
-
-html[lang="my"] p,
-.lang-my p {
-  line-height: 1.68;
-}
-
-html[lang="my"] button,
-.lang-my button {
-  letter-spacing: normal;
-}
-
-.font-myanmar {
-  font-family: var(--font-myanmar), -apple-system, sans-serif;
-}
-
 /* ==========================================================================
-   Myanmar Typography & UX Enhancements
+   Myanmar Typography & Layout Harmonization
+   - Matches English visual weight, layout, margins, and hierarchy
+   - Scaled slightly smaller (~92%) to compensate for Myanmar script's optical bulk
+   - Retains line-height and word-wrapping down to 320px/322px without UI breakage
    ========================================================================== */
+html[lang="my"],
+[data-lang="my"],
+.lang-my {
+  font-size: 92%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
 html[lang="my"] body,
-[data-lang="my"] body {
+[data-lang="my"] body,
+.lang-my body {
   font-family: var(--font-myanmar), var(--font-dmsans), sans-serif;
-  line-height: 1.75;
+  line-height: 1.55;
 }
 
 html[lang="my"] .font-serif,
-[data-lang="my"] .font-serif {
+[data-lang="my"] .font-serif,
+.lang-my .font-serif {
   font-family: var(--font-myanmar), var(--font-cormorant), Georgia, serif;
 }
 
 html[lang="my"] .font-sans,
-[data-lang="my"] .font-sans {
+[data-lang="my"] .font-sans,
+.lang-my .font-sans {
   font-family: var(--font-myanmar), var(--font-dmsans), sans-serif;
 }
 
-/* Prevent uppercase tracking from breaking Burmese conjuncts and diacritics */
-html[lang="my"] .tracking-wider,
-html[lang="my"] .tracking-widest,
-html[lang="my"] .tracking-\[1\.2px\],
-html[lang="my"] .tracking-\[2px\],
-[data-lang="my"] .tracking-wider,
-[data-lang="my"] .tracking-widest {
-  letter-spacing: normal !important;
-  text-transform: none !important;
-}
-
-/* Burmese Headings & Paragraphs spacing balance */
+/* Headings scale proportionally with English while keeping the same margins and weights */
 html[lang="my"] h1,
 html[lang="my"] h2,
 html[lang="my"] h3,
@@ -113,72 +72,48 @@ html[lang="my"] h4,
 [data-lang="my"] h1,
 [data-lang="my"] h2,
 [data-lang="my"] h3,
-[data-lang="my"] h4 {
-  line-height: 1.48;
-  text-wrap: balance;
+[data-lang="my"] h4,
+.lang-my h1,
+.lang-my h2,
+.lang-my h3,
+.lang-my h4 {
+  font-size: 0.94em;
+  line-height: 1.38;
   letter-spacing: normal !important;
 }
 
-/* Ensure distinct optical separation between headings and following paragraphs */
-html[lang="my"] h1 + p,
-html[lang="my"] h2 + p,
-html[lang="my"] h3 + p,
-html[lang="my"] h4 + p,
-[data-lang="my"] h1 + p,
-[data-lang="my"] h2 + p,
-[data-lang="my"] h3 + p,
-[data-lang="my"] h4 + p {
-  margin-top: 0.75rem !important;
-  line-height: 1.82 !important;
-  word-spacing: 0.04em;
-}
-
-/* Consecutive paragraphs spacing */
-html[lang="my"] p + p,
-[data-lang="my"] p + p {
-  margin-top: 0.85rem !important;
-}
-
+/* Paragraphs and text elements: retain component-defined margins and classes,
+   with clean Burmese line-height preventing clipping without spreading */
 html[lang="my"] p,
-[data-lang="my"] p {
-  text-wrap: pretty;
-  line-height: 1.82 !important;
+[data-lang="my"] p,
+.lang-my p {
+  line-height: 1.55;
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
-/* Compact mobile view (≤ 380px) responsive typographic scaling */
-@media (max-width: 380px) {
-  html[lang="my"] h1 {
-    font-size: clamp(20px, 6vw, 24px) !important;
-    line-height: 1.45 !important;
-  }
-  html[lang="my"] h2 {
-    font-size: clamp(17px, 5.2vw, 21px) !important;
-    line-height: 1.45 !important;
-  }
-  html[lang="my"] h3 {
-    font-size: clamp(15px, 4.8vw, 18px) !important;
-    line-height: 1.45 !important;
-  }
-  html[lang="my"] h4 {
-    font-size: clamp(14px, 4.4vw, 16px) !important;
-    line-height: 1.45 !important;
-  }
-  html[lang="my"] p {
-    font-size: 13px !important;
-    line-height: 1.8 !important;
-  }
-  html[lang="my"] h1 + p,
-  html[lang="my"] h2 + p,
-  html[lang="my"] h3 + p,
-  html[lang="my"] h4 + p,
-  [data-lang="my"] h1 + p,
-  [data-lang="my"] h2 + p,
-  [data-lang="my"] h3 + p,
-  [data-lang="my"] h4 + p {
-    margin-top: 0.65rem !important;
-  }
+html[lang="my"] button,
+[data-lang="my"] button,
+.lang-my button {
+  letter-spacing: normal;
+}
+
+/* Prevent uppercase tracking from breaking Burmese conjuncts and diacritics */
+html[lang="my"] .tracking-wider,
+html[lang="my"] .tracking-widest,
+html[lang="my"] .tracking-\[1\.2px\],
+html[lang="my"] .tracking-\[1\.5px\],
+html[lang="my"] .tracking-\[2px\],
+[data-lang="my"] .tracking-wider,
+[data-lang="my"] .tracking-widest,
+.lang-my .tracking-wider,
+.lang-my .tracking-widest {
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+.font-myanmar {
+  font-family: var(--font-myanmar), -apple-system, sans-serif;
 }
 
 /* Hide scrollbar for category pills / horizontal scroll */

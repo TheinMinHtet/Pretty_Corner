@@ -13,7 +13,7 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
     <footer className="w-full bg-[#fdfafb] border-t border-[#eedfe5] mt-auto">
       {/* 1. Main Footer Grid: Balanced layout with Customer Care & Payment side-by-side on mobile */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-7 sm:pt-9 pb-6 sm:pb-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-12 items-start">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 lg:gap-12 items-start">
           {/* Column 1: Brand & Follow Us (Full-width on mobile, 1 col on desktop) */}
           <div className="col-span-2 md:col-span-1 flex flex-col items-center sm:items-start text-center sm:text-left">
             <Link href="/" className="inline-block group">
@@ -82,14 +82,14 @@ export default function Footer({ hasBottomNav = false }: { hasBottomNav?: boolea
             <h4 className="font-serif text-[14.5px] sm:text-[17px] font-semibold text-[#38262e] mb-2 sm:mb-3 tracking-tight">
               {t.paymentAndDelivery}
             </h4>
-            <div className="flex flex-col sm:flex-row sm:flex-wrap items-start gap-1.5 sm:gap-2 text-[11px] sm:text-[12px] font-medium text-[#38262e]">
-              <span className="bg-white border border-[#eedfe5] px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 whitespace-nowrap">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap items-start gap-1.5 sm:gap-2 text-[10.5px] sm:text-[12px] font-medium text-[#38262e] max-w-full">
+              <span className="bg-white border border-[#eedfe5] px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 truncate max-w-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#b73d67] shrink-0" />
-                {t.mobileBanking}
+                <span className="truncate">{t.mobileBanking}</span>
               </span>
-              <span className="bg-white border border-[#eedfe5] px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 whitespace-nowrap">
+              <span className="bg-white border border-[#eedfe5] px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg shadow-2xs inline-flex items-center gap-1.5 truncate max-w-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#3b775d] shrink-0" />
-                {t.cod}
+                <span className="truncate">{t.cod}</span>
               </span>
             </div>
           </div>
