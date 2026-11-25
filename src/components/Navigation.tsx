@@ -20,11 +20,11 @@ export default function Navigation() {
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 w-full bg-white/98 backdrop-blur-md z-40 border-t border-[#eedfe5] shadow-lg pb-[env(safe-area-inset-bottom,0px)]">
-      <div className="h-[54px] sm:h-[58px] max-w-md sm:max-w-lg mx-auto flex items-center justify-around px-0.5 sm:px-2">
+      <div className="h-[56px] sm:h-[58px] max-w-md sm:max-w-lg mx-auto flex items-center justify-around px-1 sm:px-2">
         {/* Home Tab */}
         <Link
           href="/"
-          className={`flex flex-col items-center justify-center flex-1 max-w-[60px] sm:max-w-[68px] py-0.5 sm:py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 min-w-0 max-w-[64px] min-[360px]:max-w-[72px] sm:max-w-[80px] py-1 transition-colors ${
             isHome ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
@@ -40,7 +40,7 @@ export default function Navigation() {
         {/* Shop Tab */}
         <Link
           href="/shop"
-          className={`flex flex-col items-center justify-center flex-1 max-w-[60px] sm:max-w-[68px] py-0.5 sm:py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 min-w-0 max-w-[64px] min-[360px]:max-w-[72px] sm:max-w-[80px] py-1 transition-colors ${
             isShop ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
@@ -58,7 +58,7 @@ export default function Navigation() {
         {/* Bag Tab */}
         <Link
           href="/bag"
-          className={`flex flex-col items-center justify-center flex-1 max-w-[60px] sm:max-w-[68px] py-0.5 sm:py-1 transition-colors relative ${
+          className={`flex flex-col items-center justify-center flex-1 min-w-0 max-w-[64px] min-[360px]:max-w-[72px] sm:max-w-[80px] py-1 transition-colors relative ${
             isBag ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
@@ -82,7 +82,7 @@ export default function Navigation() {
           href="/order-lookup"
           aria-label={t.navReceipt}
           title={t.navReceipt}
-          className={`flex flex-col items-center justify-center flex-1 max-w-[60px] sm:max-w-[68px] py-0.5 sm:py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 min-w-0 max-w-[78px] min-[360px]:max-w-[86px] sm:max-w-[94px] py-1 transition-colors ${
             isReceipt ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
@@ -92,7 +92,7 @@ export default function Navigation() {
             <path d="M8 11h8" />
             <path d="M8 15h5" />
           </svg>
-          <span className={`text-[9.5px] sm:text-[10.5px] mt-0.5 tracking-tight truncate max-w-full px-0.5 text-center ${isReceipt ? 'font-bold' : 'font-medium'}`}>
+          <span className={`text-[8.5px] min-[340px]:text-[9px] min-[370px]:text-[10px] sm:text-[10.5px] mt-0.5 tracking-tight whitespace-nowrap text-center ${isReceipt ? 'font-bold' : 'font-medium'}`}>
             {t.navReceipt}
           </span>
         </Link>
@@ -100,7 +100,7 @@ export default function Navigation() {
         {/* Contact Tab */}
         <Link
           href="/contact"
-          className={`flex flex-col items-center justify-center flex-1 max-w-[60px] sm:max-w-[68px] py-0.5 sm:py-1 transition-colors ${
+          className={`flex flex-col items-center justify-center flex-1 min-w-0 max-w-[64px] min-[360px]:max-w-[72px] sm:max-w-[80px] py-1 transition-colors ${
             isContact ? 'text-[#b73d67]' : 'text-[#7a6870] hover:text-[#38262e]'
           }`}
         >
